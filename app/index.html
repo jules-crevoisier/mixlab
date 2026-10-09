@@ -2,7 +2,7 @@
 <title>Mixlab</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
 <style>
 /* Mixlab · écran plein, panneaux denses sur fond quasi noir, comme en cabine.
    La grille des panneaux est recomposée en JS selon la disposition choisie. */
@@ -317,13 +317,124 @@ kbd{font:500 10px var(--num);border:1px solid var(--ln2);border-bottom-width:2px
   .mx{flex-wrap:wrap}
 }
 @media (prefers-reduced-motion:reduce){.flash,.tb.rec.on i,.learn [data-ctl].sel::after{animation:none}}
+
+/* =====================================================================
+   Thème v3 : d'après l'analyse des logiciels du marché.
+   Surfaces calmes en 3 niveaux, couleurs réservées aux platines, aux
+   waveforms et aux cues ; chiffres à chasse fixe ; états allumé / contour.
+   ===================================================================== */
+:root{
+  --bg:#0a0b0d;--s1:#131519;--s2:#181b20;--s3:#21252c;--ln:#1d2026;--ln2:#2a2e36;
+  --tx:#d9dde3;--mu:#8d94a0;--dim:#5d636e;--white:#f5f7fa;
+  --A:#2ec5e8;--B:#ff8f3a;--C:#ff5fa2;--D:#3fd68f;
+  --cue:#f5b83d;--coach:#a78bfa;
+  --ui:Inter,"Segoe UI",system-ui,sans-serif;
+  --num:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:7px;
+}
+body{font:500 11px/1.3 var(--ui);letter-spacing:.005em;background:var(--bg)}
+#top{background:#0d0e11;border-bottom:1px solid var(--ln);min-height:40px;gap:8px;padding:5px 10px}
+.brand{font:800 13px var(--ui);letter-spacing:.34em}
+.seg{background:#0f1114;border:1px solid var(--ln);border-radius:var(--r);padding:2px;gap:2px}
+.seg button{border-radius:5px;padding:4px 10px;font-size:10px;letter-spacing:.08em}
+.seg button+button{border-left:0}
+.seg button[aria-pressed="true"]{background:var(--s3);color:var(--white);box-shadow:none}
+.tb{border-radius:var(--r);background:#121418;border-color:var(--ln);padding:5px 10px}
+.tb:hover{border-color:var(--ln2);color:var(--tx)}
+.mclock{border:0;background:#121418;border-radius:var(--r);padding:4px 10px}
+.mclock b{font:600 14px var(--num)}
+#app{gap:6px;padding:6px}
+.pnl{background:linear-gradient(180deg,#15171c,#121418);border:1px solid var(--ln);border-radius:10px}
+.lbl{font-size:9px;letter-spacing:.16em}
+
+/* boutons : contour au repos, allumé quand actif */
+.b{background:#181b20;border:1px solid #262a31;border-radius:6px;color:#a2a9b4;height:26px;font-size:10px;letter-spacing:.08em;transition:background .08s,border-color .08s,color .08s}
+.b:hover{background:#1e2228;border-color:#323741;color:var(--tx)}
+.b.on{background:color-mix(in srgb,var(--dc,#fff) 16%,#181b20);color:var(--dc,var(--white));border-color:color-mix(in srgb,var(--dc,#fff) 55%,transparent);box-shadow:none}
+.b.big{height:46px;border-radius:9px;font-size:12px;letter-spacing:.14em}
+.b.cue{color:var(--cue);border-color:color-mix(in srgb,var(--cue) 45%,transparent);background:#1a1912}
+.b.cue.on{background:var(--cue);color:#1a1405;border-color:var(--cue)}
+.b.play{color:var(--dc);border-color:color-mix(in srgb,var(--dc) 45%,transparent);background:color-mix(in srgb,var(--dc) 7%,#181b20)}
+.b.play.on{background:var(--dc);color:#061017;box-shadow:0 0 18px color-mix(in srgb,var(--dc) 35%,transparent)}
+.b.play svg{width:18px;height:18px}
+select.sel{background:#181b20;border:1px solid #262a31;border-radius:6px;height:24px;font-size:10.5px;padding:0 4px}
+
+/* potards : arc fin à la couleur de la platine */
+.kn svg{width:32px;height:32px}
+.kn .tr{stroke:#262a31;stroke-width:2.5}
+.kn .vl{stroke-width:2.5}
+.kn span{font-size:8.5px;letter-spacing:.14em}
+
+/* waveforms */
+#p-wave{background:#08090b;padding:4px;gap:4px}
+.lane{background:#07080a;border-radius:7px}
+.dk-ov{height:34px;background:#07080a;border-radius:6px;overflow:hidden}
+.dk-wave{background:#07080a;border-radius:6px}
+
+/* platine : BPM en gros, temps, tonalité en couleur */
+.deck{padding:10px;gap:8px}
+.deck.isMaster{border-color:color-mix(in srgb,var(--dc) 40%,var(--ln));box-shadow:inset 0 2px 0 var(--dc)}
+.dk-id{width:26px;height:26px;border-radius:7px;font:800 14px var(--ui)}
+.dk-title{font-size:14px;font-weight:700}
+.dk-artist{font-size:11.5px}
+.dk-stat .lbl{font-size:8px}
+.dk-stat b{font:700 26px var(--num);letter-spacing:-.02em}
+.dk-stat b.key{font-size:18px}
+.dk-stat b.key.ok::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ok);margin-left:5px;vertical-align:middle;box-shadow:0 0 6px var(--ok)}
+.dk-stat b.time{font-size:18px}
+.dk-stat b.time.end{animation:blink .8s infinite}
+.pv{font:600 11px var(--num)}
+.fd::-webkit-slider-runnable-track{background:#08090b;border:1px solid #262a31;border-radius:4px}
+.fd::-webkit-slider-thumb{background:linear-gradient(#59606d,#2d3139);border:1px solid #050608;border-radius:4px}
+.fd.v::-webkit-slider-thumb{width:28px;height:14px;margin-left:-12px}
+.fd.v.pitch::-webkit-slider-thumb{box-shadow:inset 0 -2px 0 var(--dc)}
+
+/* pads 2×4 : couleur du cue, plus vive à l'appui */
+.tabs{gap:3px}
+.tabs .b{height:22px;font-size:9px;border-radius:5px}
+.tabs .b[aria-pressed="true"]{color:var(--white);background:var(--s3);border-color:var(--ln2)}
+.pads{gap:5px}
+.pad{height:38px;border-radius:7px;background:#16191e;border-color:#23272e;color:#5d636e;font:600 11px var(--num)}
+.pad.set{background:color-mix(in srgb,var(--hc) 72%,#000);border-color:color-mix(in srgb,var(--hc) 90%,#fff);color:#0a0b0d;box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
+.pad.lit{background:var(--hc);box-shadow:0 0 16px color-mix(in srgb,var(--hc) 55%,transparent)}
+.compact .pad{height:28px}
+.dk-loop .sz{font:700 12px var(--num)}
+
+/* mixer */
+#p-mixer{padding:10px 8px 8px}
+.ch .nm{font:800 13px var(--ui)}
+.ch .kill{border-radius:3px}
+.mst{border-color:var(--ln)}
+.vu{border-radius:2px}
+.xf{border-top-color:var(--ln)}
+
+/* bibliothèque : dense, tonalités en pastilles colorées */
+#p-lib{grid-template-columns:190px minmax(0,1fr)}
+.side{background:#101215;border-right-color:var(--ln)}
+.side button.it{font-size:12.5px;padding:5px 12px;border-radius:0}
+.side button.it[aria-current="true"]{background:var(--s3);box-shadow:inset 2px 0 0 var(--white)}
+.libbar{padding:6px 8px;gap:8px}
+.libbar input[type=search]{background:#0c0d10;border-radius:7px;height:28px;font-size:12.5px;max-width:380px}
+.lt{font-size:12.5px}
+.lt th{background:#121418;font-size:9px;padding:6px 10px}
+.lt td{padding:5px 10px;border-bottom-color:#16181d}
+.lt tbody tr:nth-child(even){background:#111317}
+.lt tbody tr:hover{background:#1a1d23}
+.lt tbody tr.sel{background:#1f2632;box-shadow:inset 2px 0 0 var(--white)}
+.kchip{display:inline-block;min-width:30px;text-align:center;padding:1px 5px;border-radius:4px;font:700 11px var(--num);color:#0a0b0d;background:var(--kc)}
+.lt td.okk .kchip{outline:2px solid var(--ok);outline-offset:1px}
+
+/* coach */
+#p-coach{background:#0e0f13;border-left-color:var(--ln);padding:12px 14px}
+.live,.lcard{border-radius:9px;border-color:var(--ln)}
+.go{border-radius:6px;padding:6px 12px}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><radialGradient id="capg" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#4a505c"/><stop offset="1" stop-color="#16181d"/></radialGradient></defs></svg>
 
 <div id="root">
   <header id="top">
-    <div class="brand">MIXLAB<small>prototype</small></div>
+    <div class="brand">MIXLAB</div>
     <div class="seg" id="presets" role="group" aria-label="Disposition"></div>
     <div class="seg" id="ndecks" role="group" aria-label="Nombre de platines"><button data-n="2">2 platines</button><button data-n="4">4 platines</button></div>
     <details class="menu"><summary class="tb">Panneaux</summary><div class="pop" id="panels-pop"></div></details>

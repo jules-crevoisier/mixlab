@@ -89,10 +89,11 @@ Objectif : brancher **n'importe quelle table** et jouer, sans attendre qu'un éd
 
 | Preset | Ergonomie reprise |
 |---|---|
-| **Studio** | Waveforms empilées en haut, deux platines de part et d'autre d'un mixer central, bibliothèque en bas. La disposition la plus répandue. |
-| **Scène** | Waveforms très grandes, mixer masqué (pour qui mixe sur la table physique), contrôles réduits à l'essentiel. |
-| **Console** | Mixer large au centre comme une table de club, platines verticales autour. |
-| **École** | Disposition Studio + panneau Coach ouvert et aides visuelles (phase, phrases, alerte basses). |
+| **Performance** | Waveforms parallèles en haut, grandes platines de part et d'autre d'un mixer central, bibliothèque dessous (ergonomie proche de Serato DJ Pro). |
+| **Export** | Préparation : grande bibliothèque, grande waveform, cues et grille (ergonomie proche du mode Export de rekordbox). |
+| **Studio** | Effets en haut, waveform par platine, platines compactes (ergonomie proche de Traktor Pro 4). |
+| **Mix** | Waveforms en haut, platines et mixer au centre, bibliothèque dessous (ergonomie proche de VirtualDJ). |
+| **École** | Disposition Mix + panneau Coach ouvert et aides visuelles (phase, phrases, alerte basses). |
 
 - **Point juridique** : on reprend l'*ergonomie* (placement des éléments, conventions du métier comme « platine A à gauche, waveforms en haut »), qui n'est pas protégeable. On ne reprend **ni les noms, ni les logos, ni les couleurs et l'habillage exacts** des logiciels existants (habillage commercial protégé). Les presets portent nos propres noms. À faire valider par un juriste avant la sortie publique.
 - Les utilisateurs peuvent enregistrer leurs propres dispositions et les partager.
