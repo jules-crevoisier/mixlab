@@ -77,10 +77,10 @@ window.Coach=(()=>{
     const el=$('#coach-live');el.innerHTML='';
     const mkPhr=d=>{const bars=h('div',{class:'bars'});for(let i=0;i<8;i++)bars.append(h('i'));const beats=h('div',{class:'beats'});for(let i=0;i<4;i++)beats.append(h('i'));live['p'+d.id]={bars,beats,txt:h('span',{class:'v'},'')};
       return h('div',{class:'lr',style:`--dc:var(--${d.id})`},h('span',{class:'lbl',style:'color:var(--dc)'},'Phrase '+d.id),h('div',{class:'phr'},bars,beats,live['p'+d.id].txt));};
-    live.tempo=h('span',{class:'v'},'');live.nd=h('div',{class:'nd'});live.ph=h('span',{class:'v'},'');live.alerts=h('div',{style:'display:grid;gap:4px'});
+    live.tempo=h('span',{class:'v'},'');live.nd=h('div',{class:'nd'});live.ph=h('span',{class:'v'},'');
     el.append(h('div',{class:'lr'},h('span',{class:'lbl'},'Tempo'),live.tempo),
       h('div',{class:'lr'},h('span',{class:'lbl'},'Phase'),h('div',{style:'display:grid;gap:3px'},h('div',{class:'phase',title:'Décalage entre les temps de A et de B. L’aiguille doit rester dans la zone verte.'},h('div',{class:'okz'}),live.nd),live.ph)),
-      mkPhr(A()),mkPhr(B()),live.alerts);
+      mkPhr(A()),mkPhr(B()));
     render();
   }
   function render(){
@@ -121,12 +121,7 @@ window.Coach=(()=>{
       [...p.beats.children].forEach((e,i)=>{e.className=bi&&!bi.pre&&i<=bi.beat?'on':'';});
       p.txt.textContent=!bi?'—':bi.pre?'intro':`P${bi.phrase+1} · ${bi.barIn+1}/8`;
     }
-    const al=[];
-    if(audible(a)&&audible(b)&&bassOn(a)&&bassOn(b)){clash+=dt;al.push(['','Basses qui se battent : les deux pistes passent avec leurs graves. Baisse le LOW de l’une des deux.']);}
-    if(level(bus.anL)>.98||level(bus.anR)>.98)al.push(['','Ça sature : baisse le GAIN des voies ou le MASTER.']);
-    if(audible(a)&&audible(b)&&a.track&&b.track&&Math.abs(b.bpm-a.bpm)>.1)al.push(['warn','Les tempos ne sont pas calés : ça va « galoper ».']);
-    const key=al.map(x=>x[1]).join('|');
-    if(key!==live.lastAl){live.lastAl=key;live.alerts.innerHTML='';al.forEach(([c,t])=>live.alerts.append(h('div',{class:'alert '+c},t)));}
+    if(audible(a)&&audible(b)&&bassOn(a)&&bassOn(b))clash+=dt;
     const les=L.active;if(!les||L.done)return;
     const s=les.steps[L.i];
     if(les.id==='swap'&&L.i===5){const st=L.stats,now=ctx.currentTime;if(st.tA==null&&!bassOn(a))st.tA=now;if(st.tB==null&&b.p.low>=.45&&!b.p.kill.low)st.tB=now;}

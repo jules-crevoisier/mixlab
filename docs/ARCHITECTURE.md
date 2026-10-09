@@ -25,7 +25,7 @@ engine/     moteur audio Rust (crate mixlab-engine)
   engine    4 platines, crossfader (3 courbes), limiteur master, bus casque
             (mélange cue/master), commandes sans verrou, état atomique pour l'UI
   device    sorties carte son (cpal) : stéréo, 4 canaux, ou deux cartes
-src-tauri/  (à venir) fenêtre Tauri, commandes invoke() → Engine, MIDI natif (midir)
+src-tauri/  fenêtre Tauri, fichiers, bibliothèque, MIDI natif (midir) ; le moteur reste à brancher
 ```
 
 ## Ce que fait déjà le moteur
@@ -47,8 +47,8 @@ Le module carte son compile, mais il n'a pas encore été écouté sur du vrai m
 
 ## Étapes suivantes
 
-1. Fenêtre Tauri. Elle branche l'interface sur le moteur par `invoke()` pour les commandes et un événement à 60 Hz pour les positions et les vumètres.
-2. MIDI natif avec midir, car la WebView de macOS n'a pas Web MIDI. Le format de mapping JSON actuel est conservé.
+1. ~~Fenêtre Tauri~~ (fait en v0.3) et ~~MIDI natif avec midir~~ (fait en v0.3, `app/tauri-bridge.js` fournit `navigator.requestMIDIAccess`).
+2. Brancher l'interface sur le moteur par `invoke()` pour les commandes et un événement à 60 Hz pour les positions et les vumètres.
 3. Analyse BPM, grille et tonalité portée en Rust, et calcul des formes d'onde en tâche de fond.
 4. Key lock de qualité studio, avec Signalsmith Stretch (licence MIT) ou Rubber Band (licence commerciale).
 5. Effets, sampler, slip, enregistrement du master.

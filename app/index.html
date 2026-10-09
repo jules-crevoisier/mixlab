@@ -428,6 +428,30 @@ select.sel{background:#181b20;border:1px solid #262a31;border-radius:6px;height:
 #p-coach{background:#0e0f13;border-left-color:var(--ln);padding:12px 14px}
 .live,.lcard{border-radius:9px;border-color:var(--ln)}
 .go{border-radius:6px;padding:6px 12px}
+
+/* ---------- coach en direct ---------- */
+.coach-hud{position:fixed;left:50%;top:54px;transform:translateX(-50%);z-index:40;display:flex;align-items:center;gap:10px;max-width:min(560px,calc(100vw - 32px));padding:8px 10px 8px 12px;border-radius:8px;background:rgba(14,16,20,.94);border:1px solid var(--ln);border-left:4px solid var(--coach);box-shadow:0 8px 28px rgba(0,0,0,.45);backdrop-filter:blur(6px);font:12px/1.35 var(--ui);color:var(--tx);pointer-events:auto}
+.coach-hud[hidden]{display:none}
+.coach-hud.bad{border-left-color:var(--bad)}.coach-hud.warn{border-left-color:var(--warn)}.coach-hud.tip{border-left-color:var(--coach)}
+.coach-hud .dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--coach);animation:coachPulse 1s ease-in-out infinite}
+.coach-hud.bad .dot{background:var(--bad)}.coach-hud.warn .dot{background:var(--warn)}
+.coach-hud .tx{display:grid;gap:2px;min-width:0}.coach-hud .tx b{color:var(--white);font-weight:600;font-size:13px}.coach-hud .tx span{color:var(--mu)}
+.coach-hud .more{font:600 10px var(--num);color:var(--mu);font-style:normal}
+.coach-hud .x{border:0;background:none;color:var(--mu);font-size:16px;cursor:pointer;padding:0 2px}.coach-hud .x:hover{color:var(--white)}
+.coach-target{outline:2px solid var(--coach)!important;outline-offset:2px;border-radius:6px;animation:coachHalo 1s ease-in-out infinite}
+@keyframes coachPulse{50%{opacity:.35}}
+@keyframes coachHalo{50%{outline-color:transparent}}
+#coach-direct .sel{max-width:130px}
+.cl-list,.cl-hist{display:grid;gap:5px}
+.cl-ok{color:var(--mu);font-size:11px}
+.alert.tip{background:rgba(167,139,250,.12);color:var(--tx)}
+.alert b{color:var(--white)}
+.trcard{border:1px solid var(--ln);border-radius:4px;padding:5px 7px;background:#0a0b0e;font-size:11px}
+.trcard summary{cursor:pointer;color:var(--tx)}
+.trcard .sc{display:inline-block;min-width:26px;text-align:center;border-radius:3px;font:700 11px var(--num);color:#05070a;padding:1px 3px}
+.trcard .sc.ok{background:var(--ok)}.trcard .sc.warn{background:var(--warn)}.trcard .sc.bad{background:var(--bad)}
+.trcard ul{margin:5px 0 0;padding-left:16px;display:grid;gap:3px}.trcard li.g{color:var(--ok)}.trcard li.t{color:var(--tx)}
+@media (max-width:700px){.coach-hud{top:auto;bottom:12px}}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><radialGradient id="capg" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#4a505c"/><stop offset="1" stop-color="#16181d"/></radialGradient></defs></svg>
@@ -509,7 +533,9 @@ select.sel{background:#181b20;border:1px solid #262a31;border-radius:6px;height:
 <div id="loading">Préparation des morceaux de démo…</div>
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
+<script src="tauri-bridge.js"></script>
 <script src="engine.js"></script>
 <script src="desktop.js"></script>
 <script src="app.js"></script>
 <script src="learn.js"></script>
+<script src="coach-live.js"></script>

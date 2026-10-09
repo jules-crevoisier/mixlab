@@ -1,21 +1,25 @@
 {
   "name": "mixlab",
   "productName": "Mixlab",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "Logiciel DJ qui apprend à mixer : 4 platines, mixer, effets, bibliothèque, tout contrôleur MIDI, coach de transitions.",
   "main": "electron/main.js",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "start": "electron .",
     "web": "npx --yes http-server app -p 8080 -c-1",
-    "test": "node test/smoke.js",
+    "test": "node test/smoke.js && node test/coach.js",
     "dist": "electron-builder --publish never",
     "dist:win": "electron-builder --win --publish never",
     "dist:mac": "electron-builder --mac --publish never",
-    "dist:linux": "electron-builder --linux --publish never"
+    "dist:linux": "electron-builder --linux --publish never",
+    "tauri": "tauri",
+    "app": "tauri dev",
+    "app:build": "tauri build",
+    "start:electron": "electron ."
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.12.1",
     "electron": "^44.7.0",
     "electron-builder": "^26.15.3",
     "playwright": "^1.64.0"
@@ -23,11 +27,39 @@
   "build": {
     "appId": "fr.mixlab.app",
     "productName": "Mixlab",
-    "files": ["electron/**", "app/**", "package.json"],
-    "directories": { "output": "dist" },
-    "win": { "target": ["nsis", "portable"] },
-    "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true },
-    "mac": { "target": ["dmg"], "category": "public.app-category.music", "extendInfo": { "NSMicrophoneUsageDescription": "Mixlab lit les noms des cartes son pour choisir la sortie casque." } },
-    "linux": { "target": ["AppImage", "deb"], "category": "Audio" }
+    "files": [
+      "electron/**",
+      "app/**",
+      "package.json"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.music",
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "Mixlab lit les noms des cartes son pour choisir la sortie casque."
+      }
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Audio"
+    }
   }
 }

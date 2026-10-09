@@ -1,0 +1,74 @@
+name: Appli Mixlab
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
+      - name: Tests Rust de l'appli
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libasound2-dev
+          cargo test --manifest-path src-tauri/Cargo.toml
+
+  installers:
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            args: ''
+            bundle: src-tauri/target/release/bundle
+          - os: macos-latest
+            args: --target universal-apple-darwin
+            bundle: src-tauri/target/universal-apple-darwin/release/bundle
+          - os: ubuntu-22.04
+            args: ''
+            bundle: src-tauri/target/release/bundle
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.os == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+      - uses: swatinem/rust-cache@v2
+        with: { workspaces: './src-tauri -> target' }
+      - if: startsWith(matrix.os, 'ubuntu')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libasound2-dev patchelf
+      - run: npm ci --ignore-scripts
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: ${{ matrix.args }}
+          # Sur un tag vX.Y.Z, les installeurs sont joints à un brouillon de release.
+          tagName: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || '' }}
+          releaseName: Mixlab ${{ github.ref_name }}
+          releaseDraft: true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mixlab-${{ matrix.os }}
+          path: |
+            ${{ matrix.bundle }}/nsis/*.exe
+            ${{ matrix.bundle }}/msi/*.msi
+            ${{ matrix.bundle }}/dmg/*.dmg
+            ${{ matrix.bundle }}/appimage/*.AppImage
+            ${{ matrix.bundle }}/deb/*.deb
+          if-no-files-found: error
