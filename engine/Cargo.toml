@@ -1,0 +1,24 @@
+[package]
+name = "mixlab-engine"
+version = "0.1.0"
+edition = "2021"
+description = "Moteur audio natif de Mixlab : platines, mixer, casque, décodage."
+license = "UNLICENSED"
+publish = false
+
+[features]
+default = []
+# Sortie vers les vraies cartes son (ALSA/PulseAudio, WASAPI/ASIO, CoreAudio).
+device = ["dep:cpal", "dep:rtrb"]
+
+[dependencies]
+symphonia = { version = "0.5", features = ["mp3", "aac", "isomp4", "flac", "wav", "pcm", "vorbis", "ogg", "aiff"] }
+cpal = { version = "0.15", optional = true }
+rtrb = { version = "0.3", optional = true }
+
+[dev-dependencies]
+hound = "3.5"
+
+[profile.release]
+lto = true
+codegen-units = 1

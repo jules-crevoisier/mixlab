@@ -1,0 +1,30 @@
+name: Moteur audio
+
+on:
+  push:
+    branches: [main]
+    paths: ['engine/**', '.github/workflows/engine.yml']
+  pull_request:
+    paths: ['engine/**', '.github/workflows/engine.yml']
+  workflow_dispatch:
+
+jobs:
+  engine:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: engine
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with: { workspaces: engine }
+      - if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libasound2-dev
+      - run: cargo test --release
+      # Vérifie que la sortie carte son compile avec l'API audio de chaque système.
+      - run: cargo check --release --features device
