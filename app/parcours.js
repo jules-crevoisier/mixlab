@@ -133,7 +133,7 @@ window.Parcours=(()=>{
     [11,'.dk-pads,.dk-sl,[data-ctl="samplervol"]'],
     [12,'.dk-pads .tabs .b:not([data-m="hot"]):not([data-m="smp"])'],
     [12,'.dk-pads .lst,.dk-grid,#lib-side,.libbar>:not(input[type="search"]):not(.compat):not(.imp):not(.count),#lib-btn'],
-    [13,'.dk-pro,.mst .eqm,#rec-btn,#presets,#ndecks,details.menu,#q-btn,#ag-btn,#am-btn,#set-btn,#midi-btn,#stage-btn,#prefs-btn'],
+    [13,'.dk-pro,.mst .eqm,#rec-btn,#presets,#ndecks,details.menu,#q-btn,#ag-btn,#am-btn,#set-btn,#midi-btn,#stage-btn,#live-btn,#prefs-btn'],
   ];
   const PANELS_AT={fx:9};
   const HIDE_UNTIL=4;   // chapitres 1 à 4 (index 0 à 3) : on masque au lieu de griser

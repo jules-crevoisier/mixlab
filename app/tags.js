@@ -65,7 +65,7 @@ window.Tags=(()=>{
     }
     return end;
   }
-  const T2={TT2:'TIT2',TP1:'TPE1',TAL:'TALB',TCO:'TCON',TYE:'TYER',TDA:'TDAT',COM:'COMM',TBP:'TBPM',TKE:'TKEY',PIC:'APIC'};
+  const T2={TT2:'TIT2',TP1:'TPE1',TAL:'TALB',TCO:'TCON',TYE:'TYER',TDA:'TDAT',COM:'COMM',TBP:'TBPM',TKE:'TKEY',PIC:'APIC',ULT:'USLT',SLT:'SYLT'};
   function frame(id,d,R){
     const v22=id.length===3;id=T2[id]||id;const enc=d[0];
     switch(id){
@@ -86,6 +86,9 @@ window.Tags=(()=>{
         if((desc==='INITIALKEY'||desc==='KEY')&&!R.key)R.key=val;
         if((desc==='BPM'||desc==='TEMPO')&&!R.bpm){const b=parseFloat(val);if(b>0)R.bpm=b;}
         break;}
+      // paroles (lues par video.js) : USLT en texte, SYLT avec un temps en ms par ligne ou par mot
+      case 'USLT':{const te=zEnd(d,4,enc)+(enc===1||enc===2?2:1),v=td(d.subarray(te),ENC[enc]||'latin1').replace(/\u0000+$/,'');if(v.trim()&&!R.lyrics)R.lyrics=v;break;}
+      case 'SYLT':{if(!R.sylt&&d[4]===2){const L=[],w=enc===1||enc===2?2:1;let o=zEnd(d,6,enc)+w;while(o<d.length){const e=zEnd(d,o,enc);const tx=td(d.subarray(o,e),ENC[enc]||'latin1');o=e+w;if(o+4>d.length)break;L.push({t:be32(d,o)/1000,text:tx});o+=4;}if(L.length)R.sylt=L;}break;}
       case 'APIC':{
         let o=1,mime;
         if(v22){mime=str(d,1,3).toLowerCase()==='png'?'image/png':'image/jpeg';o=4;}
@@ -148,6 +151,7 @@ window.Tags=(()=>{
           case '©day':{const y=/\d{4}/.exec(text());if(y&&!R.year)R.year=+y[0];break;}
           case '©cmt':R.comment=R.comment||text();break;
           case 'tmpo':if(!R.bpm&&d.length>=1){const b=d.length>=2?(d[0]<<8)|d[1]:d[0];if(b>0)R.bpm=b;}break;
+          case '©lyr':R.lyrics=R.lyrics||td(d,'utf-8');break;
           case 'covr':pic(R,d,kind===14?'image/png':kind===13?'image/jpeg':d[0]===0x89?'image/png':'image/jpeg',3);break;
         }
         return false;
@@ -194,6 +198,7 @@ window.Tags=(()=>{
         case 'COMMENT':case 'DESCRIPTION':R.comment=R.comment||v;break;
         case 'BPM':case 'TEMPO':{const b=parseFloat(v.replace(',','.'));if(b>0&&!R.bpm)R.bpm=b;break;}
         case 'INITIALKEY':case 'KEY':R.key=R.key||v;break;
+        case 'LYRICS':case 'UNSYNCEDLYRICS':R.lyrics=R.lyrics||s.slice(k+1);break;
         case 'METADATA_BLOCK_PICTURE':flacPicture(b64(s.slice(k+1)),R);break;
       }
     }
@@ -287,6 +292,7 @@ window.Tags=(()=>{
     if(R.year&&free('year'))set('year',R.year);
     if(R.bpm)t.tagBpm=R.bpm;
     if(R.key)t.tagKey=R.key;
+    if(R.lyrics)t.lyricsText=R.lyrics;if(R.sylt)t.lyricsSync=R.sylt;
     if(R.picture&&!t.art){const url=await thumb(R.picture);if(url){t.art=url;ch=true;}}
     if(ch){t.ov=null;refresh(t);}
     return ch;

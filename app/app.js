@@ -29,7 +29,7 @@ const rgba=(c,a)=>{const[r,g,b]=Array.isArray(c)?c:hexRgb(c);return`rgba(${r},${
 const desat=(c,k,dk)=>{const[r,g,b]=Array.isArray(c)?c:hexRgb(c),y=.3*r+.59*g+.11*b;return[r,g,b].map(v=>Math.round((v+(y-v)*k)*dk));};
 // Extensions audio acceptées : la même liste que AUDIO_EXT de src-tauri/src/files.rs et electron/main.js
 // (le pont natif donne des fichiers sans type MIME : on se fie à l'extension).
-const AUDIO_EXT=['mp3','wav','aif','aiff','flac','ogg','m4a','aac','opus','mp4'];
+const AUDIO_EXT=['mp3','wav','aif','aiff','flac','ogg','m4a','aac','opus','mp4','m4v','webm','mov']; // clips vidéo : le son passe par la platine, l'image par video.js
 const AUDIO_RE=new RegExp('\\.('+AUDIO_EXT.join('|')+')$','i');
 const isAudioFile=f=>!!f&&(/^audio\//.test(f.type||'')||AUDIO_RE.test(f.name||''));
 const HOT=['#ff4d5e','#ffa53a','#ffd34d','#3fd679','#31d3c8','#2fa8ff','#7d6bff','#e86bff'];
@@ -569,6 +569,7 @@ async function importFiles(files,deck){
       const buf=await (window.Stems?Stems.decode(ab,f.name):ctx.decodeAudioData(ab)); // .stem.mp4 : piste master
       const name=f.name.replace(/(\.stem)?\.[^.]+$/i,''),m=/^(.+?)\s+-\s+(.+)$/.exec(name);
       const tr=addTrack(buf,{title:m?m[2]:name,artist:m?m[1]:'',file:f.name,path,...(pre?pre.meta:{})});
+      window.Video&&Video.onImport(tr,f,files); // clip vidéo, paroles .lrc importées avec
       if(pre)await Persist.post(tr,pre);
       const ki=keyInfo(tr.key);toast('« '+tr.title+' » : '+tr.bpm.toFixed(2)+' BPM'+(ki?' · '+ki.code:''),'ok');
       renderSide();renderTable();
@@ -841,7 +842,7 @@ function listMidi(){
   window.Controllers&&Controllers.onDevices();
 }
 function onMidi(e){
-  const[st,d1,d2=0]=e.data;if(st>=0xF0)return;
+  const[st,d1,d2=0]=e.data;if(st>=0xF0){window.LiveOut&&LiveOut.midiRealtime(e);return;} // horloge MIDI en entrée
   const type=st&0xF0,ch=st&15;let key;
   if(type===0x90||type===0x80)key=`n${ch}.${d1}`;else if(type===0xB0)key=`c${ch}.${d1}`;else if(type===0xE0)key=`p${ch}`;else return;
   $('#midi-mon').textContent='Dernier message : '+midiKeyText(key)+' = '+(type===0xE0?((d2<<7)|d1):d2);

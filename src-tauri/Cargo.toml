@@ -18,6 +18,8 @@ tauri-plugin-dialog = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 midir = "0.10"
+# Ableton Link : écouter le port partagé avec les autres applis (SO_REUSEADDR / SO_REUSEPORT)
+socket2 = { version = "0.6", features = ["all"] }
 
 [profile.release]
 lto = true

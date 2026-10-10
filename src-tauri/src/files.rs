@@ -12,7 +12,8 @@ use tauri::ipc::Response;
 use tauri::{AppHandle, Manager, State};
 use tauri_plugin_dialog::DialogExt;
 
-const AUDIO_EXT: &[&str] = &["mp3", "wav", "aif", "aiff", "flac", "ogg", "m4a", "aac", "opus", "mp4"];
+/// Les clips vidéo (mp4, webm, mov) se jouent comme des morceaux : leur son passe par les platines.
+const AUDIO_EXT: &[&str] = &["mp3", "wav", "aif", "aiff", "flac", "ogg", "m4a", "aac", "opus", "mp4", "m4v", "webm", "mov"];
 /// Un mix d'une heure en WAV tient dedans.
 const MAX_FILE: u64 = 400 * 1024 * 1024;
 const MAX_LIBRARY: usize = 50_000_000;
@@ -32,7 +33,7 @@ impl Allowed {
     fn add(&self, p: &Path) {
         self.0.lock().unwrap().insert(p.to_path_buf());
     }
-    fn has(&self, p: &Path) -> bool {
+    pub(crate) fn has(&self, p: &Path) -> bool {
         self.0.lock().unwrap().contains(p)
     }
 }

@@ -120,7 +120,7 @@
 | Mode entraînement sans matériel (« Practice Mode ») | S | **Fait** : Mixlab marche sans matériel | P2 | S |
 | Platine principale ou maître (Master) | tous | **Fait** : bouton Master | P1 | S |
 | Formats MP3, AAC/M4A, WAV, AIFF, FLAC, OGG | tous | **Fait** : décodage du navigateur ; symphonia dans le moteur Rust | P1 | S |
-| Formats ALAC, Opus, WMA, fichiers vidéo (MP4) | S, RB, VDJ | **Partiel** : Opus est accepté par l'import ; ALAC et vidéo dépendent de la WebView | P3 | M |
+| Formats ALAC, Opus, WMA, fichiers vidéo (MP4) | S, RB, VDJ | **Partiel** : Opus et clips vidéo (MP4, M4V, WebM, MOV) acceptés à l'import, image jouée par `app/video.js` ; ALAC, WMA et les codecs vidéo dépendent de la WebView | P3 | M |
 | Chargement rapide de gros fichiers (décodage en flux, mémoire) | tous | **Partiel** : tout le fichier est décodé en mémoire, 400 Mo au plus | P2 | L |
 
 ## 2. Cues, boucles et pads
@@ -398,22 +398,22 @@
 | Enregistrement WAV, FLAC, MP3 et AIFF sur le disque | tous | **Partiel** : WAV 16 et 24 bits ; pas de FLAC, MP3 ni AIFF | P1 | M |
 | Tracklist horodatée liée à l'enregistrement (cue sheet) | RB, VDJ, TR, MX | **Manque** | P2 | S |
 | Enregistrement de l'entrée micro ou de la table | TR, VDJ, MX | **Manque** | P3 | M |
-| Diffusion Icecast / Shoutcast | TR, VDJ, MX | **Manque** | P2 | M |
+| Diffusion Icecast / Shoutcast | TR, VDJ, MX | **Partiel** : dans l'appli (`src-tauri/src/net.rs`), Icecast par PUT ou SOURCE et Shoutcast v1, master encodé en Opus (WebM ou Ogg), titre envoyé au serveur, reconnexion automatique. MP3 seulement si la WebView sait l'encoder, ce qui limite Shoutcast. Pas dans le navigateur (expliqué à l'écran) | P2 | M |
 | Diffusion Twitch, YouTube, Mixcloud Live | VDJ, RB, DJS (Mixcloud) | **Manque** | P3 | L |
 | Partage du mix (Mixcloud, SoundCloud) | RB *(Core)*, S | **Manque** | P3 | M |
-| Envoi des titres joués vers un fichier ou OBS (« now playing ») | MX, VDJ, S (plugins) | **Manque** | P3 | S |
+| Envoi des titres joués vers un fichier ou OBS (« now playing ») | MX, VDJ, S (plugins) | **Fait** : morceau à l'antenne (le plus fort après un délai réglable), format libre, fichier texte et JSON (appli), page pour la source Navigateur d'OBS servie sur 127.0.0.1:7777 avec titre et paroles. Dans le navigateur : titre affiché seulement | P3 | S |
 
 ## 13. Vidéo, karaoké et paroles
 
 | Fonction | Où on la trouve | Mixlab | Priorité | Effort |
 |---|---|---|---|---|
-| Lecture de clips vidéo sur les platines | S *(payant : Serato Video)*, RB *(Creative)*, VDJ, DJAY | **Manque** | P3 | L |
-| Transitions vidéo et effets vidéo | S, RB, VDJ | **Manque** | P3 | L |
-| Sortie vidéo sur un second écran | S, RB, VDJ, DJAY | **Manque** | P3 | M |
-| Visuels générés (visualiseur audio-réactif) | VDJ, RB, DJAY, S *(Serato Visualizer)* | **Manque** | P3 | M |
-| Texte, logo et messages à l'écran | S, RB, VDJ | **Manque** | P3 | M |
-| Karaoké (CDG, file de chanteurs, second écran) | VDJ, S (extensions) | **Manque** | P3 | L |
-| Paroles synchronisées (Lyric) | RB *(Creative)*, VDJ 2026 (IA) | **Manque** | P3 | L |
+| Lecture de clips vidéo sur les platines | S *(payant : Serato Video)*, RB *(Creative)*, VDJ, DJAY | **Fait** : le son du clip passe par la platine, l'image suit sa position (pitch, sauts, boucles, scratch, pause) avec moins de 0,15 s d'écart, vignette sur la platine. Codecs selon la WebView | P3 | L |
+| Transitions vidéo et effets vidéo | S, RB, VDJ | **Partiel** : fondu, volet et coupe qui suivent faders et crossfader ; pas d'effets vidéo (flou, couleurs, rythme) | P3 | L |
+| Sortie vidéo sur un second écran | S, RB, VDJ, DJAY | **Fait** : fenêtre à part (appli et navigateur) en 1280×720, plein écran au double-clic, aperçu dans la fenêtre Live | P3 | M |
+| Visuels générés (visualiseur audio-réactif) | VDJ, RB, DJAY, S *(Serato Visualizer)* | **Fait** : barres ou cercle au spectre du master, halo sur les basses, pochette et titre, quand la platine n'a pas de vidéo | P3 | M |
+| Texte, logo et messages à l'écran | S, RB, VDJ | **Fait** : message fixe ou défilant, logo dans un coin (gardé entre deux sessions s'il est léger) | P3 | M |
+| Karaoké (CDG, file de chanteurs, second écran) | VDJ, S (extensions) | **Partiel** : file de chanteurs avec transposition par chanteur, paroles en grand qui se remplissent (mot par mot avec un LRC enrichi), chanteur au micro et suivant à l'écran. Disques CD+G non lus | P3 | L |
+| Paroles synchronisées (Lyric) | RB *(Creative)*, VDJ 2026 (IA) | **Fait** : fichier .lrc à côté du morceau (appli) ou importé avec, tags SYLT et USLT (MP3), LYRICS (FLAC, Ogg), ©lyr (MP4) ; sur la platine, la sortie vidéo et la page OBS ; décalage réglable. Pas de génération par IA | P3 | L |
 
 ## 14. Matériel
 
@@ -440,10 +440,10 @@
 | Export sur clé USB pour CDJ et XDJ (base de données matériel) | RB *(gratuit en mode Export)*, DJS, ENG (pour ses machines) | **Manque** | P2 | L |
 | Export pour les machines Engine DJ | ENG, MX 2.6 | **Manque** | P3 | L |
 | Link avec des CDJ / Pro DJ Link (jouer la bibliothèque depuis le PC) | RB *(Link Export)* | **Manque** | P3 | L |
-| Ableton Link | TR, RB, S, VDJ, DJAY, ENG, MX | **Manque** | P2 | M |
+| Ableton Link | TR, RB, S, VDJ, DJAY, ENG, MX | **Partiel** : écoute de la session Link dans l'appli (multicast, tempo des pairs suivi par la platine maître). Suite : rejoindre la session comme pair (mesure du temps, phase, Start/Stop) pour la mener | P2 | M |
 | MIDI clock en sortie | TR, VDJ, RB, MX | **Fait** : horloge, Start et Stop vers une sortie MIDI | P2 | M |
-| MIDI clock en entrée | TR, VDJ | **Manque** | P3 | M |
-| OSC (contrôle par réseau) | VDJ, MX (expérimental), TR (non) | **Manque** | P3 | M |
+| MIDI clock en entrée | TR, VDJ | **Fait** : tempo lu sur 4 temps (stable malgré la gigue USB) et suivi par la platine maître, Start et Stop pour la lancer (option). Dans l'appli, l'horloge passe désormais par le MIDI natif | P3 | M |
+| OSC (contrôle par réseau) | VDJ, MX (expérimental), TR (non) | **Partiel** : réception OSC par UDP dans l'appli, `/mixlab/<commande>` pilote tout le registre des commandes (boutons, potards, faders) ; pas de retour d'état vers la tablette | P3 | M |
 | Lumières : DMX, SoundSwitch, Lighting mode | RB *(Lighting)*, S, VDJ, ENG (SoundSwitch) | **Manque** | P3 | L |
 | Lumières Philips Hue | RB, S, VDJ, ENG | **Manque** | P3 | M |
 | Mixer externe en Thru, avec effets du mixer | RB, S (DJM, Rane) | **Manque** | P3 | L |
