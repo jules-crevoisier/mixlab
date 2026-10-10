@@ -7,6 +7,7 @@
 
 mod files;
 mod midi;
+mod net;
 #[cfg(debug_assertions)]
 mod selftest;
 
@@ -15,6 +16,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .manage(files::Allowed::default())
         .manage(midi::Midi::default())
+        .manage(net::Live::default())
         .invoke_handler(tauri::generate_handler![
             files::pick_files,
             files::pick_folder,
@@ -30,8 +32,25 @@ pub fn run() {
             midi::midi_open,
             midi::midi_signature,
             midi::midi_send,
+            net::stream_start,
+            net::stream_send,
+            net::stream_stop,
+            net::stream_state,
+            net::stream_metadata,
+            net::nowplaying_set,
+            net::nowplaying_pick,
+            net::nowplaying_path,
+            net::overlay_start,
+            net::overlay_stop,
+            net::osc_start,
+            net::osc_stop,
+            net::link_start,
+            net::link_stop,
+            net::lyrics_sidecar,
         ])
         .setup(|app| {
+            // fenêtre principale créée ici pour que la sortie vidéo puisse s'ouvrir (window.open)
+            net::main_window(app)?;
             #[cfg(debug_assertions)]
             selftest::maybe_run(app);
             let _ = app;
