@@ -12,7 +12,7 @@ use tauri::ipc::Response;
 use tauri::{AppHandle, Manager, State};
 use tauri_plugin_dialog::DialogExt;
 
-const AUDIO_EXT: &[&str] = &["mp3", "wav", "aif", "aiff", "flac", "ogg", "m4a", "aac", "opus"];
+const AUDIO_EXT: &[&str] = &["mp3", "wav", "aif", "aiff", "flac", "ogg", "m4a", "aac", "opus", "mp4"];
 /// Un mix d'une heure en WAV tient dedans.
 const MAX_FILE: u64 = 400 * 1024 * 1024;
 const MAX_LIBRARY: usize = 50_000_000;

@@ -29,7 +29,7 @@ const rgba=(c,a)=>{const[r,g,b]=Array.isArray(c)?c:hexRgb(c);return`rgba(${r},${
 const desat=(c,k,dk)=>{const[r,g,b]=Array.isArray(c)?c:hexRgb(c),y=.3*r+.59*g+.11*b;return[r,g,b].map(v=>Math.round((v+(y-v)*k)*dk));};
 // Extensions audio acceptées : la même liste que AUDIO_EXT de src-tauri/src/files.rs et electron/main.js
 // (le pont natif donne des fichiers sans type MIME : on se fie à l'extension).
-const AUDIO_EXT=['mp3','wav','aif','aiff','flac','ogg','m4a','aac','opus'];
+const AUDIO_EXT=['mp3','wav','aif','aiff','flac','ogg','m4a','aac','opus','mp4'];
 const AUDIO_RE=new RegExp('\\.('+AUDIO_EXT.join('|')+')$','i');
 const isAudioFile=f=>!!f&&(/^audio\//.test(f.type||'')||AUDIO_RE.test(f.name||''));
 const HOT=['#ff4d5e','#ffa53a','#ffd34d','#3fd679','#31d3c8','#2fa8ff','#7d6bff','#e86bff'];
@@ -560,8 +560,8 @@ async function importFiles(files,deck){
       toast('Analyse de « '+f.name+' »…');
       await new Promise(r=>setTimeout(r,30));
       const ab=await f.arrayBuffer(),pre=window.Persist?await Persist.pre(ab,f.name):null; // tags et cache d'analyse
-      const buf=await ctx.decodeAudioData(ab);
-      const name=f.name.replace(/\.[^.]+$/,''),m=/^(.+?)\s+-\s+(.+)$/.exec(name);
+      const buf=await (window.Stems?Stems.decode(ab,f.name):ctx.decodeAudioData(ab)); // .stem.mp4 : piste master
+      const name=f.name.replace(/(\.stem)?\.[^.]+$/i,''),m=/^(.+?)\s+-\s+(.+)$/.exec(name);
       const tr=addTrack(buf,{title:m?m[2]:name,artist:m?m[1]:'',file:f.name,path,...(pre?pre.meta:{})});
       if(pre)await Persist.post(tr,pre);
       const ki=keyInfo(tr.key);toast('« '+tr.title+' » : '+tr.bpm.toFixed(2)+' BPM'+(ki?' · '+ki.code:''),'ok');

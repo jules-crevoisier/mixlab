@@ -117,7 +117,7 @@ window.Desktop=(()=>{
   /* Charge un morceau enregistré (ou importé d'un autre logiciel) avec ses analyses et ses cues. */
   async function loadRecord(t){
     const ab=await N.readFile(t.path),pre=window.Persist?await Persist.pre(ab,t.path,{saved:!!t.bpm,key:t.key}):null;
-    const buf=await ctx.decodeAudioData(ab);
+    const buf=await (window.Stems?Stems.decode(ab,t.path):ctx.decodeAudioData(ab));
     const tr=addTrack(buf,{title:t.title,artist:t.artist,genre:t.genre,file:t.path.split(/[\\/]/).pop(),path:t.path,...(pre?pre.meta:{}),key:t.key||(pre&&pre.meta.key)||null});
     if(t.bpm)tr.bpm=t.bpm;if(t.grid!=null)tr.grid=t.grid;tr.cue=t.cue??tr.grid;
     if(Array.isArray(t.hot))tr.hot=t.hot.slice(0,8).concat(Array(8).fill(null)).slice(0,8);
