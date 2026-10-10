@@ -182,3 +182,20 @@ Avant et après, en captures : `docs/design/avant/` et `docs/design/apres/`. Les
 - **Effets** : potards nommés, durée en boutons segmentés, ON à la couleur de la platine, rangée repliable.
 - **Fluidité** : le calcul d'une image passe de 5,5 ms à 2,2 ms avec 4 platines. Les platines à l'arrêt ne sont plus redessinées, et l'appli ralentit à 30 images par seconde quand elle n'est pas au premier plan.
 - **Reste à faire** : encore trop de commandes visibles (environ 130 à 1366 px au lieu de 110 visés), et l'École est à l'étroit à côté du panneau du coach.
+
+
+## Matin du 10 octobre · Finitions en parallèle
+
+Neuf chantiers menés en même temps, chacun dans sa branche, fusionnés dans `finitions` (suite complète : 21 fichiers de test).
+
+- **Style** : audit des traits qui font « généré » (`docs/design/AUDIT-STYLE-IA.md`), gris mats, icônes dessinées, potards et faders retravaillés, textes sobres. Captures avant et après dans `docs/design/v2/`.
+- **Préférences** : une seule fenêtre (Ctrl+,) pour tout, y compris le logiciel d'origine et le niveau, modifiables à tout moment.
+- **Stems** : séparation rapide en voix, batterie, basse et mélodie, lecture des fichiers .stem.mp4, mute, a cappella, pads de stems, écho out.
+- **Pads, sampler, boucles** : 16 hot cues, séquences de cues, Pad FX, 32 sons de sampler, séquenceur 16 pas, looper.
+- **Grille, analyse, bibliothèque** : grille dynamique, horloge maître, LUFS, playlists imbriquées, import Serato et Traktor, dossiers surveillés.
+- **Entrées, sorties, mixer, effets** : micro et talkover, sorties séparées, booth, EQ 4 bandes, maximiseur, nouveaux effets, cue sheet.
+- **Diffusion, vidéo, paroles** : Icecast, titre en cours et page OBS, vidéo sur les platines, paroles synchronisées, karaoké, horloge MIDI, OSC, Link.
+- **Planificateur de set** : timeline avec automations, rendu WAV hors ligne, Mix Point Link, requête en français.
+- **Mappings** : six contrôleurs Pioneer et Hercules, détection automatique, écran « Tester ma table ». Non vérifiés sur le matériel.
+
+Deux vrais défauts trouvés à la fusion : le bouton ⋯ de la barre du haut restait visible à vide au chapitre 1, et deux tests dépendaient de la vitesse de la machine.

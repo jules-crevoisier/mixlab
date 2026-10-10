@@ -25,9 +25,9 @@
 
 | État | Nombre | Part |
 |---|---|---|
-| Fait | 176 | 53 % |
-| Partiel | 53 | 16 % |
-| Manque | 106 | 32 % |
+| Fait | 237 | 71 % |
+| Partiel | 67 | 20 % |
+| Manque | 31 | 9 % |
 
 **Ce qui est solide.**
 - Le cœur du jeu : platines, cues nommés, cues mémoire, boucles gardées, pads (slicer, pitch play, sampler), sync à la mesure ou à la phrase et mixer réglable.
@@ -36,12 +36,12 @@
 - La structure des morceaux, l'auto-mix et les suggestions.
 - Le coach, le parcours débutant et l'Académie, qui n'ont pas d'équivalent sur le marché.
 
-**Les trois grands manques.**
-1. Les stems.
-2. Les mappings validés sur les contrôleurs du marché.
-3. Le moteur natif, pour la latence, le key lock de qualité et le casque en 4 canaux.
+**Les grands manques restants.**
+1. Le moteur natif, pour la latence, le key lock de qualité, les sorties multicanal et les plug-ins VST/AU.
+2. La validation sur du vrai matériel : les six mappings fournis (Pioneer DDJ-FLX4, DDJ-400, DDJ-FLX6, DDJ-SB3, Hercules Inpulse 200 et 300) viennent des documents officiels et ne sont pas encore essayés. Numark, Denon, Reloop et les autres n'ont pas de liste MIDI publiée.
+3. La séparation des stems par un vrai modèle : celle de Mixlab est du traitement du signal, utile mais loin d'un modèle entraîné.
 
-**Les fonctions payantes ailleurs** (stems, vidéo, DVS, lyrics, cloud) sont toutes à faire.
+**Les fonctions payantes ailleurs** (stems, vidéo, paroles, diffusion, planificateur de set) sont maintenant dans Mixlab, avec les limites notées ligne par ligne. Restent le DVS (vinyle de contrôle), le cloud et la synchronisation entre machines.
 
 ## Légende
 
