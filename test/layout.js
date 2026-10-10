@@ -26,8 +26,9 @@ async function open(browser, w, h, store, opts = {}) {
   page.on('pageerror', e => errors.push(e.message));
   page.on('console', m => { if (m.type() === 'error' && !/AudioContext/.test(m.text())) errors.push(m.text()); });
   await page.addInitScript(s => {
-    if (sessionStorage.getItem('init')) return; sessionStorage.setItem('init', '1');
-    localStorage.clear(); for (const [k, v] of Object.entries(s)) localStorage.setItem('mixlab2.' + k, JSON.stringify(v));
+    // marqueur dans localStorage : sessionStorage n'est pas fiable d'un rechargement à l'autre en file://
+    if (localStorage.getItem('__testInit')) return;
+    localStorage.clear(); localStorage.setItem('__testInit', '1'); for (const [k, v] of Object.entries(s)) localStorage.setItem('mixlab2.' + k, JSON.stringify(v));
   }, { onboarded: true, ...store });
   await page.goto(url);
   await ready(page);
