@@ -95,7 +95,7 @@ window.Coach=(()=>{
     const n=les.steps.length;
     el.append(h('div',{},h('div',{class:'lbl',style:'color:var(--coach)'},les.mod),h('div',{style:'font-weight:600;font-size:13px;color:var(--white)'},les.title),h('div',{class:'prog'},h('i',{style:`width:${(L.done?n:L.i)/n*100}%`}))));
     el.append(h('ol',{class:'steps'},les.steps.map((s,i)=>h('li',{class:L.done||i<L.i?'done':i===L.i?'cur':''},s.t))));
-    if(L.done)el.append(h('div',{class:'donebox flash'},h('b',{},'Bravo, leçon réussie.'),h('ul',{},les.finish().map(x=>h('li',{},x)))));
+    if(L.done)el.append(h('div',{class:'donebox flash'},h('b',{},'Leçon validée.'),h('ul',{},les.finish().map(x=>h('li',{},x)))));
     else{const s=les.steps[L.i];L.hintEl=h('div',{class:'hx'},'');L.lastHint='';el.append(h('div',{class:'now',id:'coach-now'},h('div',{class:'t'},`Étape ${L.i+1}/${n} · ${s.t}`),h('div',{class:'why'},s.why),L.hintEl));}
     el.append(h('div',{class:'r fixed',style:'flex-wrap:wrap'},h('button',{class:'b',onclick:()=>start(les.id)},'Recommencer'),!L.done&&h('button',{class:'b',onclick:()=>advance(true)},'Passer l’étape'),h('button',{class:'b',onclick:()=>{L.active=null;render();}},'Toutes les leçons')));
   }
@@ -107,7 +107,7 @@ window.Coach=(()=>{
   function advance(skip){
     const les=L.active;L.i++;L.hold=0;
     if(L.i>=les.steps.length){L.done=true;toast('Leçon réussie : '+les.title,'ok');}
-    else if(!skip)toast('✓ '+les.steps[L.i-1].t,'ok');
+    else if(!skip)toast(les.steps[L.i-1].t,'ok');
     render();const now=$('#coach-now');if(now&&!skip)now.classList.add('flash');
   }
   // Halo sur la commande à toucher (même mécanisme que le coach en direct et le parcours).
