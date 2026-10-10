@@ -146,6 +146,7 @@ window.Structure=(()=>{
     tr.ov=null;
     if(typeof renderTable==='function')renderTable();
     window.AutoMix&&AutoMix.onAnalyzed&&AutoMix.onAnalyzed(tr);
+    window.Persist&&Persist.onStructure(tr);
   }
 
   /* ---------- lecture ---------- */

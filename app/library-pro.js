@@ -247,7 +247,7 @@ window.LibPro=(()=>{
     }
     return{tests,free:free.filter(Boolean)};
   }
-  const hay=t=>{const ki=keyInfo(t.key);return fold([t.title,t.artist,t.genre,t.bpm?t.bpm.toFixed(0):'',ki?ki.name+' '+ki.code:'',(t.tags||[]).join(' '),t.comment].join(' '));};
+  const hay=t=>{const ki=keyInfo(t.key);return fold([t.title,t.artist,t.album,t.genre,t.bpm?t.bpm.toFixed(0):'',ki?ki.name+' '+ki.code:'',(t.tags||[]).join(' '),t.comment].join(' '));};
   function matchQ(q){if(!S.qc||S.qc.q!==q)S.qc={q,p:parseQuery(q)};const{tests,free}=S.qc.p;return t=>tests.every(f=>f(t))&&(!free.length||(s=>free.every(w=>s.includes(w)))(hay(t)));}
   const filter=(rows,q)=>{const m=matchQ(q);return rows.filter(r=>m(r.t));};
   const search=(q,tracks=LIB.tracks)=>tracks.filter(matchQ(q.toLowerCase()));
@@ -322,19 +322,23 @@ window.LibPro=(()=>{
   }
 
   /* ---------- vues de la barre latérale ---------- */
-  const owns=v=>v.startsWith('sc:')||v==='dups';
-  const keepOrder=v=>v==='dups';
+  const owns=v=>v.startsWith('sc:')||v.startsWith('set:')||v==='dups';
+  const keepOrder=v=>v==='dups'||v.startsWith('set:');
   function viewTracks(v){
+    if(v.startsWith('set:')){const st=S.sets.find(x=>'set:'+x.id===v);return st?setTracks(st).filter(t=>LIB.tracks.includes(t)):[];}
     if(v==='dups')return duplicates().flat().filter((t,i,a)=>a.indexOf(t)===i);
     return crateTracks(S.crates.find(c=>'sc:'+c.id===v));
   }
-  const empty=v=>v==='dups'?'Aucun doublon : chaque morceau n’apparaît qu’une fois.':v.startsWith('sc:')?'Aucun morceau ne respecte ces règles pour l’instant. Clic droit sur la crate pour la modifier.':v==='hist'?'Rien joué pour l’instant : un morceau entre dans l’historique après 30 s de lecture.':null;
+  const empty=v=>v==='dups'?'Aucun doublon : chaque morceau n’apparaît qu’une fois.':v.startsWith('sc:')?'Aucun morceau ne respecte ces règles pour l’instant. Clic droit sur la crate pour la modifier.':v.startsWith('set:')?'Aucun morceau de ce set n’est dans ta bibliothèque en ce moment. « Historique des sets » montre la tracklist complète.':v==='hist'?'Rien joué pour l’instant : un morceau entre dans l’historique après 30 s de lecture.':null;
   function side(s,it,where){
     if(where==='crates'){
       s.append(h('div',{class:'sec lbl'},'Crates intelligentes'));
       S.crates.forEach(c=>s.append(it('sc:'+c.id,'⚡ '+c.name,crateTracks(c).length,b=>{b.title='Clic droit pour modifier les règles';b.addEventListener('contextmenu',e=>{e.preventDefault();crateEditor(c);});})));
       s.append(h('button',{class:'it',type:'button',style:'color:var(--mu)',onclick:()=>crateEditor(null)},'+ Nouvelle crate'));
     }else{
+      // sets des sessions précédentes, du plus récent au plus ancien
+      const past=S.sets.filter(x=>x.id!==S.sid&&x.items&&x.items.length).slice(-6).reverse();
+      past.forEach(x=>s.append(it('set:'+x.id,setLabel(x),x.items.length,b=>{b.title='Set du '+new Date(x.start).toLocaleString('fr-FR');})));
       s.append(h('button',{class:'it',type:'button',style:'color:var(--mu)',onclick:historyModal},'Exporter la tracklist',S.sets.length?h('span',{},S.sets.length+' sets'):null));
       const nd=duplicates().reduce((n,g)=>n+g.length,0),nm=missingList().length;
       s.append(h('div',{class:'sec lbl'},'Outils'),it('dups','Doublons',nd));
@@ -362,7 +366,7 @@ window.LibPro=(()=>{
   const shopLink=(label,url)=>h('a',{class:'shop',href:url,target:'_blank',rel:'noopener noreferrer',onclick:e=>{const n=N();if(n&&n.openShop){e.preventDefault();n.openShop(url).catch(()=>{});}}},label);
 
   /* ---------- historique et tracklist ---------- */
-  const histItems=hist=>hist.map(x=>{const t=x.track||x,ki=keyInfo(t.key);return{time:new Date(x.time),deck:x.deck||'',title:t.title,artist:t.artist,bpm:t.bpm?+(+t.bpm).toFixed(2):null,key:x.key||(ki?ki.code:''),path:t.path||null};});
+  const histItems=hist=>hist.map(x=>{const t=x.track||x,ki=keyInfo(t.key);return{time:new Date(x.time),deck:x.deck||'',title:t.title,artist:t.artist,bpm:t.bpm?+(+t.bpm).toFixed(2):null,key:x.key||(ki?ki.code:''),path:t.path||null,file:t.file||null};});
   const curSet=()=>LIB.history.length?{id:S.sid,start:new Date(LIB.history[0].time).toISOString(),items:histItems(LIB.history).map(x=>({...x,time:x.time.toISOString()}))}:null;
   const allSets=()=>{const c=curSet();return S.sets.filter(s=>s.id!==S.sid).concat(c?[c]:[]).slice(-100);};
   const stamp=s=>{s=Math.max(0,Math.round(s));const hh=Math.floor(s/3600),m=Math.floor(s/60)%60,x=s%60;return(hh?hh+':'+pad2(m):pad2(m))+':'+pad2(x);};
@@ -378,6 +382,12 @@ window.LibPro=(()=>{
     return[['Position','Début','Heure','Platine','Artiste','Titre','BPM','Tonalité']].concat(it.map((x,i)=>[i+1,stamp((x.time-t0)/1000),x.time.toLocaleTimeString('fr-FR'),x.deck,x.artist,x.title,x.bpm??'',x.key]))
       .map(r=>r.map(csvCell).join(',')).join('\n')+'\n';
   }
+  // Morceaux d'un set : ceux de la bibliothèque quand on les retrouve (chemin, sinon artiste et titre).
+  const setLabel=x=>{const d=new Date(x.start);return d.toLocaleDateString('fr-FR')+' '+pad2(d.getHours())+'h'+pad2(d.getMinutes());};
+  function setTracks(st){
+    const byPath=new Map(),byFile=new Map(),byMeta=new Map();LIB.tracks.forEach(t=>{if(t.path)byPath.set(t.path,t);if(t.file)byFile.set(t.file.toLowerCase(),t);byMeta.set(mkey(t),t);});
+    return (st.items||[]).map(x=>(x.path&&byPath.get(x.path))||(x.file&&byFile.get(String(x.file).toLowerCase()))||byMeta.get(mkey(x))||{title:x.title||'',artist:x.artist||'',path:x.path||null,duration:0});
+  }
   function historyModal(){
     const sets=allSets().slice().reverse();
     const pre=h('pre',{class:'tl'},'');
@@ -389,7 +399,8 @@ window.LibPro=(()=>{
         h('button',{type:'button',class:'b',onclick:()=>show(s)},s.id===S.sid?'Ce set':new Date(s.start).toLocaleDateString('fr-FR')+' '+new Date(s.start).toTimeString().slice(0,5)),
         h('span',{class:'mu'},s.items.length+' morceaux'),h('span',{class:'spacer'}),
         h('button',{type:'button',class:'b',onclick:()=>saveFile(fname(s,'txt'),tracklistText(s.items))},'Texte'),
-        h('button',{type:'button',class:'b',onclick:()=>saveFile(fname(s,'csv'),tracklistCSV(s.items),'text/csv')},'CSV')))):null,
+        h('button',{type:'button',class:'b',onclick:()=>saveFile(fname(s,'csv'),tracklistCSV(s.items),'text/csv')},'CSV'),
+        h('button',{type:'button',class:'b',title:'Playlist M3U8 du set, à rouvrir dans Mixlab ou un autre logiciel',onclick:()=>saveFile(fname(s,'m3u8'),toM3U(setTracks(s),'Set du '+setLabel(s)),'audio/x-mpegurl')},'M3U')))):null,
       pre);
     show(sets[0]);
   }
@@ -637,9 +648,9 @@ window.LibPro=(()=>{
     const L=['<?xml version="1.0" encoding="UTF-8"?>','<DJ_PLAYLISTS Version="1.0.0">','  <PRODUCT Name="Mixlab" Version="0.3.0" Company="Mixlab"/>',`  <COLLECTION Entries="${tracks.length}">`];
     tracks.forEach((t,i)=>{
       const ki=keyInfo(t.key),src=t.path||t.file||t.title,ext=(/\.(\w+)$/.exec(src)||[])[1]||'',c=colorOf(t.color);
-      const at={TrackID:i+1,Name:t.title,Artist:t.artist,Album:'',Genre:t.genre||'',Kind:ext?ext.toUpperCase()+' File':'',TotalTime:Math.round(t.duration||0),
+      const at={TrackID:i+1,Name:t.title,Artist:t.artist,Album:t.album||'',Genre:t.genre||'',Kind:ext?ext.toUpperCase()+' File':'',TotalTime:Math.round(t.duration||0),
         AverageBpm:(t.bpm||0).toFixed(2),DateAdded:ymd(t.added),PlayCount:t.plays||0,Rating:(t.rating||0)*51,Location:pathToLoc(src),Tonality:ki?ki.name:'',Comments:t.comment||''};
-      if(c)at.Colour=c.rb;
+      if(c)at.Colour=c.rb;if(t.year)at.Year=t.year;
       const kids=[];
       if(t.bpm&&t.grid!=null){const beat=60/t.bpm;let g=t.grid;while(g<0)g+=4*beat;kids.push(`      <TEMPO Inizio="${g.toFixed(3)}" Bpm="${t.bpm.toFixed(2)}" Metro="4/4" Battito="1"/>`);}
       if(t.cue!=null)kids.push(mark('',-1,t.cue));
@@ -836,7 +847,7 @@ window.LibPro=(()=>{
   if(!N()&&typeof indexedDB!=='undefined')browserLoad();else B.loaded=true;
 
   return{COLORS,parseKey,parseRekordbox,parseItunes,parseM3U,parseCSV,parseList,parseAny,locToPath,pathToLoc,normTitle,matchList,
-    importCollection,toRekordbox,toM3U,tracklistText,tracklistCSV,duplicates,crateTracks,saveCrate,deleteCrate,crateEditor,search,filter,
+    importCollection,toRekordbox,toM3U,tracklistText,tracklistCSV,setTracks,duplicates,crateTracks,saveCrate,deleteCrate,crateEditor,search,filter,
     hidden,bar,side,owns,keepOrder,viewTracks,empty,edit,closeEdit,row,plItem,autoLoad,liveView,menu,rowMenu,plMenu,renamePl,deletePl,missingList,saveBrowser:browserSave,get hasSaved(){return B.saved;},metaOut,metaIn,extraOut,extraIn,exchange,exchangeList,historyModal,missingModal,relocateFrom,saveFile,
     get crates(){return S.crates;},get sets(){return allSets();},state:S};
 })();

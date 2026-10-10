@@ -21,13 +21,13 @@
 
 ## Résumé
 
-**334 fonctions** recensées.
+**338 fonctions** recensées.
 
 | État | Nombre | Part |
 |---|---|---|
-| Fait | 93 | 28 % |
-| Partiel | 49 | 15 % |
-| Manque | 192 | 57 % |
+| Fait | 100 | 30 % |
+| Partiel | 48 | 14 % |
+| Manque | 190 | 56 % |
 
 **Ce qui est solide.**
 - Le cœur du jeu : platines, cues, boucles, sync et mixer.
@@ -272,6 +272,7 @@
 | Effet déclenché quantisé (Beat FX on sur le temps) | RB, S | **Manque** | P2 | S |
 | Post-fader / pré-fader au choix (queue d'écho après la coupe) | RB, TR, MX | **Partiel** : l'effet est avant le fader, mais une queue existe pour l'écho | P2 | S |
 | Effets par stem | S *(Stems FX)*, RB, VDJ, MX 2.6 | **Manque** | P2 | M |
+| Réglages des effets gardés d'une session à l'autre | tous | **Fait** : type, durée, dosage, réglages, mode et cibles rendus au démarrage (l'unité reste coupée) | P2 | S |
 | Banques ou favoris d'effets | VDJ 2026, TR | **Manque** | P3 | S |
 | Effets en plugin (VST/AU) | VDJ, MX (LV2), DJS | **Manque** | P3 | L |
 | Effets « RMX » (Build-up, Break-down, Scene) | RB *(Creative, RMX EFFECTS)* | **Manque** | P3 | M |
@@ -314,15 +315,15 @@
 |---|---|---|---|---|
 | Import de fichiers et de dossiers entiers | tous | **Fait** : bureau (fichiers, dossier, glisser-déposer) | P1 | S |
 | Bibliothèque persistante | tous | **Fait** : `library.json`, appli de bureau seulement | P1 | S |
-| Cache de l'analyse (pas de réanalyse au démarrage) | tous | **Partiel** : BPM, grille et tonalité gardés, mais chaque morceau est redécodé et réanalysé (waveform) au lancement | P1 | M |
+| Cache de l'analyse (pas de réanalyse au démarrage) | tous | **Fait** : BPM, grille, tonalité, waveform, sections, énergie et cues de structure gardés dans IndexedDB sous l'empreinte du fichier (taille + hachage du début et de la fin) ; le morceau est seulement redécodé. Invalidation : version de l'analyse, plage de BPM, fichier modifié, plus anciens au-delà de 2000 (`app/persist.js`) | P1 | M |
 | Analyse par lots en tâche de fond | tous | **Partiel** : séquentielle, sur le fil de l'interface | P1 | M |
 | Recherche instantanée | tous | **Fait** : titre, artiste, genre, BPM, tonalité | P1 | S |
 | Recherche par champ (`bpm:120-126`, `key:8A`) | MX, TR, RB | **Manque** | P2 | S |
 | Tri par colonne | tous | **Fait** | P1 | S |
 | Colonnes configurables | tous | **Manque** | P2 | S |
-| Lecture des tags ID3, Vorbis et MP4 (titre, artiste, album, genre, année, commentaire) | tous | **Manque** : les infos viennent du nom de fichier | P1 | M |
+| Lecture des tags ID3, Vorbis et MP4 (titre, artiste, album, genre, année, commentaire) | tous | **Fait** : ID3v1, v2.2 à v2.4, MP4/M4A, FLAC, Ogg Vorbis et Opus, en JavaScript (`app/tags.js`), avec BPM (guide l'analyse) et tonalité ; ne remplace jamais une info modifiée à la main | P1 | M |
 | Écriture des tags et édition des métadonnées | tous | **Manque** | P2 | M |
-| Pochettes | tous | **Manque** | P2 | S |
+| Pochettes | tous | **Fait** : lues dans les tags, vignette de 96 px dans la liste et sur la platine | P2 | S |
 | Note (étoiles) | tous | **Manque** | P1 | S |
 | Couleur de piste | tous | **Manque** | P2 | S |
 | Commentaire, énergie, label, année, bitrate | tous | **Manque** | P2 | S |
@@ -333,8 +334,8 @@
 | Dossiers de playlists, sous-crates | tous | **Manque** | P2 | S |
 | Smart crates / playlists intelligentes à règles | S *(Pro)*, RB, TR, VDJ, ENG, MX | **Manque** | P1 | M |
 | Couleur, favoris et tri des crates | S 4.0 | **Manque** | P3 | S |
-| Historique des sets | tous | **Partiel** : session en cours seulement, rien n'est sauvegardé | P1 | S |
-| Export de la tracklist (texte, CSV) | tous | **Manque** | P2 | S |
+| Historique des sets | tous | **Fait** : sets gardés d'une session à l'autre (bibliothèque de l'appli, IndexedDB dans le navigateur), listés par date dans la barre latérale | P1 | S |
+| Export de la tracklist (texte, CSV) | tous | **Fait** : texte, CSV et M3U8 pour chaque set | P2 | S |
 | File d'attente / Prepare / Sidelist | S, VDJ, RB, TR | **Manque** : il existe une playlist « Préparation » | P1 | S |
 | Afficher dans quelles playlists se trouve une piste | S 4.0, RB | **Manque** | P3 | S |
 | Doublons | RB, VDJ, MX | **Partiel** : doublon de chemin refusé à l'import | P2 | S |
