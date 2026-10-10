@@ -393,6 +393,8 @@ window.Academie=(()=>{
     if(!confirm('Effacer toute ta progression dans l’Académie ?'))return;
     Object.assign(prog,JSON.parse(JSON.stringify(DEF)),{open:true});save();render();
   }
+  // depuis Préférences (qui demande la confirmation)
+  function resetProgress(){const o=prog.open;Object.assign(prog,JSON.parse(JSON.stringify(DEF)),{open:o});save();if(o)render();}
 
   /* ---------- carte dans la liste des leçons du coach ---------- */
   function card(){
@@ -407,5 +409,5 @@ window.Academie=(()=>{
     if(prog.open)open();
     if(window.Coach&&!Coach.L.active&&Coach.render)Coach.render();
   }
-  return{init,open,close,go,card,render,lecture,stats,prog,LESSONS,TPL,makePlan,analyse,match,resample,energyOf:E,GLOSS:GL,get active(){return prog.open;}};
+  return{init,open,close,go,card,render,resetProgress,lecture,stats,prog,LESSONS,TPL,makePlan,analyse,match,resample,energyOf:E,GLOSS:GL,get active(){return prog.open;}};
 })();

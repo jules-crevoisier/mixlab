@@ -10,7 +10,7 @@ app/         interface et moteur audio Web Audio, en JavaScript sans bundler
 src-tauri/   fenêtre Tauri 2 : fichiers, bibliothèque, exports, MIDI natif (midir)
 engine/      moteur audio natif Rust (crate mixlab-engine), pas encore branché
 electron/    ancienne version Electron, gardée en secours
-test/        11 suites de tests Playwright (Chromium sans écran)
+test/        12 suites de tests Playwright (Chromium sans écran)
 docs/        guide, feuille de route, parité, journal, architecture
 ```
 
@@ -32,14 +32,14 @@ Toutes les commandes cliquables passent par le registre `controls` de `app.js` (
 |---|---|---|---|
 | `tauri-bridge.js` | `window.mixlabNative`, `navigator.requestMIDIAccess` | Dans l'appli seulement : expose les commandes Tauri (fichiers, bibliothèque, exports, WAV, liens d'achat) et un Web MIDI construit sur le MIDI natif. Ne fait rien dans un navigateur. | Chargé en premier, avant tout le reste. |
 | `engine.js` | `ctx`, `S`, `bus`, `Deck`, `decks`, `LIB`, `addTrack`, `FXU`, `SAMPLER`, `REC`… | Le moteur Web Audio : 4 platines, key lock (pitch shifter granulaire), 2 unités d'effets et 13 effets, effets de voie, bus master / casque / split, limiteur, sampler, enregistrement WebM, analyse BPM, grille, tonalité et volume, morceaux de démo synthétisés. | Globales classiques. |
-| `desktop.js` | `Desktop` | Sorties audio (master et casque sur deux cartes), boutons Fichiers et Dossier, bibliothèque persistante de l'appli (`library.json`), fichiers manquants et relocalisation. Dans un navigateur, il ne garde que le choix des sorties. | `Desktop.init()` puis `Desktop.boot()` dans `boot()`. |
+| `desktop.js` | `Desktop` | Sorties audio (master et casque sur deux cartes, listes posées dans Préférences › Audio), boutons Fichiers et Dossier, bibliothèque persistante de l'appli (`library.json`), fichiers manquants et relocalisation. Dans un navigateur, il ne garde que le choix des sorties. | `Desktop.init()` puis `Desktop.boot()` dans `boot()`. |
 | `app.js` | fonctions globales (`h`, `store`, `toast`, `renderTable`, `applyLayout`, `loadTo`, `importFiles`…) | Construit l'interface : barre du haut, effets, waveforms, platines, mixer, bibliothèque, dispositions, MIDI v1, clavier (`KEYS_DEF`), boucle d'affichage `frame()`. | Lance `boot()` après `DOMContentLoaded`, une fois tous les scripts exécutés. |
 | `library-pro.js` | `LibPro` | Bibliothèque pro : note, couleur, énergie, tags, colonnes, recherche par champ, crates intelligentes, doublons, historique des sets, import rekordbox / iTunes / M3U / CSV, export rekordbox XML et M3U8, playlists Spotify / Deezer, menus contextuels, clavier de la table, sauvegarde du navigateur dans IndexedDB. | Remplace `addTrack`, ajoute des colonnes à `COLS` ; appelé par `buildLib`, `renderSide`, `trackRows`, `paintRows`. |
 | `mappings/index.js` | `MIXLAB_MAPPINGS` | Les mappings livrés (copie de `mappings/*.json`, car `file://` ne peut pas lire de JSON). Aujourd'hui le modèle « Générique 2 platines ». | Lu par `controllers.js`. |
 | `controllers.js` | `Controllers` | Mapping v2 (bouton, absolu, relatif en 3 codages, jog, toucher, 14 bits, Shift, rattrapage, inversion, bascule de platine), voyants, assistant de mapping, bibliothèque de mappings, détection au branchement, horloge MIDI, éditeur des raccourcis clavier. | `app.js` lui passe `onMidi`, `ledTick`, `renderMaps`, `onDevices`, `importText` ; `Controllers.build()` depuis `buildMidi()`. |
 | `perf.js` | `Perf` | Popovers, éditeur de hot cue (nom, couleur), liste des cues mémoire et des boucles gardées, sons du sampler (IndexedDB `mixlab-sampler`), plage d'analyse BPM, préférences d'effet de voie et d'EQ. | `Perf.init()` dans `boot()` ; `Perf.padMenu`, `Perf.cueList` depuis les pads. |
 | `view.js` | `View` | Interface live : répartition de la hauteur sans défilement, séparateurs, tailles de platine, bibliothèque plein écran, zoom de l'interface, mode scène, plein écran, menu Affichage, panneau Préparation, panneau latéral du preset Mix, compteur de temps et de phrase. | `View.build()` dans `boot()`, `View.layout()` depuis `applyLayout()`, `View.tick()` dans `frame()`. |
-| `deck-pro.js` | `DeckPro` | Modes de cue CDJ / Denon / Numark, Cue Play, sync à la mesure ou à la phrase, key sync, ton fin, tonalité corrigée, instant double, verrou de grille, métronome, décompte, pré-écoute de la bibliothèque, chargement du suivant, courbes des faders et du crossfader, résonance, balance, enregistrement WAV (AudioWorklet), fenêtre « Réglages de jeu ». | Remplace des méthodes de `Deck.prototype`, `faderGain`, `xfGains`, `recToggle` ; sa boucle de 100 ms pose les commandes. |
+| `deck-pro.js` | `DeckPro` | Modes de cue CDJ / Denon / Numark, Cue Play, sync à la mesure ou à la phrase, key sync, ton fin, tonalité corrigée, instant double, verrou de grille, métronome, décompte, pré-écoute de la bibliothèque, chargement du suivant, courbes des faders et du crossfader, résonance, balance, enregistrement WAV (AudioWorklet). Ses réglages se changent dans les Préférences (`setPref`). | Remplace des méthodes de `Deck.prototype`, `faderGain`, `xfGains`, `recToggle` ; sa boucle de 100 ms pose les commandes. |
 | `learn.js` | `Coach` | Le panneau Coach et les 3 leçons guidées, validées sur l'état réel. Héberge les cartes du parcours et de l'Académie. | `Coach.build()`, `Coach.ready()` dans `boot()`, `Coach.tick()` dans `frame()`. |
 | `coach-live.js` | `MixCoach` | Le coach en direct : 13 règles, un conseil à la fois, halo et voyant sur la commande, bilan noté de chaque transition, niveaux Débutant / Essentiel / Coupé. | `MixCoach.build()` dans `boot()`, `MixCoach.tick()` dans `frame()`. |
 | `structure.js` | `Structure` | Analyse de structure en tâche de fond (intro, couplet, break, montée, drop, outro), énergie de 1 à 10, cues mémoire automatiques, dessin sur les waveforms. | `addTrack` appelle `Structure.queue()` ; `drawLane`, `drawOv` depuis le dessin ; `Structure.build()` dans `boot()`. |
@@ -49,6 +49,7 @@ Toutes les commandes cliquables passent par le registre `controls` de `app.js` (
 | `academie.js` | `Academie` | L'Académie : leçons, quiz, courbe d'énergie, assistant de plan de set, simulation de piste, crate et tags. | `Academie.init()` dans `boot()`. |
 | `tags.js` | `Tags` | Lecture des tags en pur JS : ID3v1 / v2.2 / v2.3 / v2.4, MP4, FLAC, Ogg Vorbis et Opus, pochettes. | Appelé par `Persist.pre()` et `Persist.post()`. |
 | `persist.js` | `Persist` | Cache d'analyse dans IndexedDB (`mixlab-analyse`, clé = empreinte du fichier), tags à l'import, réglages des unités d'effets gardés. | `importFiles` et `Desktop.loadRecord` appellent `Persist.pre()` avant le décodage et `Persist.post()` après `addTrack`. |
+| `prefs.js` | `Prefs` | La fenêtre Préférences : 9 onglets (Profil, Affichage, Audio, Platines, Mixer, Contrôleurs et clavier, Coach et apprentissage, Bibliothèque, Avancé) et une recherche. Aucun état en double : chaque ligne lit la valeur dans son module et passe par son setter (`DeckPro.setPref`, `View.setStage`, `MixCoach.setLevel`…). Profil (logiciel d'origine et niveau, écrit aussi par l'accueil), export, import et remise à zéro des réglages. | `Prefs.init()` dans `boot()` : bouton dans la barre du haut, Ctrl+,, et y déplace le clavier et le mapping en texte de la fenêtre Contrôleur. |
 
 ### Démarrage
 
@@ -59,7 +60,7 @@ Toutes les commandes cliquables passent par le registre `controls` de `app.js` (
    - `Coach.build()`, `MixCoach.build()`, `Structure.build()`, `AutoMix.build()` ;
    - première image de `frame()` ;
    - les 4 morceaux de démo sont synthétisés et chargés sur les platines ;
-   - `Coach.ready()`, `Parcours.init()` (fenêtre d'accueil au premier lancement), `Academie.init()`, `Desktop.boot()` (sorties audio, bibliothèque enregistrée, sauvegarde toutes les 5 s).
+   - `Coach.ready()`, `Parcours.init()` (fenêtre d'accueil au premier lancement), `Academie.init()`, `Prefs.init()`, `Desktop.boot()` (sorties audio, bibliothèque enregistrée, sauvegarde toutes les 5 s).
 3. `frame()` tourne à chaque image : avance des platines, historique (30 s de lecture), waveforms, vue d'ensemble, jog, voyants des boutons, VU-mètres, limiteur, effets, BPM maître, horloge, voyants MIDI, puis `View.tick`, `Coach.tick`, `MixCoach.tick`, `Parcours.tick`.
 
 ### Où sont gardées les données
@@ -100,7 +101,7 @@ Seuls les fichiers que l'utilisateur a choisis (dialogue, dossier, bibliothèque
 
 ## Les tests
 
-`npm test` lance 11 suites Playwright dans Chromium sans écran, sur `app/index.html`. Le pont natif et le MIDI sont simulés quand il le faut, et le son est mesuré à l'analyseur quand c'est possible.
+`npm test` lance 12 suites Playwright dans Chromium sans écran, sur `app/index.html`. Le pont natif et le MIDI sont simulés quand il le faut, et le son est mesuré à l'analyseur quand c'est possible.
 
 | Suite | Ce qu'elle couvre |
 |---|---|
@@ -114,6 +115,7 @@ Seuls les fichiers que l'utilisateur a choisis (dialogue, dossier, bibliothèque
 | `test/academie.js` | Ouverture, leçons, quiz, progression, quatre exercices, glossaire. |
 | `test/tags.js` | Tags fabriqués octet par octet, préremplissage, cache d'analyse, historique et effets gardés. |
 | `test/deckpro.js` | Modes de cue, pitch, ton fin, key sync, instant double, pré-écoute, courbes, balance, verrou, métronome, sync à la mesure et à la phrase, WAV. |
+| `test/prefs.js` | Préférences : ouverture (bouton, menu, Ctrl+,), chaque onglet, recherche, profil repris de l'accueil puis changé, persistance, export et import d'un fichier, remises à zéro, anciennes entrées. |
 | `test/layout.js` | Chaque preset en 2 et 4 platines, en 1600×950, 1366×768 et 1280×800 : rien ne défile. Séparateurs, tailles, plein écran, zoom, mode scène, contraste, polices locales, temps d'image. |
 
 Côté Rust : `cargo test --manifest-path src-tauri/Cargo.toml` (appli) et `cargo test` dans `engine/` (moteur).

@@ -127,13 +127,7 @@ window.Perf=(()=>{
   }
 
   function init(){
-    const pop=$('#panels-pop');
-    if(pop){
-      const sel=h('select',{class:'sel wide','aria-label':'Plage d’analyse BPM',title:'Les morceaux importés ensuite sont analysés dans cette plage. 60-120 pour le hip-hop et le downtempo, 88-175 pour la house, 100-200 pour la drum and bass.'},BPM_RANGES.map(([k])=>h('option',{value:k},k.replace('-',' à ')+' BPM')));
-      sel.value=(BPM_RANGES.find(x=>x[1][0]===S.bpmRange[0])||BPM_RANGES[2])[0];
-      sel.addEventListener('change',()=>{setBpmRange(sel.value);toast('Les prochains morceaux importés seront analysés entre '+sel.value.replace('-',' et ')+' BPM','ok');});
-      pop.append(h('div',{class:'lbl',style:'margin-top:6px'},'Plage d’analyse BPM'),sel);
-    }
+    // la plage d'analyse BPM se règle dans Préférences › Platines
     restoreSamples();
   }
   function setBpmRange(k){const r=BPM_RANGES.find(x=>x[0]===k);if(!r)return;S.bpmRange=r[1];store.set('bpmRange',k);}

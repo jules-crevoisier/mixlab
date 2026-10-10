@@ -49,12 +49,11 @@ window.Desktop=(()=>{
     if(c.hp&&ids.has(c.hp))await setHeadphones(c.hp);
   }
 
-  function buildAudioModal(){
-    const m=h('div',{class:'modal',id:'audio-modal',hidden:true});
+  /* Listes des sorties master et casque, et l'état (latence) : posées dans Préférences › Audio. */
+  function audioControls(){
     const master=h('select',{class:'sel wide','aria-label':'Sortie master'});
     const hp=h('select',{class:'sel wide','aria-label':'Sortie casque'});
     const info=h('p',{class:'lat'},'');
-    const close=h('button',{class:'b',type:'button',onclick:()=>{m.hidden=true;}},'Fermer');
     const fill=async()=>{
       const devs=await listOutputs(),c=store.get('audio',{master:'default',hp:''});
       master.innerHTML='';hp.innerHTML='';
@@ -71,16 +70,7 @@ window.Desktop=(()=>{
       if(hp.value&&hp.value===master.value){toast('Choisis une autre sortie que celle du master, ou garde « Même carte »');}
       if(await setHeadphones(hp.value)){const c=store.get('audio',{});c.hp=hp.value;store.set('audio',c);toast(hp.value?'Casque : '+hp.selectedOptions[0].textContent:'Casque sur la carte du master','ok');}
     });
-    m.append(h('div',{class:'mbox',role:'dialog','aria-label':'Réglages audio'},
-      h('h2',{},'Audio ',close),
-      h('div',{class:'mgrid'},
-        h('div',{},h('h3',{},'Sortie master'),h('p',{},'Ce que le public entend : enceintes, ou sortie master de ta table.'),master),
-        h('div',{},h('h3',{},'Sortie casque'),h('p',{},'Sur une table DJ avec carte son, choisis sa sortie casque pour préécouter sans que la salle entende.'),hp),
-        h('div',{},h('h3',{},'État'),info))));
-    m.addEventListener('click',e=>{if(e.target===m)m.hidden=true;});
-    document.body.append(m);
-    navigator.mediaDevices&&navigator.mediaDevices.addEventListener&&navigator.mediaDevices.addEventListener('devicechange',()=>{if(!m.hidden)fill();});
-    return{open:()=>{fill();m.hidden=false;}};
+    return{master,hp,info,fill};
   }
 
   /* ---------- import depuis le disque ---------- */
@@ -163,11 +153,10 @@ window.Desktop=(()=>{
   const dropMissing=m=>{A.missing=A.missing.filter(x=>x!==m);};
 
   /* ---------- démarrage ---------- */
-  let modal=null;
   function init(){
+    // le bouton Audio de la barre du haut ouvre Préférences › Audio
     const b=$('#audio-btn');
-    modal=buildAudioModal();
-    if(b)b.addEventListener('click',()=>modal.open());
+    if(b){b.title='Cartes son : master et casque (Préférences › Audio)';b.addEventListener('click',()=>window.Prefs&&Prefs.open('audio'));}
     if(N)document.documentElement.classList.add('native');
   }
   async function boot(){
@@ -176,6 +165,6 @@ window.Desktop=(()=>{
     setInterval(save,5000);
     window.addEventListener('beforeunload',save);
   }
-  return{init,boot,importButtons,pathOf,save,setHeadphones,setMaster,listOutputs,loadRecord,relocate,addMissing,dropMissing,snapshot,
+  return{init,boot,importButtons,pathOf,save,setHeadphones,setMaster,listOutputs,audioControls,loadRecord,relocate,addMissing,dropMissing,snapshot,
     get missing(){return A.missing;},get native(){return !!N;}};
 })();

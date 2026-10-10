@@ -400,7 +400,8 @@ function buildMixer(){
   const split=btn('split','Split cue','Split','',()=>{setSplit(!S.split);},null,'Split : casque à gauche, master à droite, sur une seule carte son (câble répartiteur)');ui.split=split;
   // réglages rares du mixer (effet de voie, mode d'EQ, volume du sampler) : dans un menu, pas sur la façade
   const setPop=h('div',{class:'pop mxpop',role:'dialog','aria-label':'Réglages du mixer'},
-    h('label',{class:'mxf'},h('span',{class:'lbl'},'Effet de voie'),cfx),h('label',{class:'mxf'},h('span',{class:'lbl'},'Égaliseur'),eqm),h('div',{class:'mxf'},h('span',{class:'lbl'},'Volume du sampler'),sv.el));
+    h('label',{class:'mxf'},h('span',{class:'lbl'},'Effet de voie'),cfx),h('label',{class:'mxf'},h('span',{class:'lbl'},'Égaliseur'),eqm),h('div',{class:'mxf'},h('span',{class:'lbl'},'Volume du sampler'),sv.el),
+    h('button',{class:'b',type:'button',id:'mx-prefs',title:'Courbes, résonance, limiteur, balance',onclick:()=>{setD.open=false;window.Prefs&&Prefs.open('mixer');}},'Tous les réglages du mixer…'));
   const setD=h('details',{class:'mxset'},h('summary',{class:'b',title:'Réglages du mixer : effet de voie, mode d’EQ, volume du sampler'},'Réglages'),setPop);
   setD.addEventListener('toggle',()=>{if(!setD.open)return;const r=$('summary',setD).getBoundingClientRect(),z=window.View?View.zoom:1,W=innerWidth/z;
     setPop.style.top='';setPop.style.left=Math.max(6,Math.min(r.left/z,W-setPop.offsetWidth-6))+'px';setPop.style.top=Math.max(6,r.top/z-setPop.offsetHeight-6)+'px';});
@@ -628,9 +629,7 @@ function buildTop(){
   $$('#ndecks button').forEach(b=>b.addEventListener('click',()=>{S.numDecks=+b.dataset.n;if(S.master&&!S.master.active)S.master=null;applyLayout();}));
   const pop=$('#panels-pop');
   for(const[k,n]of Object.entries(PANELS))pop.append(h('label',{},h('input',{type:'checkbox',value:k,onchange:e=>{e.target.checked?layout.visible.add(k):layout.visible.delete(k);applyLayout();}}),n));
-  const wm=h('select',{class:'sel wide','aria-label':'Couleurs des waveforms'},Object.entries(WAVE_MODES).map(([k,m])=>h('option',{value:k},m.name)));
-  wm.value=store.get('wave','3b');wm.addEventListener('change',()=>setWaveMode(wm.value));
-  pop.append(h('div',{class:'lbl',style:'margin-top:6px'},'Waveforms'),wm);
+  // couleurs des waveforms : dans Préférences › Affichage
   const q=$('#q-btn');q.setAttribute('aria-pressed',String(S.quantize));q.addEventListener('click',()=>{S.quantize=!S.quantize;q.setAttribute('aria-pressed',String(S.quantize));});
   const ag=$('#ag-btn');ag.setAttribute('aria-pressed',String(S.autoGain));ag.addEventListener('click',()=>{S.autoGain=!S.autoGain;ag.setAttribute('aria-pressed',String(S.autoGain));decks.forEach(d=>d.applyAutoGain());});
   $('#coach-btn').addEventListener('click',()=>setCoach(!layout.coach));
@@ -902,7 +901,7 @@ function buildMidi(){
 }
 
 /* ---------- clavier ---------- */
-/* Touches physiques (e.code) : mêmes positions en AZERTY, QWERTY ou QWERTZ. Modifiables dans la fenêtre Contrôleur. */
+/* Touches physiques (e.code) : mêmes positions en AZERTY, QWERTY ou QWERTZ. Modifiables dans Préférences › Contrôleurs et clavier. */
 const KEYS_DEF={KeyQ:'A.play',KeyW:'A.cue',KeyE:'A.sync',KeyA:'A.nudgeL',KeyS:'A.nudgeR',Digit1:'A.pad1',Digit2:'A.pad2',Digit3:'A.pad3',Digit4:'A.pad4',
   KeyP:'B.play',KeyO:'B.cue',KeyI:'B.sync',KeyK:'B.nudgeL',KeyL:'B.nudgeR',Digit7:'B.pad1',Digit8:'B.pad2',Digit9:'B.pad3',Digit0:'B.pad4',KeyZ:'xf-',KeyX:'xf+',
   F2:'ui.libfull',F9:'ui.stage'};
@@ -1018,6 +1017,7 @@ async function boot(){
   window.Coach&&Coach.ready&&Coach.ready();
   window.Parcours&&Parcours.init();
   window.Academie&&Academie.init();
+  window.Prefs&&Prefs.init();
   window.Desktop&&Desktop.boot();
 }
 // On attend que tous les scripts de la page (library-pro, coach…) soient exécutés.

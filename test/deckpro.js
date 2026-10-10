@@ -58,18 +58,21 @@ const helpers = () => {
   await page.evaluate(() => { const w = document.querySelector('.pc-wel'); if (w) w.remove(); });
   const W = (f, a) => page.evaluate(f, a);
 
-  // ---------- 1. Réglages : fenêtre ouverte depuis Panneaux, valeurs gardées ----------
-  await page.click('details.menu:has(#dp-open) summary');
-  await page.click('#dp-open');
-  check(await page.isVisible('#dp-modal'), 'Panneaux › Réglages de jeu : la fenêtre s’ouvre');
-  await page.selectOption('#dp-modal select[aria-label="Mode du bouton Cue"]', 'denon');
-  await page.selectOption('#dp-modal select[aria-label="Sync calée sur"]', 'bar');
-  await page.selectOption('#dp-modal select[aria-label="Courbe des faders de voie"]', 'lin');
-  await page.selectOption('#dp-modal select[aria-label="Format d’enregistrement"]', 'wav24');
-  await page.check('#dp-modal input[aria-label="Charger le morceau suivant"]');
+  // ---------- 1. Réglages : Préférences ouvertes depuis le menu Affichage, valeurs gardées ----------
+  await page.click('details.menu:has(#prefs-menu) summary');
+  await page.click('#prefs-menu');
+  check(await page.isVisible('#prefs'), 'Affichage › Préférences : la fenêtre s’ouvre');
+  await page.click('#pf-tab-platines');
+  await page.selectOption('#prefs select[aria-label="Mode du bouton Cue"]', 'denon');
+  await page.selectOption('#prefs select[aria-label="Sync calée sur"]', 'bar');
+  await page.check('#prefs input[aria-label="Charger le morceau suivant"]');
+  await page.click('#pf-tab-mixer');
+  await page.selectOption('#prefs select[aria-label="Courbe des faders de voie"]', 'lin');
+  await page.click('#pf-tab-audio');
+  await page.selectOption('#prefs select[aria-label="Format d’enregistrement"]', 'wav24');
   const st = await W(() => store.get('deckpro'));
   check(st.cueMode === 'denon' && st.syncUnit === 'bar' && st.faderCurve === 'lin' && st.recFormat === 'wav24' && st.autoNext === true, 'Réglages gardés (mode de cue, sync, courbe, format, suivant)', JSON.stringify(st));
-  await page.click('#dp-modal .mbox h2 button');
+  await page.click('#prefs-close');
 
   // ---------- 2. Modes du bouton Cue et Cue Play ----------
   await W(() => { resetMixer(); decks.forEach(d => { d.ui.fader.set(0); }); });

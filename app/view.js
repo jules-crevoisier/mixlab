@@ -207,7 +207,6 @@ window.View=(()=>{
     V.el.size=h('select',{class:'sel wide','aria-label':'Taille des platines'},Object.entries(SNAME).map(([k,n])=>h('option',{value:k},n)));
     V.el.size.addEventListener('change',()=>setSize(V.el.size.value));
     V.el.stageCk=h('input',{type:'checkbox',onchange:e=>setStage(e.target.checked)});V.el.stageCk.checked=V.stage;
-    const wh=dir=>{const s=start();sp().lane=clamp(s.lane+dir*6,LANEMIN,220);store.set('splits',V.splits);fit();};
     pop.append(
       h('div',{class:'lbl'},'Zoom de l’interface'),
       h('div',{class:'r fixed'},mini('−','Réduire (Ctrl −)',()=>setZoom(V.zoom-.1)),V.el.zv,mini('+','Agrandir (Ctrl +)',()=>setZoom(V.zoom+.1))),
@@ -217,7 +216,8 @@ window.View=(()=>{
       h('label',{title:'Contraste renforcé, gros chiffres, textes plus grands : pour une cabine sombre (F9)'},V.el.stageCk,'Mode scène (F9)'),
       h('div',{class:'r fixed vm-acts'},mini('Bibliothèque plein écran','Touche F2, Échap pour revenir',()=>{pop.closest('details').open=false;toggleLib(!V.libFull);}),
         mini('Plein écran','Toute la place pour l’appli',()=>{pop.closest('details').open=false;toggleFs();})),
-      mini('Disposition par défaut','Remet les séparateurs et la taille des platines de ce preset',()=>{delete V.splits[key()];delete V.sizes[key()];store.set('splits',V.splits);store.set('deckSizes',V.sizes);fit();toast('Disposition « '+PR().name+' » remise par défaut');}));
+      mini('Disposition par défaut','Remet les séparateurs et la taille des platines de ce preset',resetLayout),
+      h('button',{class:'b vm-prefs',id:'prefs-menu',type:'button',title:'Tous les réglages : profil, audio, platines, mixer, clavier, coach (Ctrl+,)',onclick:()=>{closeMenus();window.Prefs&&Prefs.open('affichage');}},'Préférences…'));
     const top=$('#top'),rec=$('#rec-btn');
     V.el.libBtn=h('button',{class:'tb',id:'lib-btn',type:'button','data-ctl':'ui.libfull','aria-pressed':'false',title:'Bibliothèque plein écran (F2). Échap pour revenir aux platines.',onclick:()=>toggleLib(!V.libFull)},'Biblio');
     // Mode scène : une icône toujours visible (même à 1366 px), et la touche F9
@@ -249,8 +249,10 @@ window.View=(()=>{
     pop.style.maxHeight=Math.max(140,H-s.bottom/z-10)+'px';pop.style.overflowY='auto';
     pop.style.left=Math.max(6,Math.min(s.left/z,W-pop.offsetWidth-6))+'px';
   }
+  function wh(dir){const s=start();sp().lane=clamp(s.lane+dir*6,LANEMIN,220);store.set('splits',V.splits);fit();}
+  function resetLayout(){delete V.splits[key()];delete V.sizes[key()];store.set('splits',V.splits);store.set('deckSizes',V.sizes);fit();toast('Disposition « '+PR().name+' » remise par défaut');}
   function closeMenus(){$$('#top details[open]').forEach(x=>{x.open=false;});}
-  const COLLAPSE=['#ag-btn','#q-btn','#audio-btn','#midi-btn','#fs-btn','#pc-btn','#am-btn','#lib-btn','#rec-btn','#ndecks'];
+  const COLLAPSE=['#ag-btn','#q-btn','#audio-btn','#midi-btn','#fs-btn','#pc-btn','#am-btn','#lib-btn','#prefs-btn','#rec-btn','#ndecks'];
   const overTop=t=>t.scrollWidth>t.clientWidth+1;
   // La barre du haut ne déborde jamais : les boutons les moins urgents passent dans « ⋯ », dans cet ordre.
   function fitTop(){
@@ -394,5 +396,5 @@ window.View=(()=>{
     const mo=new MutationObserver(refit);decks.forEach(d=>mo.observe(panel(d),{childList:true}));
     document.fonts&&document.fonts.ready.then(()=>{fit();fitTop();});
   }
-  return{build,layout:layoutHook,fit,toggleFxFold,fitTop,closeMenus,tick,setZoom,setStage,setSize,toggleLib,toggleFs,cycle,state:V,get zoom(){return V.zoom;},get libFull(){return V.libFull;}};
+  return{build,layout:layoutHook,fit,toggleFxFold,fitTop,closeMenus,tick,setZoom,setStage,setSize,toggleLib,toggleFs,cycle,waveHeight:wh,resetLayout,state:V,get zoom(){return V.zoom;},get libFull(){return V.libFull;}};
 })();

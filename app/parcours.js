@@ -106,7 +106,7 @@ window.Parcours=(()=>{
   const closeGloss=()=>{if(P.el.pop)P.el.pop.hidden=true;};
   document.addEventListener('pointerdown',e=>{if(!e.target.closest('.pc-pop,.pc-gl'))closeGloss();},true);
   document.addEventListener('keydown',e=>{
-    if(e.key==='Escape'){closeGloss();if(P.el.wel)welcome('pro');}
+    if(e.key==='Escape'){closeGloss();if(P.el.wel)welcome('pro',true);}
     if(!prog.active||e.target.closest('input,textarea,select')||e.metaKey||e.ctrlKey||e.altKey||e.repeat)return;
     if(e.key.toLowerCase()==='t'){const s=P.steps[prog.step];if(s&&s.w==='tap'){tap();e.preventDefault();}}
     if(e.key.toLowerCase()==='m'){const s=P.steps[prog.step];if(s&&s.w==='mark'){mark();e.preventDefault();}}
@@ -133,7 +133,7 @@ window.Parcours=(()=>{
     [11,'.dk-pads,.dk-sl,[data-ctl="samplervol"]'],
     [12,'.dk-pads .tabs .b:not([data-m="hot"]):not([data-m="smp"])'],
     [12,'.dk-pads .lst,.dk-grid,#lib-side,.libbar>:not(input[type="search"]):not(.compat):not(.imp):not(.count),#lib-btn'],
-    [13,'.dk-pro,.mst .eqm,#rec-btn,#presets,#ndecks,details.menu,#q-btn,#ag-btn,#am-btn,#midi-btn,#stage-btn'],
+    [13,'.dk-pro,.mst .eqm,#rec-btn,#presets,#ndecks,details.menu,#q-btn,#ag-btn,#am-btn,#midi-btn,#stage-btn,#prefs-btn'],
   ];
   const PANELS_AT={fx:9};
   const HIDE_UNTIL=4;   // chapitres 1 à 4 (index 0 à 3) : on masque au lieu de griser
@@ -475,6 +475,8 @@ window.Parcours=(()=>{
   }
   function toggleFree(){prog.free=!prog.free;save();applyLocks();render();}
   function reset(){if(!confirm('Effacer toute ta progression dans le parcours ?'))return;Object.assign(prog,JSON.parse(JSON.stringify(DEF)),{active:true});P.run=null;loadChapter(0,0);}
+  // depuis Préférences (qui demande la confirmation) : le parcours reste ouvert s'il l'était
+  function resetProgress(){const a=prog.active;Object.assign(prog,JSON.parse(JSON.stringify(DEF)),{active:a});P.run=null;save();if(a)loadChapter(0,0);}
 
   /* ---------- halo et LED ---------- */
   function elOf(tg){if(!tg)return null;if(/^[#.\[]/.test(tg))return $(tg);const c=ctl(tg);return c?c.el:null;}
@@ -616,14 +618,19 @@ window.Parcours=(()=>{
   }
 
   /* ---------- premier lancement ---------- */
-  // Je viens d'un autre logiciel : on choisit la disposition la plus proche.
+  // Je viens d'un autre logiciel : on choisit la disposition la plus proche (les noms en texte, jamais de logo).
   const FROM={serato:['Serato','perf'],rekordbox:['rekordbox','export'],traktor:['Traktor','studio'],virtualdj:['VirtualDJ','mix']};
-  function welcome(choice){
+  /* Le choix passe par le profil des Préférences (disposition, niveau du coach) : même code que
+     Préférences › Profil. Échap ferme l'accueil sans rien changer. */
+  function welcome(choice,dismiss){
     if(choice){store.set('welcome',choice);if(P.el.wel){P.el.wel.remove();P.el.wel=null;}
+      if(dismiss)return;
+      const f=FROM[choice],prof={from:f?choice:'',level:choice==='novice'?'debutant':'mixe'};
+      if(window.Prefs)Prefs.applyProfile(prof,{quiet:true});
+      else if(f){const pr=PRESETS[f[1]];layout.preset=f[1];layout.visible=new Set(pr.show);layout.coach=!!pr.coach;applyLayout();}
       if(choice==='novice'){open(prog.active?null:0);return;}
-      const f=FROM[choice];
-      if(f){const[name,k]=f,pr=PRESETS[k];layout.preset=k;layout.visible=new Set(pr.show);layout.coach=!!pr.coach;applyLayout();toast(`Disposition « ${pr.name} », la plus proche de ${name}. Le parcours reste dans le bouton Parcours.`,'ok');}
-      else toast('Le parcours débutant reste dans le bouton Parcours, en haut.');return;}
+      if(f)toast(`Disposition « ${PRESETS[f[1]].name} », la plus proche de ${f[0]}. Le parcours reste dans le bouton Parcours. Tout se change dans Préférences.`,'ok');
+      else toast('Le parcours débutant reste dans le bouton Parcours, en haut. Tout se change dans Préférences.');return;}
     const opt=(id,t,p,c)=>h('button',{class:'pc-opt',type:'button',id,onclick:()=>welcome(c)},h('b',{},t),h('span',{},p));
     P.el.wel=h('div',{class:'pc-wel',role:'dialog','aria-label':'Bienvenue'},h('div',{class:'pc-welc'},
       h('div',{class:'pc-k'},'Bienvenue dans Mixlab'),h('h2',{},'Tu as déjà mixé ?'),
@@ -658,6 +665,6 @@ window.Parcours=(()=>{
     else if(store.get('welcome',null)==null&&(!navigator.webdriver||/welcome/.test(location.hash)))welcome();
     if(!Coach.L.active&&Coach.render)Coach.render();
   }
-  return{init,tick,open,exit,go:(c,s)=>{if(!prog.active)open(c);loadChapter(c,s||0);},skip:()=>advance(true),next:()=>advance(false),tap,mark,card,keepIssue,welcome,
+  return{init,tick,open,exit,resetProgress,FROM,go:(c,s)=>{if(!prog.active)open(c);loadChapter(c,s||0);},skip:()=>advance(true),next:()=>advance(false),tap,mark,card,keepIssue,welcome,
     summaryText,summary,CH,GLOSS,gloss,prog,P,LOCKS,get target(){return prog.active?P.target:null;},get active(){return prog.active;}};
 })();

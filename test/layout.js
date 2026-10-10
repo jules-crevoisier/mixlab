@@ -249,10 +249,10 @@ const measure = page => page.evaluate(() => {
   for (const [w, h] of SIZES) {
     page = await open(browser, w, h, { preset: 'perf', decks: 2 });
     await page.click('#top details.menu > summary'); await sleep(200);
-    const vis = await hitOk('#dp-open');
-    if (vis) { await page.click('#dp-open'); await sleep(200); }
-    const modal = await page.evaluate(() => { const m = document.querySelector('#dp-modal'); if (!m || m.hidden) return false; const r = m.getBoundingClientRect(); return r.width > 0 && r.height > 0; });
-    check(vis && modal, `Menu Affichage à ${w}×${h} : « Réglages de jeu… » visible et cliquable`, `visible ${Number(vis)}, fenêtre ${Number(modal)}`);
+    const vis = await hitOk('#prefs-menu');
+    if (vis) { await page.click('#prefs-menu'); await sleep(200); }
+    const modal = await page.evaluate(() => { const m = document.querySelector('#prefs'); if (!m || m.hidden) return false; const r = m.querySelector('.mbox').getBoundingClientRect(); return r.width > 0 && r.height > 0 && r.bottom <= innerHeight + .5 && r.right <= innerWidth + .5; });
+    check(vis && modal, `Menu Affichage à ${w}×${h} : « Préférences… » visible et cliquable, la fenêtre tient à l’écran`, `visible ${Number(vis)}, fenêtre ${Number(modal)}`);
     await page.context().close();
   }
 
