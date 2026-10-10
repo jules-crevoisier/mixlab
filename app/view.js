@@ -26,8 +26,11 @@ window.View=(()=>{
   function apply(t){
     const P=PR(),A=app();
     decks.forEach(d=>{const el=panel(d),s=P.prep&&!el.classList.contains('big')&&S.numDecks===4?'mini':t.sz;
-      if(!el.classList.contains('sz-'+s)){el.classList.remove('sz-full','sz-compact','sz-mini');el.classList.add('sz-'+s);}});
-    $('#p-mixer').classList.toggle('mxc',t.mx==='compact');
+      if(!el.classList.contains('sz-'+s)){el.classList.remove('sz-full','sz-compact','sz-mini');el.classList.add('sz-'+s);}
+      // platine mini : pads et boucle tant qu'ils tiennent, puis pads seuls, puis rien
+      const mp=s!=='mini'?2:t.sz==='mini'?t.mp??2:0; // petites platines de Préparation : sans pads
+      el.classList.toggle('mini-nl',mp<2);el.classList.toggle('mini-np',mp<1);});
+    $('#p-mixer').classList.toggle('mxc',t.mx==='compact');$('#p-fx').classList.toggle('fxfold',!!t.fx);
     css('--jog',t.j+'px');css('--lane',t.ln+'px');css('--dkw',t.ln+'px');css('--fdr',t.mx==='compact'?'58px':'104px');
     A.style.gridTemplateRows=rowsFor(t);
   }
@@ -51,7 +54,9 @@ window.View=(()=>{
     if(narrow()){A.style.gridTemplateRows='';return;}
     if(V.libFull)return fitLibFull();
     const t0=performance.now(),P=PR(),n=S.numDecks,k=key(),sp=V.splits[k]||{},H=A.clientHeight;
-    const lane0=clamp(sp.lane??P.lane[n],LANEMIN,220),L0=clamp((sp.lib??P.lib)*H,LMIN,Math.max(LMIN,H*.85));
+    // mode scène : waveforms 40 % plus hautes ; écran de moins de 800 px : la bibliothèque cède d'abord sa part (30 % de la fenêtre)
+    const lane0=clamp(sp.lane??Math.round(P.lane[n]*(V.stage?1.4:1)),LANEMIN,220),short=innerHeight/V.zoom<800;
+    const L0=clamp(sp.lib!=null?sp.lib*H:short?Math.min(P.lib*H,.305*innerHeight/V.zoom):P.lib*H,LMIN,Math.max(LMIN,H*.85));
     // la bibliothèque garde sa part (preset ou séparateur) ; à défaut au moins un tiers ; en dernier recours 5 lignes
     const Lp=Math.min(L0,Math.max(LMIN,H*.33));
     const user=V.sizes[k]||'auto';
@@ -59,13 +64,15 @@ window.View=(()=>{
     if(P.prep&&sizes[0]==='mini')sizes=['full','compact','mini'];
     const mxs=P.mixer==='compact'?['compact']:['full','compact'];
     const J=(P.jog&&P.jog[n])||0,jogs=sz=>sz==='full'&&!P.noJog&&J?[J,Math.round(J*.86),Math.round(J*.74)]:[J||120];
+    // rangée d'effets repliée sur une ligne : avant de passer à une taille de platine plus petite (toujours en mode scène)
+    const fxOn=layout.visible.has('fx')&&layout.rows.some(r=>r.a.includes('fx')),fxs=!fxOn?[false]:V.stage?[true]:[false,true];
     // pour chaque taille, on essaie d'abord la variante la plus petite : si elle ne tient pas, la taille est écartée
-    let ok=null,fb=null,nl=0,last=null;A.classList.add('fitting');
+    let ok=null,fb=null,nl=0,last=null,lastVars=[];A.classList.add('fitting');
     let best=null,bestR=-1e9;const note=(t,r)=>{if(r>bestR){bestR=r;best=t;}};
     const tol=Math.max(1,Math.min(L0-Lp,H*.04)),judge=(t,r)=>{note(t,r);if(r>=L0-tol){ok={...t,L:Math.min(L0,r)};return true;}if(!fb&&r>=Lp-1)fb={...t,L:Lp};if(user!=='auto'&&t.sz===user&&!fb&&r>=LMIN-1)fb={...t,L:Math.max(LMIN,Math.min(r,Lp))};return false;};
     for(const sz of sizes){
-      const vars=[];mxs.forEach(mx=>jogs(sz).forEach(j=>vars.push({sz,mx,j,ln:lane0})));
-      const small=last=vars[vars.length-1],rs=room(small);nl++;note(small,rs);
+      const vars=[],mps=sz==='mini'?[2,1,0]:[2];mps.forEach(mp=>mxs.forEach(mx=>jogs(sz).forEach(j=>fxs.forEach(fx=>vars.push({sz,mx,j,fx,mp,ln:lane0})))));
+      const small=last=vars[vars.length-1],rs=room(small);nl++;note(small,rs);lastVars=vars;
       // plutôt des waveforms un peu plus basses que des platines sans pads
       let hit=false;
       if((sz==='compact'||sz===user)&&sp.lane==null&&rs<L0-tol)for(const f of sz===user?[.8,.6]:[.8]){const t={...small,ln:Math.max(LANEMIN,Math.round(lane0*f))};if(t.ln>=lane0)break;nl++;const r=room(t);if(judge(t,r)){hit=true;break;}if(r>=Lp-1)break;}
@@ -81,7 +88,12 @@ window.View=(()=>{
     if(!ok&&sp.lib!=null&&sp.lane==null&&best)for(const f of [.82,.68]){const t={...best,ln:Math.max(LANEMIN,Math.round(lane0*f))};if(t.ln>=best.ln)continue;nl++;const r=room(t);if(r>bestR){best=t;bestR=r;}if(r>=L0-tol)break;}
     ok=ok||(sp.lib!=null&&best&&bestR>=Lp-1?{...best,L:Math.min(L0,bestR)}:fb);
     if(!ok){
-      for(const ln of [Math.round(lane0*.82),Math.round(lane0*.68),LANEMIN].filter(x=>x<lane0&&x>=LANEMIN)){const r=room({...last,ln});nl++;if(r>=LMIN-1){ok={...last,ln,L:Math.max(LMIN,Math.min(r,Lp))};break;}}
+      // waveforms plus basses : on garde la variante la plus riche (pads de la platine mini, effets dépliés) qui laisse sa part à la bibliothèque
+      const lns=[Math.round(lane0*.82),Math.round(lane0*.68),LANEMIN].filter(x=>x<lane0&&x>=LANEMIN);
+      const rich=lastVars.filter(v=>v!==last&&v.mx===last.mx&&v.j===last.j&&v.fx===last.fx);
+      // en mode scène, la hauteur des waveforms passe avant les pads de la platine mini
+      for(const ln of V.stage?lns.slice(0,1):lns){for(const v of rich){const r=room({...v,ln});nl++;if(r>=Lp-1){ok={...v,ln,L:Lp};break;}}if(ok)break;}
+      if(!ok)for(const ln of lns){const r=room({...last,ln});nl++;if(r>=LMIN-1){ok={...last,ln,L:Math.max(LMIN,Math.min(r,Lp))};break;}}
       if(!ok)ok={...last,ln:LANEMIN,L:LMIN};
     }
     A.classList.remove('fitting');apply(ok);
@@ -162,12 +174,12 @@ window.View=(()=>{
   function setZoom(z,quiet){
     V.zoom=clamp(Math.round(z*20)/20,.8,1.5);store.set('uiZoom',V.zoom);css('--uiz',String(V.zoom));
     if(V.el.zv)V.el.zv.textContent=Math.round(V.zoom*100)+' %';
-    fit();if(!quiet)toast('Zoom de l’interface : '+Math.round(V.zoom*100)+' %');
+    fit();fitTop();closeMenus();if(!quiet)toast('Zoom de l’interface : '+Math.round(V.zoom*100)+' %');
   }
   function setStage(on){
     V.stage=on;store.set('stage',on);document.documentElement.classList.toggle('stage',on);
     if(V.el.stageBtn)V.el.stageBtn.setAttribute('aria-pressed',String(on));if(V.el.stageCk)V.el.stageCk.checked=on;
-    fit();
+    fit();fitTop();
   }
   async function toggleFs(){
     try{
@@ -198,16 +210,58 @@ window.View=(()=>{
       h('div',{class:'lbl'},'Platines (clic sur l’en-tête)'),V.el.size,
       h('div',{class:'lbl'},'Waveforms : hauteur et zoom'),
       h('div',{class:'r fixed'},mini('−','Moins haute',()=>wh(-1)),mini('+','Plus haute',()=>wh(1)),h('span',{style:'width:8px'}),mini('Zoom −','Voir plus de temps (Ctrl + molette sur la waveform)',()=>setZoom2(ui.zoom*1.5)),mini('Zoom +','Voir moins de temps',()=>setZoom2(ui.zoom/1.5))),
-      h('label',{title:'Contraste renforcé, gros chiffres, textes plus grands : pour une cabine sombre'},V.el.stageCk,'Mode scène'),
-      h('div',{class:'r fixed vm-acts'},mini('Bibliothèque plein écran','Touche Tab, Échap pour revenir',()=>{pop.closest('details').open=false;toggleLib(!V.libFull);}),
+      h('label',{title:'Contraste renforcé, gros chiffres, textes plus grands : pour une cabine sombre (F9)'},V.el.stageCk,'Mode scène (F9)'),
+      h('div',{class:'r fixed vm-acts'},mini('Bibliothèque plein écran','Touche F2, Échap pour revenir',()=>{pop.closest('details').open=false;toggleLib(!V.libFull);}),
         mini('Plein écran','Toute la place pour l’appli',()=>{pop.closest('details').open=false;toggleFs();})),
       mini('Disposition par défaut','Remet les séparateurs et la taille des platines de ce preset',()=>{delete V.splits[key()];delete V.sizes[key()];store.set('splits',V.splits);store.set('deckSizes',V.sizes);fit();toast('Disposition « '+PR().name+' » remise par défaut');}));
     const top=$('#top'),rec=$('#rec-btn');
-    V.el.libBtn=h('button',{class:'tb',id:'lib-btn',type:'button','aria-pressed':'false',title:'Bibliothèque plein écran (Tab). Échap pour revenir aux platines.',onclick:()=>toggleLib(!V.libFull)},'Biblio');
-    V.el.stageBtn=h('button',{class:'tb',id:'stage-btn',type:'button','aria-pressed':String(V.stage),title:'Mode scène : contraste renforcé, gros BPM et temps restant',onclick:()=>setStage(!V.stage)},'Scène');
+    V.el.libBtn=h('button',{class:'tb',id:'lib-btn',type:'button','data-ctl':'ui.libfull','aria-pressed':'false',title:'Bibliothèque plein écran (F2). Échap pour revenir aux platines.',onclick:()=>toggleLib(!V.libFull)},'Biblio');
+    // Mode scène : une icône toujours visible (même à 1366 px), et la touche F9
+    const ico=svgEl('svg',{viewBox:'0 0 16 16','aria-hidden':'true'});ico.append(svgEl('circle',{cx:8,cy:8,r:6.2,fill:'none',stroke:'currentColor','stroke-width':1.6}),svgEl('path',{d:'M8 1.8 A6.2 6.2 0 0 1 8 14.2 Z',fill:'currentColor'}));
+    V.el.stageBtn=h('button',{class:'tb ico',id:'stage-btn',type:'button','data-ctl':'ui.stage','aria-pressed':String(V.stage),'aria-label':'Mode scène',title:'Mode scène (F9) : contraste renforcé, waveforms plus hautes, gros BPM et temps restant',onclick:()=>setStage(!V.stage)},ico);
     V.el.fsBtn=h('button',{class:'tb ico',id:'fs-btn',type:'button',title:'Plein écran','aria-label':'Plein écran',onclick:toggleFs},'⛶');
     $$('#ndecks button').forEach(b=>{b.title=b.textContent;b.setAttribute('aria-label',b.textContent);b.innerHTML=b.dataset.n+'<span class="w"> platines</span>';});
-    top.insertBefore(V.el.libBtn,rec);top.insertBefore(V.el.stageBtn,rec);top.append(V.el.fsBtn);
+    // menu « ⋯ » : reçoit les boutons qui ne tiennent plus dans la barre (au lieu de les couper)
+    V.el.morePop=h('div',{class:'pop vmore',role:'menu'});
+    V.el.more=h('details',{class:'tbmore',id:'top-more',hidden:true},h('summary',{class:'tb ico',title:'Autres commandes','aria-label':'Autres commandes'},'⋯'),V.el.morePop);
+    V.el.morePop.addEventListener('click',e=>{if(e.target.closest('button,label.tb'))V.el.more.open=false;});
+    top.insertBefore(V.el.libBtn,rec);top.append(V.el.stageBtn,V.el.fsBtn,V.el.more);
+    regBtn('ui.libfull','Bibliothèque plein écran',V.el.libBtn,()=>toggleLib(!V.libFull));
+    regBtn('ui.stage','Mode scène',V.el.stageBtn,()=>setStage(!V.stage));
+    $$('details',top).forEach(menuPop);
+    // la liste des raccourcis (fenêtre Contrôleur) a été dessinée avant ces deux commandes : on la redessine avec leurs noms
+    if(window.Controllers&&Controllers.renderKeys)Controllers.renderKeys();
+  }
+  /* Menus de la barre du haut : le panneau sort du flux de #top (position fixe calée sur le bouton),
+     il n'est donc jamais rogné, quelle que soit la largeur ; un clic ailleurs ou Échap le referme. */
+  function menuPop(det){
+    if(det._mp)return;det._mp=1;
+    det.addEventListener('toggle',()=>{if(!det.open)return;$$('#top details[open]').forEach(x=>{if(x!==det)x.open=false;});placePop(det);});
+  }
+  function placePop(det){
+    const pop=$(':scope>.pop',det),sum=$(':scope>summary',det);if(!pop||!sum||!det.open)return;
+    const s=sum.getBoundingClientRect(),z=V.zoom,W=innerWidth/z,H=innerHeight/z;
+    pop.style.position='fixed';pop.style.top=(s.bottom/z+4)+'px';pop.style.right='auto';
+    pop.style.maxHeight=Math.max(140,H-s.bottom/z-10)+'px';pop.style.overflowY='auto';
+    pop.style.left=Math.max(6,Math.min(s.left/z,W-pop.offsetWidth-6))+'px';
+  }
+  function closeMenus(){$$('#top details[open]').forEach(x=>{x.open=false;});}
+  const COLLAPSE=['#ag-btn','#q-btn','#audio-btn','#midi-btn','#fs-btn','#pc-btn','#am-btn','#lib-btn','#rec-btn','#ndecks'];
+  const overTop=t=>t.scrollWidth>t.clientWidth+1;
+  // La barre du haut ne déborde jamais : les boutons les moins urgents passent dans « ⋯ », dans cet ordre.
+  function fitTop(){
+    const top=$('#top'),more=V.el.more,pop=V.el.morePop;if(!top||!more)return;
+    [...pop.children].forEach(el=>{if(el._ph&&el._ph.parentNode)el._ph.parentNode.insertBefore(el,el._ph);else top.insertBefore(el,more);});
+    more.hidden=true;
+    if(overTop(top)){
+      more.hidden=false;
+      for(const sel of COLLAPSE){const el=$(sel);if(!el||el.parentElement!==top)continue;
+        if(!el._ph){el._ph=document.createComment(sel);el.before(el._ph);}pop.append(el);if(!overTop(top))break;}
+      [...pop.children].sort((a,b)=>a._ph.compareDocumentPosition(b._ph)&Node.DOCUMENT_POSITION_FOLLOWING?-1:1).forEach(e=>pop.append(e));
+    }
+    if(!pop.children.length)more.open=false;
+    if(V.topMo)V.topMo.takeRecords();
+    $$('#top details[open]').forEach(placePop);
   }
   const setZoom2=z=>window.setZoom(z); // zoom des waveforms (app.js), à ne pas confondre avec le zoom de l'interface
 
@@ -321,17 +375,20 @@ window.View=(()=>{
       if(mod&&(e.key==='+'||e.key==='='||e.code==='NumpadAdd')){e.preventDefault();setZoom(V.zoom+.1);return;}
       if(mod&&(e.key==='-'||e.key==='_'||e.code==='NumpadSubtract')){e.preventDefault();setZoom(V.zoom-.1);return;}
       if(mod&&(e.key==='0'||e.code==='Numpad0'||e.code==='Digit0')){e.preventDefault();setZoom(1);return;}
-      if(e.key==='Tab'&&!mod&&!e.altKey&&!e.shiftKey){
-        const t=e.target;if(t.closest&&(t.closest('textarea,select,.modal,[role=dialog],details[open],.am-panel:not(.docked)')||(t.matches('input')&&!V.libFull&&t.type!=='range')))return;
-        e.preventDefault();toggleLib(!V.libFull);return;
-      }
+      if(e.key==='Escape'&&$('#top details[open]')){closeMenus();return;}
       if(e.key==='Escape'&&V.libFull&&!(midi&&midi.learn)){toggleLib(false);}
     });
     const refit=()=>{if(V.rq)return;V.rq=requestAnimationFrame(()=>{V.rq=0;fit();});};
     new ResizeObserver(refit).observe(A);
+    // barre du haut : boutons ajoutés après coup (auto-mix, parcours), largeur de la fenêtre, textes qui s'allongent
+    const top=$('#top'),retop=()=>{if(V.tq)return;V.tq=requestAnimationFrame(()=>{V.tq=0;fitTop();});};
+    new ResizeObserver(retop).observe(top);V.topMo=new MutationObserver(retop);V.topMo.observe(top,{childList:true});
+    setInterval(()=>{if(overTop(top))fitTop();},1000);
+    addEventListener('resize',closeMenus);
+    document.addEventListener('pointerdown',e=>{if(!e.target.closest('#top details'))closeMenus();},true);
     // une rangée ajoutée ou retirée dans une platine (modules chargés après coup) : on répartit à nouveau
     const mo=new MutationObserver(refit);decks.forEach(d=>mo.observe(panel(d),{childList:true}));
-    document.fonts&&document.fonts.ready.then(()=>fit());
+    document.fonts&&document.fonts.ready.then(()=>{fit();fitTop();});
   }
-  return{build,layout:layoutHook,fit,tick,setZoom,setStage,setSize,toggleLib,toggleFs,cycle,state:V,get zoom(){return V.zoom;},get libFull(){return V.libFull;}};
+  return{build,layout:layoutHook,fit,fitTop,closeMenus,tick,setZoom,setStage,setSize,toggleLib,toggleFs,cycle,state:V,get zoom(){return V.zoom;},get libFull(){return V.libFull;}};
 })();

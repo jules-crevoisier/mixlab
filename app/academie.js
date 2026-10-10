@@ -18,7 +18,7 @@ window.Academie=(()=>{
   const fold=s=>String(s??'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
   const pl=(n,w,ws)=>n+' '+(n>1?ws||w+'s':w);
   const lbl=(t,c)=>h('div',{class:'pc-k'+(c?' '+c:'')},t);
-  const DEF={v:1,open:false,view:'home',les:null,done:{},quiz:{},ex:{},energy:null,plan:null,crowd:null,crate:null};
+  const DEF={v:1,open:false,read:true,view:'home',les:null,done:{},quiz:{},ex:{},energy:null,plan:null,crowd:null,crate:null};
   const prog=Object.assign(JSON.parse(JSON.stringify(DEF)),store.get('academie',{}));
   const save=()=>store.set('academie',prog);
   const A={el:{},drag:null};
@@ -71,8 +71,30 @@ window.Academie=(()=>{
   /* ---------- ouverture ---------- */
   function build(){
     const root=A.el.root=h('section',{id:'ac',class:'pc ac',hidden:true,'aria-label':'Académie'});
-    A.el.body=h('div',{class:'pc-body'});root.append(A.el.body);
+    A.el.body=h('div',{class:'pc-body'});
+    A.el.mode=h('button',{class:'b ac-mode',type:'button',id:'ac-mode',onclick:()=>{prog.read=prog.read===false;save();lecture();}},'');
+    root.append(A.el.mode,A.el.body);
     const after=$('#pc')||$('#p-coach h2');after.after(root);
+    // Échap : on quitte le mode lecture (retour aux platines, l'Académie reste dans la colonne du coach)
+    document.addEventListener('keydown',e=>{
+      if(e.key!=='Escape'||!document.body.classList.contains('ac-lecture'))return;
+      if($$('.modal').some(m=>!m.hidden)||$('.pc-pop:not([hidden])')||(e.target.closest&&e.target.closest('input,textarea,select')))return;
+      prog.read=false;save();lecture();
+    });
+  }
+  /* Mode lecture : l'Académie prend la place des platines, sur une colonne de 710 px.
+     Les exercices sur la bibliothèque (énergie, trame, crate) l'ouvrent en grand à côté. */
+  const LIBEX=new Set(['energy','plan','crate']);
+  function lecture(){
+    const B=document.body,on=!!(prog.open&&prog.read!==false&&!(window.Parcours&&Parcours.active));
+    const l=on&&prog.view==='lesson'&&byId(prog.les),withLib=!!(l&&l.exercise&&LIBEX.has(l.exercise.type));
+    B.classList.toggle('ac-lecture',on);B.classList.toggle('ac-lib',withLib);
+    if(window.View){
+      if(withLib&&!A.libMine&&!View.libFull){A.libMine=true;View.toggleLib(true);const f=document.activeElement;if(f&&f.blur)f.blur();}
+      else if(!withLib&&A.libMine){A.libMine=false;if(View.libFull)View.toggleLib(false);}
+    }
+    if(A.el.mode){A.el.mode.textContent=on?'Retour aux platines':'Mode lecture';
+      A.el.mode.title=on?'Revenir aux platines, l’Académie reste dans la colonne de droite (Échap)':'Lire l’Académie en grand, sur une colonne large';}
   }
   function open(lid){
     if(window.Parcours&&Parcours.active)Parcours.exit();
@@ -83,7 +105,7 @@ window.Academie=(()=>{
     render();
   }
   function close(){
-    prog.open=false;save();closePop();document.body.classList.remove('academie');A.el.root.hidden=true;
+    prog.open=false;save();closePop();document.body.classList.remove('academie');A.el.root.hidden=true;lecture();
     if(window.Coach&&!Coach.L.active&&Coach.render)Coach.render();
   }
   function go(view,lid){prog.view=view;if(lid)prog.les=lid;save();render();const p=$('#p-coach');if(p)p.scrollTop=0;}
@@ -91,7 +113,7 @@ window.Academie=(()=>{
 
   /* ---------- affichage ---------- */
   function render(){
-    const el=A.el.body;if(!el)return;closePop();el.innerHTML='';A.drag=null;
+    const el=A.el.body;if(!el)return;closePop();el.innerHTML='';A.drag=null;lecture();
     if(prog.view==='gloss')return renderGloss(el);
     const l=prog.view==='lesson'&&byId(prog.les);
     if(l)return renderLesson(el,l);
@@ -385,5 +407,5 @@ window.Academie=(()=>{
     if(prog.open)open();
     if(window.Coach&&!Coach.L.active&&Coach.render)Coach.render();
   }
-  return{init,open,close,go,card,render,stats,prog,LESSONS,TPL,makePlan,analyse,match,resample,energyOf:E,GLOSS:GL,get active(){return prog.open;}};
+  return{init,open,close,go,card,render,lecture,stats,prog,LESSONS,TPL,makePlan,analyse,match,resample,energyOf:E,GLOSS:GL,get active(){return prog.open;}};
 })();

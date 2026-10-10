@@ -57,6 +57,9 @@ const measure = page => page.evaluate(() => {
     page: [document.documentElement.scrollHeight, document.body.scrollHeight, innerHeight], app: [A.scrollHeight, A.clientHeight],
     plays: act.map(d => inView(d.ui.b.play)), xf: inView(document.querySelector('[data-ctl=xf] input')), mixer: !document.querySelector('#p-mixer').hidden,
     rows, titles, sizes: act.map(d => (d.ui.panel.className.match(/sz-(\w+)/) || [])[1]), lib: Math.round(document.querySelector('#p-lib').getBoundingClientRect().height),
+    times: act.map(d => inView(d.ui.time)), top: (t => t.scrollWidth <= t.clientWidth + 1)(document.querySelector('#top')),
+    load: (th => !!th && th.offsetParent !== null && th.getBoundingClientRect().right <= twr.right + 1)(document.querySelector('#p-lib thead th.c-load')),
+    pads: act.map(d => inView(d.ui.panel.querySelector('.pad'))), half: act.map(d => inView(d.ui.b.lhalf)), pitch: act.map(d => inView(d.ui.pitch)),
   };
 });
 
@@ -72,6 +75,10 @@ const measure = page => page.evaluate(() => {
     const okRows = m.rows >= 5, okTitles = m.titles.every(c => c > 2);
     check(okScroll && okPlays && okXf && okRows && okTitles, tag + ' : tout tient, Play, crossfader, 5 lignes, titres lisibles',
       `page ${m.page[0]}/${m.page[2]}, play ${m.plays.map(Number).join('')}, xf ${m.mixer ? Number(m.xf) : '—'}, lignes ${m.rows}, titres ${m.titles.join('/')}, platines ${m.sizes.join(',')}, biblio ${m.lib}px`);
+    check(m.times.every(Boolean) && m.top && (m.load || preset === 'export'), tag + ' : temps restant visible, barre du haut sans débordement, colonne Charger visible',
+      `temps ${m.times.map(Number).join('')}, barre ${Number(m.top)}, charger ${Number(m.load)}`);
+    if (preset === 'perf' && n === 2) check(m.pads.every(Boolean) && m.half.every(Boolean) && m.pitch.every(Boolean), tag + ' : pads, boucle et pitch accessibles',
+      `pads ${m.pads.map(Number).join('')}, ½ ${m.half.map(Number).join('')}, pitch ${m.pitch.map(Number).join('')}`);
     if (w === 1366) await page.screenshot({ path: SHOTS + `${preset}-${n}-1366x768.png` });
     if (w === 1366 && n === 2) check(m.lib >= 0.3 * h, tag + ' : bibliothèque ≥ 30 % de la hauteur par défaut', m.lib + ' px');
     if (h < 800) check(!m.sizes.includes('full') || preset === 'studio', tag + ' : platines réduites automatiquement sous 800 px', m.sizes.join(','));
@@ -117,9 +124,12 @@ const measure = page => page.evaluate(() => {
 
   /* ---------- 4. Bibliothèque plein écran ---------- */
   await page.mouse.click(683, 5);
-  await page.keyboard.press('Tab'); await sleep(200);
+  // Tab reste à la navigation au clavier (WCAG 2.1.1) : il ne bascule plus la bibliothèque
+  await page.keyboard.press('Tab'); await sleep(150);
+  check(!(await page.evaluate(() => View.libFull)), 'Tab : le focus avance, la bibliothèque ne bascule pas', await page.evaluate(() => document.activeElement && (document.activeElement.id || document.activeElement.className)));
+  await page.keyboard.press('F2'); await sleep(200);
   let lf = await page.evaluate(() => ({ on: document.querySelector('#app').classList.contains('lib-full'), lib: document.querySelector('#p-lib').getBoundingClientRect().height, deck: !!document.querySelector('#p-deckA').offsetParent, btn: document.querySelector('#lib-btn').getAttribute('aria-pressed') }));
-  check(lf.on && !lf.deck && lf.lib > 768 * 0.7 && lf.btn === 'true', 'Tab : bibliothèque plein écran', `${Math.round(lf.lib)} px`);
+  check(lf.on && !lf.deck && lf.lib > 768 * 0.7 && lf.btn === 'true', 'F2 : bibliothèque plein écran', `${Math.round(lf.lib)} px`);
   await page.screenshot({ path: SHOTS + 'bibliotheque-plein-ecran-1366x768.png' });
   await page.keyboard.press('Escape'); await sleep(200);
   lf = await page.evaluate(() => ({ on: document.querySelector('#app').classList.contains('lib-full'), deck: !!document.querySelector('#p-deckA').offsetParent }));
@@ -179,7 +189,7 @@ const measure = page => page.evaluate(() => {
     const lum = c => { const m = c.match(/[\d.]+/g).map(Number); return m.slice(0, 3).map(v => v / 255).map(v => v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4).reduce((s, v, i) => s + v * [.2126, .7152, .0722][i], 0); };
     const bgOf = e => { const out = []; for (let x = e; x; x = x.parentElement) { const cs = getComputedStyle(x); const g = cs.backgroundImage.match(/rgba?\([^)]+\)/g); if (g) out.push(...g); if (!/rgba?\(0, 0, 0, 0\)|transparent/.test(cs.backgroundColor)) { out.push(cs.backgroundColor); break; } } return out.length ? out : ['rgb(0,0,0)']; };
     const ratio = e => { const fg = lum(getComputedStyle(e).color); return Math.min(...bgOf(e).map(b => { const l = lum(b); return (Math.max(fg, l) + .05) / (Math.min(fg, l) + .05); })); };
-    const sel = ['.dk-stat .lbl', '.kn span', '.lt th', '.side .sec', '#p-mixer .ch .kn span', '.pad', '.lbl', '.tb', '.dk-artist', '.libbar .count', '.xfa button'];
+    const sel = ['.dk-stat .lbl', '.kn span', '.lt th', '.side .sec', '#p-mixer .ch .kn span', '.pad', '.lbl', '.tb', '.dk-artist', '.side-count .count', '.xfa button'];
     return sel.map(s => { const e = [...document.querySelectorAll(s)].find(x => x.offsetParent && x.textContent.trim()); return e ? [s, +ratio(e).toFixed(2)] : [s, null]; }).filter(x => x[1] != null);
   });
   await page.evaluate(() => View.setStage(false)); await sleep(150);
@@ -227,6 +237,80 @@ const measure = page => page.evaluate(() => {
     requestAnimationFrame(tick); }));
   console.log('     temps d’image, 4 platines en lecture, 1366×768 :', JSON.stringify(perf));
   check(perf.frame.moy < 12, 'Boucle d’affichage légère (moyenne de frame() < 12 ms)', perf.frame.moy + ' ms');
+  await page.context().close();
+
+  /* ---------- 10. Barre du haut, menus, mode scène, bibliothèque, Académie ---------- */
+  // Le menu Affichage s'ouvre à la souris et ses commandes sont réellement cliquables (rien ne les rogne)
+  const hitOk = sel => page.evaluate(s => { const e = document.querySelector(s); if (!e || !e.offsetParent) return false; const r = e.getBoundingClientRect();
+    if (r.bottom > innerHeight + .5 || r.right > innerWidth + .5 || r.top < 0 || r.left < 0) return false;
+    const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return !!hit && (hit === e || e.contains(hit)); }, sel);
+  for (const [w, h] of SIZES) {
+    page = await open(browser, w, h, { preset: 'perf', decks: 2 });
+    await page.click('#top details.menu > summary'); await sleep(200);
+    const vis = await hitOk('#dp-open');
+    if (vis) { await page.click('#dp-open'); await sleep(200); }
+    const modal = await page.evaluate(() => { const m = document.querySelector('#dp-modal'); if (!m || m.hidden) return false; const r = m.getBoundingClientRect(); return r.width > 0 && r.height > 0; });
+    check(vis && modal, `Menu Affichage à ${w}×${h} : « Réglages de jeu… » visible et cliquable`, `visible ${Number(vis)}, fenêtre ${Number(modal)}`);
+    await page.context().close();
+  }
+
+  page = await open(browser, 1366, 768, { preset: 'perf', decks: 2 });
+  await page.mouse.click(683, 5);
+  // Mode scène : icône visible à 1366 px, F9, waveforms plus hautes, gros temps restant
+  const sb = await hitOk('#stage-btn');
+  const laneN = await page.evaluate(() => document.querySelector('#lane-A').getBoundingClientRect().height);
+  await page.keyboard.press('F9'); await sleep(300);
+  const sg = await page.evaluate(() => ({ on: document.documentElement.classList.contains('stage'), lane: document.querySelector('#lane-A').getBoundingClientRect().height, time: parseFloat(getComputedStyle(decks[0].ui.time).fontSize),
+    top: (t => t.scrollWidth <= t.clientWidth + 1)(document.querySelector('#top')), fold: document.querySelector('#p-fx').classList.contains('fxfold') }));
+  check(sb && sg.on && sg.lane >= laneN * 1.15 && sg.time >= 26 && sg.top, 'Mode scène : icône visible à 1366 px, F9, waveforms plus hautes, temps restant ≥ 26 px',
+    `icône ${Number(sb)}, waveform ${Math.round(laneN)} → ${Math.round(sg.lane)} px, temps ${sg.time} px, effets repliés ${Number(sg.fold)}, scène ${Number(sg.on)}, barre ${Number(sg.top)}`);
+  check((await measure(page)).plays.every(Boolean) && (await measure(page)).times.every(Boolean), 'Mode scène 1366 : Play et temps restant visibles');
+  const more = await page.evaluate(() => { const d = document.querySelector('#top-more'); return d && !d.hidden ? d.querySelectorAll('.vmore > *').length : 0; });
+  if (more) {
+    await page.click('#top-more > summary'); await sleep(200);
+    const items = await page.evaluate(() => [...document.querySelectorAll('#top-more .vmore > *')].filter(e => e.offsetParent).map(e => { const r = e.getBoundingClientRect(); return r.bottom <= innerHeight && r.right <= innerWidth && r.left >= 0; }));
+    check(items.length > 0 && items.every(Boolean), 'Menu « ⋯ » : les commandes repliées sont visibles', items.length + ' commande(s)');
+    await page.keyboard.press('Escape'); await sleep(100);
+  }
+  await page.keyboard.press('F9'); await sleep(200);
+  check(!(await page.evaluate(() => document.documentElement.classList.contains('stage'))), 'F9 : sortie du mode scène');
+  // F2 marche aussi depuis la recherche
+  await page.click('#p-lib input[type=search]').catch(() => {});
+  await page.keyboard.press('F2'); await sleep(200);
+  check(await page.evaluate(() => View.libFull), 'F2 depuis le champ de recherche : bibliothèque plein écran');
+  await page.keyboard.press('F2'); await sleep(200);
+  // Ligne sélectionnée : bord de 3 px à la couleur d'accent ; aperçu caché tant qu'on n'écoute rien
+  await page.click('#p-lib tbody tr:nth-child(2) td:nth-child(3)'); await sleep(150);
+  const sel = await page.evaluate(() => { const r = document.querySelector('#p-lib tbody tr.sel'); return r ? getComputedStyle(r).boxShadow : ''; });
+  check(/3px 0px 0px( 0px)? inset|inset 3px 0px 0px/.test(sel), 'Ligne sélectionnée : bord de 3 px', sel);
+  const pv = await page.evaluate(() => { const p = document.querySelector('.dp-pv'); return p ? { idle: p.classList.contains('idle'), canvas: !!(p.querySelector('canvas') || {}).offsetParent } : null; });
+  check(!pv || (pv.idle && !pv.canvas), 'Barre de pré-écoute cachée tant qu’elle ne sert pas', JSON.stringify(pv));
+  // Menu contextuel d'une ligne
+  await page.click('#p-lib tbody tr:nth-child(2) td:nth-child(3)', { button: 'right' }); await sleep(150);
+  const cm = await page.evaluate(() => [...document.querySelectorAll('.ctx button, .ctx [role=menuitem]')].map(b => b.textContent));
+  const want = ['file auto-mix', 'Pré-écouter', 'Analyser à nouveau'];
+  check(want.every(x => cm.some(t => t.includes(x))) && !cm.some(t => t.includes('Afficher le fichier')), 'Menu contextuel : file auto-mix, pré-écoute, nouvelle analyse (pas d’« Afficher le fichier » hors appli)', cm.join(' | '));
+  await page.keyboard.press('Escape'); await sleep(100);
+  // Petites corrections : ½, couleur de la platine sur l'unité d'effets, une seule palette
+  const misc = await page.evaluate(() => ({ half: decks[0].ui.b.lhalf.textContent, dc: getComputedStyle(document.querySelector('.fxu')).getPropertyValue('--dc').trim() }));
+  const roots = (css.match(/^:root\s*\{/gm) || []).length;
+  check(misc.half === '½' && /var\(--A\)|#|rgb/.test(misc.dc) && roots === 1, 'Notation ½, unité d’effets à la couleur de sa platine, une seule palette :root', `${misc.half}, --dc ${misc.dc}, :root ×${roots}`);
+  await page.context().close();
+
+  // Académie en mode lecture : colonne de 680 à 720 px, retour aux platines, Échap
+  page = await open(browser, 1600, 950, { preset: 'mix', decks: 2 });
+  await page.evaluate(() => Academie.open()); await sleep(300);
+  const ac = await page.evaluate(() => ({ on: document.body.classList.contains('ac-lecture'), w: Math.round(document.querySelector('#p-coach').getBoundingClientRect().width), app: !!document.querySelector('#p-deckA').offsetParent, mode: (document.querySelector('#ac-mode') || {}).textContent }));
+  // la colonne de lecture fait 710 px de texte (padding compris, 680 à 760 px de panneau)
+  const col = await page.evaluate(() => { const p = document.querySelector('#p-coach'), k = [...p.children].find(c => c.offsetParent && c.getBoundingClientRect().width > 300); return k ? Math.round(k.getBoundingClientRect().width) : 0; });
+  check(ac.on && !ac.app && col >= 680 && col <= 720 && /Retour aux platines/.test(ac.mode), 'Académie, mode lecture : colonne de 680 à 720 px à la place des platines', `colonne ${col} px, panneau ${ac.w} px, platines ${Number(ac.app)}, bouton « ${ac.mode} »`);
+  await page.mouse.click(5, 5); await page.keyboard.press('Escape'); await sleep(200);
+  const back = await page.evaluate(() => ({ on: document.body.classList.contains('ac-lecture'), app: !!document.querySelector('#p-deckA').offsetParent }));
+  check(!back.on && back.app, 'Échap : retour aux platines, l’Académie reste dans la colonne', JSON.stringify(back));
+  await page.evaluate(() => { Academie.prog.read = true; Academie.open('set-energy'); }); await sleep(300);
+  check(await page.evaluate(() => View.libFull && document.body.classList.contains('ac-lib')), 'Leçon sur la bibliothèque : la bibliothèque s’ouvre en grand à côté');
+  await page.evaluate(() => Academie.close()); await sleep(200);
+  check(await page.evaluate(() => !View.libFull && !document.body.classList.contains('ac-lecture')), 'Fermer l’Académie : retour à l’écran normal');
   await page.context().close();
 
   check(errors.length === 0, 'Aucune erreur dans la page', errors.slice(0, 5).join(' | '));

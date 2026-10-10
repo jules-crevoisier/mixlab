@@ -251,7 +251,7 @@ const fakeMidi = () => {
   await kev('KeyQ', 'a'); const x0 = await W(() => S.xf); await kev('KeyW', 'z'); const x1 = await W(() => S.xf); await kev('KeyZ', 'w'); const x2 = await W(() => S.xf);
   check(await W(() => !decks[0].playing) && x1 === x0 && x2 < x0, 'AZERTY : Z (place du W) = Cue, W (place du Z) = crossfader', [x0, x1, x2].join(' / '));
   await W(() => { document.querySelector('#midi-modal').hidden = false; });
-  check(await W(() => document.querySelectorAll('#key-list li').length === 20), 'Fenêtre Contrôleur : liste des raccourcis clavier');
+  check(await W(() => document.querySelectorAll('#key-list li').length === 22 && /Bibliothèque plein écran/.test(document.querySelector('#key-list li[data-code="F2"]').textContent) && /Mode scène/.test(document.querySelector('#key-list li[data-code="F9"]').textContent)), 'Fenêtre Contrôleur : liste des raccourcis clavier (dont F2 bibliothèque plein écran et F9 mode scène)', await W(() => [...document.querySelectorAll('#key-list li')].map(l => l.dataset.code).join()));
   await page.click('#key-list li[data-code="KeyQ"] button.opt');
   await page.keyboard.press('KeyM');
   check(await W(() => KEYS.KeyM === 'A.play' && !KEYS.KeyQ && JSON.parse(localStorage.getItem('mixlab2.keys')).KeyM === 'A.play'), 'Raccourci modifié et enregistré (Play A sur M)');

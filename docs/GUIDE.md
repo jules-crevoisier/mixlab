@@ -101,16 +101,17 @@ De gauche à droite :
 | **Affichage** | Menu : panneaux, couleurs des waveforms, zoom, taille des platines, mode scène, réglages. |
 | **Quantize** | Les cues, hot cues, boucles et effets se calent sur le temps. |
 | **Gain auto** | Égalise le volume des morceaux au chargement. |
-| **MASTER** | Le BPM de la platine maître. |
-| **Biblio** | Bibliothèque plein écran (touche Tab). |
-| **Scène** | Mode scène. |
+| **MASTER** | Le BPM de la platine maître (rien ne s'affiche tant qu'aucune platine ne donne le tempo). |
+| **Biblio** | Bibliothèque plein écran (touche F2). |
 | **REC** | Enregistre le mix. Affiche la durée pendant l'enregistrement. |
 | **Audio** | Cartes son : sortie master et sortie casque. |
 | **Contrôleur** | MIDI, mappings, clavier. Le point s'allume quand une table est branchée. |
 | **Auto-mix** | Le panneau de l'auto-mix. |
 | **Parcours** | Le parcours « De zéro à ton premier set ». |
 | **Coach** | Le panneau du coach : conseils en direct, leçons, Académie. Le point s'allume quand les conseils en direct sont actifs. |
-| L'heure, puis **⛶** | Plein écran. |
+| L'heure, puis **◐** | Mode scène (touche F9). |
+| **⛶** | Plein écran. |
+| **⋯** | Apparaît quand la fenêtre est trop étroite : les boutons qui ne tiennent plus dans la barre (Gain auto, Quantize, Audio, Contrôleur…) s'y rangent, au lieu d'être coupés. |
 
 ### Les dispositions (presets)
 
@@ -130,7 +131,7 @@ Chaque disposition reprend l'organisation d'une famille de logiciels connus.
 - **Zoom de l'interface** : **−**, **100 %**, **+**. De 80 à 150 %.
 - **Platines (clic sur l'en-tête)** : **Auto**, **Complètes**, **Compactes** ou **Mini**.
 - **Waveforms : hauteur et zoom** : **−** et **+** pour la hauteur, **Zoom −** et **Zoom +** pour voir plus ou moins de temps.
-- **Mode scène** : case à cocher.
+- **Mode scène** : case à cocher (ou touche F9).
 - **Bibliothèque plein écran** et **Plein écran**.
 - **Disposition par défaut** : remet les séparateurs et la taille des platines de ce preset.
 - **Réglages de jeu…** : la fenêtre des réglages.
@@ -150,7 +151,7 @@ S'il n'y a pas assez de hauteur, un message le dit : réduis la bibliothèque ou
 
 ### Mode scène
 
-Bouton **Scène** ou **Affichage › Mode scène**. Textes plus grands, contraste renforcé, BPM et temps restant agrandis. Pour une cabine sombre.
+Bouton **◐** en haut à droite, touche **F9**, ou **Affichage › Mode scène**. Contraste renforcé, textes d'au moins 11 px, waveforms 40 % plus hautes, temps restant en très gros (32 px), potards plus grands, rangée d'effets repliée sur une ligne. Pour une cabine sombre.
 
 ### Zoom
 
@@ -204,7 +205,9 @@ Colonnes disponibles : #, Titre, Artiste, BPM, Tonalité, Durée, Genre, Joué, 
 
 - Clique une étoile dans la colonne **Note** pour noter de 1 à 5. Le même clic enlève la note.
 - Clic droit sur une ligne, puis **Modifier les infos…** (ou le bouton **Infos**) : titre, artiste, genre, note, couleur, énergie (1 calme, 10 à fond, ou **Auto** pour revenir à l'estimation), tags séparés par des virgules, commentaire.
-- Le clic droit propose aussi : **Charger sur la platine A/B/C/D**, **Ajouter à « … »**, et dans une playlist **Monter**, **Descendre**, **Retirer de « … »**.
+- Le clic droit propose aussi : **Charger sur la platine A/B/C/D**, **Ajouter à la file auto-mix**, **Pré-écouter au casque**, **Ajouter à « … »**, dans une playlist **Monter**, **Descendre**, **Retirer de la playlist « … »**, et **Analyser à nouveau** (BPM, grille, tonalité, waveform ; impossible quand la grille est verrouillée).
+- La ligne sélectionnée (souris ou flèches) est bordée d'un liseré bleu de 3 px.
+- Les colonnes s'adaptent à la largeur du tableau : sous 1 300 px, **Couleur** et **Tags** sont masquées (la couleur devient un liseré au bout de la ligne) ; sous 1 100 px, **Joué** et **Genre** aussi. **Charger** reste toujours visible. Une colonne que tu coches dans **Colonnes** reste affichée.
 
 ### Recherche par champ
 
@@ -284,7 +287,7 @@ Un morceau entre dans l'historique après 30 secondes de lecture.
 
 ### Pré-écoute
 
-Sélectionne un morceau, puis **▶ Pré-écoute** dans la barre de la bibliothèque. Le morceau joue au casque seulement, sans toucher aux platines. Clique ou glisse sur la petite waveform pour te déplacer. Si tu sélectionnes un autre morceau pendant la pré-écoute, elle passe au nouveau.
+Sélectionne un morceau, puis **▶ Pré-écoute** dans la barre de la bibliothèque (ou clic droit, **Pré-écouter au casque**). Le morceau joue au casque seulement, sans toucher aux platines. Une petite waveform apparaît alors à côté du bouton : clique ou glisse dessus pour te déplacer. Si tu sélectionnes un autre morceau pendant la pré-écoute, elle passe au nouveau.
 
 Il faut une sortie casque séparée : bouton **Split** du mixer, ou sortie casque dans **Audio**.
 
@@ -351,14 +354,14 @@ Sur une platine compacte, les onglets défilent à la molette.
 La rangée sous les pads :
 - **In** et **Out** : boucle manuelle. Out la lance.
 - **Reloop** : relance la dernière boucle, ou en sort.
-- **/2** et **×2** : divise ou double la boucle. Le chiffre entre les deux est la taille.
+- **½** et **×2** : divise ou double la boucle. Le chiffre entre les deux est la taille.
 - **Loop** : boucle automatique de la taille affichée.
 - **Saut ◀ et ▶** : recule ou avance du nombre de temps affiché. Clique le chiffre pour changer la taille du saut (1 à 32).
 
 ### Grille
 
 - **Tap** : tape le tempo (4 fois ou plus).
-- **BPM /2** et **BPM ×2**.
+- **BPM ½** et **BPM ×2**.
 - **◁** et **▷** : décale la grille de 10 ms.
 - **1 ici** : la position actuelle devient le premier temps d'une phrase.
 - **Verrou** : verrouille le BPM et la grille de ce morceau, pour ne plus les modifier par erreur.
@@ -566,7 +569,7 @@ Sur AZERTY, les touches de la rangée des chiffres marchent sans Maj.
 | ↑ ↓ | Morceau précédent, suivant |
 | Entrée ou Maj+← | Charger sur la platine A |
 | Maj+→ | Charger sur la platine B |
-| Tab | Bibliothèque plein écran, et retour |
+| F2 | Bibliothèque plein écran, et retour (marche aussi depuis la recherche) |
 
 ### Affichage et fenêtres
 
@@ -575,12 +578,14 @@ Sur AZERTY, les touches de la rangée des chiffres marchent sans Maj.
 | Ctrl + / Ctrl − | Zoom de l'interface |
 | Ctrl 0 | Zoom à 100 % |
 | Ctrl + molette sur une waveform | Zoom de la waveform |
-| Échap | Ferme la fenêtre ouverte, quitte la bibliothèque plein écran, arrête MIDI Learn |
+| F9 | Mode scène, et retour |
+| Tab | Passe d'une commande à la suivante (navigation au clavier) |
+| Échap | Ferme la fenêtre ou le menu ouvert, quitte la bibliothèque plein écran, le mode lecture de l'Académie, arrête MIDI Learn |
 | F11 | Plein écran (dans le navigateur) |
 | ↑ ↓ sur un séparateur | Change sa position |
 | Entrée ou Espace sur la lettre d'une platine | Change sa taille |
 
-Sur Mac, Cmd remplace Ctrl.
+Sur Mac, Cmd remplace Ctrl. F2 et F9 se changent comme les autres touches, dans **Contrôleur › Clavier**.
 
 ### Parcours
 
@@ -609,7 +614,7 @@ Ouvre le panneau avec **Coach**. En haut, la liste **Conseils** règle le niveau
 | Tempos pas calés | Monter ou descendre le pitch, ou Sync. |
 | Kicks qui se décalent | Retenir ou pousser avec ‹ ou ›. |
 | Deux basses en même temps | Couper le LOW de la piste qui entre. |
-| Tonalités qui frottent | Passage court, ou baisser les MID. Il cite les tonalités voisines. |
+| Tonalités peu compatibles | Passage court, ou baisser les MID. Il cite les tonalités voisines. |
 | Écart de volume entre deux pistes | Régler le GAIN, faders en haut. |
 | Deux morceaux à fond depuis longtemps | Finir la transition sur la prochaine phrase. |
 | Fin de morceau dans 30 s | Charger ou lancer le suivant sur le prochain début de phrase. |
@@ -695,6 +700,8 @@ Chaque leçon a ses points clés, un quiz avec une explication à chaque répons
 
 Boutons : **‹ Précédente**, **Modules**, **Suivante ›**, **J'ai lu, leçon terminée**, **Glossaire**, **Fermer**.
 
+L'Académie s'ouvre en **mode lecture** : elle prend la place des platines, sur une colonne large et centrée. **Retour aux platines** (ou Échap) la remet dans la colonne du coach, à droite ; **Mode lecture** l'agrandit à nouveau. Les exercices sur ta bibliothèque (courbe d'énergie, plan de set, crate) ouvrent la bibliothèque en grand à côté de la leçon.
+
 ---
 
 ## L'auto-mix
@@ -770,7 +777,7 @@ Dans l'appli, un morceau glissé depuis l'explorateur est joué mais pas gardé.
 
 ### Le BPM ou la tonalité est faux
 
-- BPM moitié ou double : **BPM /2** ou **BPM ×2**, ou change la **Plage d'analyse BPM** et réimporte.
+- BPM moitié ou double : **BPM ½** ou **BPM ×2**, ou change la **Plage d'analyse BPM** et réimporte.
 - Grille décalée : **◁ ▷**, **1 ici**, et **Métro** pour vérifier. Puis **Verrou**.
 - Tonalité : clique sur la tonalité dans l'en-tête de la platine pour la corriger.
 

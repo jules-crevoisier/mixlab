@@ -228,11 +228,13 @@ window.DeckPro=(()=>{
     cv.addEventListener('pointerup',()=>{drag=false;});
     const tm=h('span',{class:'dp-pvt'},'');
     regBtn('preview','Pré-écoute',play,pvToggle);
-    PV.el={root:h('div',{class:'dp-pv'},play,cv,tm),play,cv,tm};return PV.el.root;
+    PV.el={root:h('div',{class:'dp-pv idle'},play,cv,tm),play,cv,tm};return PV.el.root;
   }
   function drawPreview(){
     const E=PV.el;if(!E)return;const tr=PV.tr||pvSelected();
     E.play.textContent=PV.on?'■ Pré-écoute':'▶ Pré-écoute';E.play.classList.toggle('on',PV.on);
+    // la barre de position n'apparaît qu'une fois la pré-écoute lancée (avant, elle ressemblait à un champ vide)
+    E.root.classList.toggle('idle',!PV.tr);if(!PV.tr)return;
     E.tm.textContent=tr?fmtTime(pvPos(),false)+' / '+fmtTime(tr.duration,false):'';
     E.root.title=tr?'Pré-écoute : '+(tr.artist?tr.artist+' - ':'')+tr.title:'';
     const cv=E.cv;if(!fitCanvas(cv))return;const g=cv.getContext('2d'),W=cv.width,H=cv.height;
@@ -393,7 +395,7 @@ window.DeckPro=(()=>{
     const D=d.id,P0=$('#p-deck'+D);if(!P0)return;
     if(!d.ui.dp||!P0.contains(d.ui.dp.root)){
       const X={};
-      X.cup=btn(D+'.cueplay','Cue Play '+D,'CUP','',()=>d.cuePlay(),null,'Cue Play : revient au cue et lance la lecture. Appuie plusieurs fois pour bégayer (stutter).');
+      X.cup=btn(D+'.cueplay','Cue Play '+D,'CUP','',()=>d.cuePlay(),null,'CUP = Cue Play : revient au cue et lance la lecture. Appuie plusieurs fois pour bégayer (stutter).');
       X.dbl=btn(D+'.clone','Doubler '+D,'Doubler','',()=>clone(d),null,'');
       X.ks=btn(D+'.keysync','Key sync '+D,'Key sync','',()=>setKeySync(d,!d.keySync),null,'Key sync : accorde la tonalité sur la platine maître (même tonalité ou compatible, le plus petit écart possible)');
       X.fine=h('span',{class:'keyd dp-fine',title:'Ton fin en cents (100 cents = 1 demi-ton). Double-clic : 0.'},'0');
@@ -403,9 +405,9 @@ window.DeckPro=(()=>{
       regAbs(D+'.keyfine','Ton fin '+D,X.fine,v=>{d.keySync=false;d.setKeyFine(v*100-50);},()=>((d.keyFine||0)+50)/100);
       X.cd=h('span',{class:'dp-cd',title:'Compte à rebours en mesures.temps jusqu’au prochain cue (hot cue ou cue mémoire) ou à la fin de la phrase'},'');
       const grid=$('.dk-grid',P0);
-      X.lock=btn(D+'.gridlock','Verrou de grille '+D,'Verrou','',()=>{if(!d.track)return;setLock(d.track,!locked(d.track));toast(locked(d.track)?'Grille et BPM verrouillés pour « '+d.track.title+' »':'Grille déverrouillée','ok');},null,'Verrouille le BPM et la grille de ce morceau : plus de modification par erreur');
-      X.metro=btn(D+'.metro','Métronome '+D,'Métro','',()=>{d.metro=!d.metro;d._mk=null;if(d.metro&&!hpRouted())toast('Métronome au casque : active Split ou choisis une sortie casque (bouton Audio)');},null,'Métronome au casque, calé sur la grille : vérifie qu’elle tombe juste');
-      X.root=h('div',{class:'r dk-pro'},X.cup,X.dbl,X.ks,h('span',{class:'dp-kf'},h('span',{class:'lbl'},'ct'),fm,X.fine,fp),X.lock,X.metro,X.cd);
+      X.lock=btn(D+'.gridlock','Verrou de grille '+D,'Verrou','',()=>{if(!d.track)return;setLock(d.track,!locked(d.track));toast(locked(d.track)?'Grille et BPM verrouillés pour « '+d.track.title+' »':'Grille déverrouillée','ok');},null,'Verrouiller la grille : le BPM et la grille de ce morceau ne bougent plus par erreur');
+      X.metro=btn(D+'.metro','Métronome '+D,'Métro','',()=>{d.metro=!d.metro;d._mk=null;if(d.metro&&!hpRouted())toast('Métronome au casque : active Split ou choisis une sortie casque (bouton Audio)');},null,'Métro = métronome au casque, calé sur la grille : vérifie qu’elle tombe juste');
+      X.root=h('div',{class:'r dk-pro'},X.cup,X.dbl,X.ks,h('span',{class:'dp-kf',title:'Ton fin : transposition en centièmes de demi-ton (cents)'},h('span',{class:'lbl'},'ct'),fm,X.fine,fp),X.lock,X.metro,X.cd);
       (grid||$('.dk-loop',P0)||P0.lastElementChild).after(X.root);
       d.ui.dp=X;
     }

@@ -26,7 +26,7 @@ window.LibPro=(()=>{
   const pad2=n=>String(n).padStart(2,'0');
   const ymd=d=>{d=d?new Date(d):null;return d&&isFinite(d)?d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()):'';};
   const shortDate=d=>{d=new Date(d);return pad2(d.getDate())+'/'+pad2(d.getMonth()+1)+' '+pad2(d.getHours())+':'+pad2(d.getMinutes());};
-  const S={hide:new Set(store.get('libcols',['comment','last'])),crates:store.get('crates',[]),sets:store.get('sets',[]),sid:'s'+Date.now(),qc:null};
+  const S={hide:new Set(store.get('libcols',['comment','last'])),show:new Set(store.get('libcolsOn',[])),auto:new Set(),autoW:0,crates:store.get('crates',[]),sets:store.get('sets',[]),sid:'s'+Date.now(),qc:null};
 
   /* ---------- tonalités ---------- */
   const NOTE={c:0,d:2,e:4,f:5,g:7,a:9,b:11};
@@ -175,11 +175,28 @@ window.LibPro=(()=>{
     {k:'last',n:'Dernière lecture',td:r=>h('td',{class:'n'},r.t.lastPlayed?shortDate(r.t.lastPlayed):'—'),sv:t=>t.lastPlayed?+new Date(t.lastPlayed):0},
   ];
   COLS.splice(COLS.findIndex(c=>c.k==='load'),0,...EXTRA);
-  const hidden=k=>S.hide.has(k);
+  // Masquée par toi, ou masquée d'office parce que le tableau est trop étroit (sauf si tu l'as cochée toi-même).
+  const hidden=k=>S.hide.has(k)||(S.auto.has(k)&&!S.show.has(k));
   const FIXED=['deck','title','load'];
+  /* Colonnes par défaut selon la largeur du tableau : Charger reste toujours visible.
+     Sous 1 300 px, ni Couleur ni Tags (la couleur passe en liseré de ligne) ; sous 1 100 px, ni Joué ni Genre ;
+     et si ça déborde encore, on retire dans cet ordre jusqu'à ce que tout tienne. */
+  const AUTO=['color','tags','plays','genre','energy','rating','dur','artist'];
+  function autoCols(){
+    const tw=lib.tw;if(!tw||!tw.isConnected||!tw.clientWidth)return;
+    const w=tw.clientWidth;if(Math.abs(w-S.autoW)<2&&tw.scrollWidth<=w)return;S.autoW=w;
+    const was=[...S.auto].join();
+    S.auto=new Set(w<1100?['color','tags','plays','genre']:w<1300?['color','tags']:[]);
+    if([...S.auto].join()!==was)renderTable();
+    for(const k of AUTO){if(tw.scrollWidth<=tw.clientWidth)break;if(hidden(k)||S.show.has(k))continue;S.auto.add(k);renderTable();}
+  }
+  let acq=0;const autoSoon=()=>{if(!acq)acq=requestAnimationFrame(()=>{acq=0;autoCols();});};
+  const watchW=()=>{if(!lib.tw){setTimeout(watchW,200);return;}const ro=new ResizeObserver(autoSoon);ro.observe(lib.tw);
+    // le tableau peut s'élargir sans que la zone change (titres plus longs, plus de platines) : on le surveille aussi
+    const tb=lib.tw.querySelector('table');if(tb)ro.observe(tb);autoSoon();};watchW();
   function colMenu(){
     const pop=h('div',{class:'pop'});
-    const fill=()=>{pop.innerHTML='';COLS.filter(c=>!FIXED.includes(c.k)).forEach(c=>{const cb=h('input',{type:'checkbox'});cb.checked=!hidden(c.k);cb.addEventListener('change',()=>{cb.checked?S.hide.delete(c.k):S.hide.add(c.k);store.set('libcols',[...S.hide]);renderTable();});pop.append(h('label',{},cb,c.n||'#'));});};
+    const fill=()=>{pop.innerHTML='';COLS.filter(c=>!FIXED.includes(c.k)).forEach(c=>{const cb=h('input',{type:'checkbox'});cb.checked=!hidden(c.k);cb.addEventListener('change',()=>{if(cb.checked){S.hide.delete(c.k);S.show.add(c.k);}else{S.hide.add(c.k);S.show.delete(c.k);}store.set('libcols',[...S.hide]);store.set('libcolsOn',[...S.show]);renderTable();});pop.append(h('label',{},cb,c.n||'#'));});};
     const d=h('details',{class:'menu colmenu'},h('summary',{class:'tb',title:'Choisir les colonnes affichées'},'Colonnes'),pop);
     d.addEventListener('toggle',()=>{if(d.open)fill();});
     document.addEventListener('click',e=>{if(d.open&&!d.contains(e.target))d.open=false;});
@@ -797,19 +814,40 @@ window.LibPro=(()=>{
   function rowMenu(t,ev){
     ui.sel=t.id;$$('tr.sel',lib.tbody).forEach(x=>x.classList.toggle('sel',x._r&&x._r.t===t));
     const p=curPl(),i=p?p.ids.indexOf(t.id):-1,ordered=p&&lib.sort.k==='added'&&!lib.q;
+    const AM=window.AutoMix,inQ=AM&&AM.queue.includes(t.id),DP=window.DeckPro,N0=N();
     menu(ev,(t.artist?t.artist+' - ':'')+t.title,[
       {label:'Modifier les infos…',fn:()=>edit(t,ev)},'-',
-      ...decks.filter(d=>d.active).map(d=>({label:'Charger sur la platine '+d.id+(onAir(d)?' (à l’antenne)':''),off:onAir(d),fn:()=>loadTo(d,t)})),'-',
+      ...decks.filter(d=>d.active).map(d=>({label:'Charger sur la platine '+d.id+(onAir(d)?' (à l’antenne)':''),off:onAir(d),fn:()=>loadTo(d,t)})),
+      AM?{label:inQ?'✓ Déjà dans la file auto-mix':'Ajouter à la file auto-mix',off:inQ,fn:()=>{AM.add(t.id);toast('« '+t.title+' » ajouté à la file auto-mix','ok');}}:null,
+      DP&&DP.pvPlay?{label:'Pré-écouter au casque',off:!t.buffer,fn:()=>{ui.sel=t.id;paintRows();DP.pvPlay(t);}}:null,'-',
       ...LIB.playlists.filter(q=>q!==p).map(q=>({label:(q.ids.includes(t.id)?'✓ Déjà dans « ':'Ajouter à « ')+q.name+' »',off:q.ids.includes(t.id),fn:()=>{q.ids.push(t.id);saveMeta();renderSide();toast('Ajouté à « '+q.name+' »','ok');}})),
       p?'-':null,
       p?{label:'Monter dans la playlist',off:!ordered||i<=0,fn:()=>movePl(p,t.id,i-1)}:null,
       p?{label:'Descendre dans la playlist',off:!ordered||i>=p.ids.length-1,fn:()=>movePl(p,t.id,i+1)}:null,
-      p?{label:'Retirer de « '+p.name+' »',cls:'bad',fn:()=>{p.ids=p.ids.filter(x=>x!==t.id);saveMeta();renderSide();renderTable();toast('Retiré de « '+p.name+' »');}}:null,
+      p?{label:'Retirer de la playlist « '+p.name+' »',cls:'bad',fn:()=>{p.ids=p.ids.filter(x=>x!==t.id);saveMeta();renderSide();renderTable();toast('Retiré de « '+p.name+' »');}}:null,
+      '-',
+      {label:'Analyser à nouveau'+(DP&&DP.locked&&DP.locked(t)?' (grille verrouillée)':''),off:!t.buffer||!!(DP&&DP.locked&&DP.locked(t)),fn:()=>reanalyze(t)},
+      // « Afficher le fichier » : seulement dans l'appli, quand elle sait ouvrir le dossier
+      N0&&N0.revealFile&&t.path?{label:'Afficher le fichier',fn:()=>N0.revealFile(t.path)}:null,
     ]);
+  }
+  // Nouvelle analyse (BPM, grille, tonalité, waveform, structure) : après un changement de plage BPM, ou un morceau mal lu.
+  function reanalyze(t){
+    if(!t.buffer)return;
+    toast('Analyse de « '+t.title+' »…');
+    setTimeout(()=>{
+      const a=analyze(t.buffer,false);
+      Object.assign(t,{bpm:a.bpm,grid:a.grid,key:a.key||t.key,rmsDb:a.rmsDb,wf:a.wf,ov:null,_a:{bpm:a.bpm,grid:a.grid,key:a.key}});
+      if(t.cue==null||t.cue<a.grid-1e-3)t.cue=a.grid;
+      if(a.sections){t.sections=a.sections;t.energy=a.energy;t.musicEnd=a.musicEnd;}else if(window.Structure)Structure.queue(t);
+      decks.forEach(d=>{if(d.track===t&&d.applyAutoGain)d.applyAutoGain();});
+      changed(t);const ki=keyInfo(t.key);toast('« '+t.title+' » : '+t.bpm.toFixed(2)+' BPM'+(ki?' · '+ki.code:''),'ok');
+    },30);
   }
   // Ligne de la table : clic droit, et glisser-déposer pour réordonner une playlist.
   function row(tr,r){
     tr.addEventListener('contextmenu',e=>{e.preventDefault();rowMenu(r.t,e);});
+    const c=hidden('color')&&colorOf(r.t.color);if(c){tr.classList.add('rc');tr.style.setProperty('--rc',c.c);}
     const p=curPl();if(!p||lib.sort.k!=='added'||lib.q)return;
     tr.addEventListener('dragover',e=>{if([...e.dataTransfer.types].includes('text/mixlab-track')){e.preventDefault();tr.classList.add('dropb');}});
     tr.addEventListener('dragleave',()=>tr.classList.remove('dropb'));

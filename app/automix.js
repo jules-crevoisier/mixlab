@@ -25,7 +25,7 @@ window.Suggest=(()=>{
     if(ka&&kb){
       if(ka.code===kb.code){s+=40;keyOk=true;why.push('même tonalité '+kb.code);}
       else if(keysCompatible(ref.key,t.key)){s+=34;keyOk=true;why.push(ka.code+' → '+kb.code);}
-      else why.push(kb.code+' frotte avec '+ka.code);
+      else why.push(kb.code+' peu compatible avec '+ka.code);
     }else s+=12;
     const g=bpmGap(ref.bpm,t.bpm),bpmOk=g<=.06;
     if(bpmOk)s+=30*(1-g/.06);
@@ -97,7 +97,7 @@ window.AutoMix=(()=>{
     const outro=[...(out.track.sections||[])].reverse().find(s=>s.type==='outro'),intro=(inc.track.sections||[]).find(s=>s.type==='intro');
     if(style==='auto'){
       if(gap>.08){style='cut';why='Tempos trop éloignés : coupe nette sur le 1.';}
-      else if(!compat){style='echo';why=`Tonalités qui frottent (${kc(ko)} → ${kc(ki)}) : transition courte, sortie en écho.`;}
+      else if(!compat){style='echo';why=`Tonalités peu compatibles (${kc(ko)} → ${kc(ki)}) : transition courte, sortie en écho.`;}
       else if((outro&&outro.bars>=A.bars/2)||(intro&&intro.bars>=A.bars/2)){style='bass';why=`Tonalités compatibles (${kc(ko)} → ${kc(ki)}) : mélange long avec échange des basses.`;}
       else{style='filter';why='Intro et outro courtes : le filtre fait de la place à la piste qui entre.';}
     }else why=WHY[style];
@@ -274,7 +274,9 @@ window.AutoMix=(()=>{
     const E=A.el;if(!E.sug)return;E.sug.innerHTML='';
     const ref=A.main&&A.main.track?A.main:refDeck()||decks.find(d=>d.active&&d.track);
     E.ref.textContent=ref?'d’après '+ref.id+' · '+ref.track.title:'';
-    const list=ref?Suggest.next(ref):[];
+    // jamais un morceau déjà chargé sur une platine
+    const loaded=new Set(decks.filter(d=>d.active&&d.track).map(d=>d.track.id));
+    const list=ref?Suggest.next(ref,{n:5+loaded.size}).filter(s=>!loaded.has(s.t.id)).slice(0,5):[];
     list.forEach(s=>E.sug.append(h('li',{title:s.why.join(' · ')},h('span',{class:'sc '+(s.score>=75?'ok':s.score>=50?'warn':'')},String(s.score)),
       h('span',{class:'t'},s.t.title,h('span',{class:'am-meta'},s.why.join(' · '))),
       h('button',{class:'b',type:'button',title:'Jouer ce morceau ensuite',onclick:()=>{add(s.t.id,true);toast('« '+s.t.title+' » passera ensuite','ok');}},'Ensuite'))));

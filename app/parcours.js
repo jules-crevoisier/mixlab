@@ -312,7 +312,7 @@ window.Parcours=(()=>{
       {t:'Laisse jouer, puis appuie de nouveau sur ce pad',why:'La platine saute au repère, dans le temps. Les DJ s’en servent pour relancer un passage fort.',
        check:st=>{const tr=A().track;if(!tr||!A().playing)return false;const hs=tr.hot.filter(x=>x!=null),p=A().position();if(hs.some(x=>p>x+1.5))st.away=true;return st.away&&hs.some(x=>p>=x-.05&&p<x+.4);},target:'A.pad1'},
       {t:'Boucle de 4 temps : appuie sur LOOP',why:'Le passage se répète en rythme.',check:()=>A().loop.on,target:'A.loop'},
-      {t:'Divise la boucle deux fois (÷2)',why:'4, puis 2, puis 1 temps : la tension monte. Un classique avant un drop.',check:()=>A().loop.on&&A().loop.beats<=1,target:'A.loophalf'},
+      {t:'Divise la boucle deux fois (½)',why:'4, puis 2, puis 1 temps : la tension monte. Un classique avant un drop.',check:()=>A().loop.on&&A().loop.beats<=1,target:'A.loophalf'},
       {t:'Sors de la boucle',why:'Appuie sur LOOP ou RELOOP.',check:()=>!A().loop.on,target:'A.loop'},
       {t:'Effet : choisis « Écho » sur l’unité FX de A et active-le',why:'Un {effet} marque un moment. Il est calé sur le tempo.',check:()=>A().fx.on&&A().fx.type==='echo',target:()=>A().fx.type==='echo'?'A.fxon':'#fxu-'+A().fx.n+' select'},
       {t:'Règle le dosage vers 50 %',why:'Le {dosage} mélange l’effet au son. Trop fort, il noie le morceau.',check:()=>A().fx.amount>=.35&&A().fx.amount<=.65,target:'A.fxamt'},

@@ -100,7 +100,7 @@ function buildFxUnit(u){
   const on=btn(id+'.on',N+' on','On','fxon',()=>u.setOn(!u.on),null,'Active l’unité. Avec Q, elle démarre sur le temps suivant. L’écho continue de résonner quand tu le coupes.');
   const slots=u.slots.map((c,i)=>{
     const sid=id+'.s'+(i+1),sel=h('select',{class:'sel','aria-label':N+' effet '+(i+1)},FX_TYPES.map(([k,n])=>h('option',{value:k},n)));
-    const amt=knob(sid+'.amt','Dosage',c.amount,v=>{u.slots[i].amount=v;u.applyAll();},{bip:false,aria:N+' dosage '+(i+1),title:'Dosage de l’effet',color:'var(--coach)'});
+    const amt=knob(sid+'.amt','Dosage',c.amount,v=>{u.slots[i].amount=v;u.applyAll();},{bip:false,aria:N+' dosage '+(i+1),title:'Dosage de l’effet',color:'var(--dc)'});
     const k1=knob(sid+'.p1',' ',c.p1,v=>u.setSlot(i,{p1:v}),{bip:false,aria:N+' réglage 1','color':'var(--A)'});
     const k2=knob(sid+'.p2',' ',c.p2,v=>u.setSlot(i,{p2:v}),{bip:false,aria:N+' réglage 2','color':'var(--A)'});
     k1.el.classList.add('kp','kp1');k2.el.classList.add('kp','kp2');
@@ -117,6 +117,7 @@ function buildFxUnit(u){
 function renderFxUnit(u){
   const U=u.ui;if(!U)return;
   U.root.classList.toggle('single',u.mode==='single');U.root.classList.toggle('chain',u.mode==='chain');
+  const tg=['A','B','C','D'].find(t=>u.targets.has(t));U.root.style.setProperty('--dc',tg?'var(--'+tg+')':'var(--white)');
   U.mode.textContent=u.mode==='single'?'Simple':'Chaîne';U.bv.textContent=beatsLabel(u.beats);
   $$('button',U.asg).forEach(b=>b.setAttribute('aria-pressed',String(u.targets.has(b.dataset.t))));
   U.slots.forEach((s,i)=>{const c=u.slots[i],P=FX_P[c.type]||[];s.sel.value=c.type;
@@ -270,7 +271,7 @@ function buildDeck(d){
   B.lin=btn(D+'.loopin','Loop in '+D,'In','',()=>d.loopInSet(),null,'Début de boucle manuelle');
   B.lout=btn(D+'.loopout','Loop out '+D,'Out','',()=>d.loopOutSet(),null,'Fin de boucle manuelle : la boucle démarre');
   B.relp=btn(D+'.reloop','Reloop '+D,'Reloop','',()=>d.reloop(),null,'Relance la dernière boucle, ou en sort');
-  B.lhalf=btn(D+'.loophalf','Boucle /2 '+D,'/2','',()=>d.loopResize(.5),null,'Divise la boucle par deux');
+  B.lhalf=btn(D+'.loophalf','Boucle ½ '+D,'½','',()=>d.loopResize(.5),null,'Divise la boucle par deux');
   B.ldbl=btn(D+'.loopdbl','Boucle ×2 '+D,'×2','',()=>d.loopResize(2),null,'Double la boucle');
   B.loop=btn(D+'.loop','Boucle auto '+D,'Loop','',()=>d.loopAuto(),null,'Boucle automatique de la taille affichée');
   B.jb=btn(D+'.jumpback','Saut arrière '+D,'◀','',()=>d.beatJump(-d.jumpSize),null,'Recule du nombre de temps affiché');
@@ -280,7 +281,7 @@ function buildDeck(d){
   const loopRow=h('div',{class:'r dk-loop'},B.lin,B.lout,B.relp,B.lhalf,d.ui.lsz,B.ldbl,B.loop,h('span',{class:'lbl',style:'margin-left:4px'},'Saut'),B.jb,d.ui.jsz,B.jf);
   const gridRow=h('div',{class:'r dk-grid'},h('span',{class:'lbl',style:'margin-right:2px'},'Grille'),
     btn(D+'.tap','Tap '+D,'Tap','',()=>d.tap(),null,'Tape le tempo (4 fois ou plus)'),
-    h('button',{class:'b',type:'button',title:'Diviser le BPM par deux',onclick:()=>d.setBpm(d.track.bpm/2)},'BPM /2'),
+    h('button',{class:'b',type:'button',title:'Diviser le BPM par deux',onclick:()=>d.setBpm(d.track.bpm/2)},'BPM ½'),
     h('button',{class:'b',type:'button',title:'Doubler le BPM',onclick:()=>d.setBpm(d.track.bpm*2)},'BPM ×2'),
     h('button',{class:'b',type:'button',title:'Décaler la grille plus tôt (10 ms)',onclick:()=>d.gridNudge(-10)},'◁'),
     h('button',{class:'b',type:'button',title:'Décaler la grille plus tard (10 ms)',onclick:()=>d.gridNudge(10)},'▷'),
@@ -393,7 +394,7 @@ function buildLib(){
   lib.thead=h('thead');lib.tbody=h('tbody');
   lib.tw=h('div',{class:'tw'},h('table',{class:'lt'},lib.thead,lib.tbody));
   lib.tw.addEventListener('scroll',()=>{if(!lib.raf)lib.raf=requestAnimationFrame(()=>{lib.raf=0;paintRows();});});
-  P.append(side,h('div',{class:'libmain'},h('div',{class:'libbar'},q,comp,addTo,(window.Desktop&&Desktop.importButtons())||file,window.LibPro&&LibPro.bar(),lib.count),lib.tw));
+  P.append(side,h('div',{class:'libmain'},h('div',{class:'libbar'},q,comp,addTo,(window.Desktop&&Desktop.importButtons())||file,window.LibPro&&LibPro.bar()),lib.tw));
   renderSide();renderTable();
 }
 function renderSide(){
@@ -408,6 +409,8 @@ function renderSide(){
   s.append(h('div',{class:'sec lbl'},'Historique'),it('hist','Ce set',LIB.history.length));
   window.LibPro&&LibPro.side(s,it,'end');
   if(lib.recs.length){s.append(h('div',{class:'sec lbl'},'Enregistrements'));lib.recs.forEach(r=>s.append(h('a',{class:'it',href:r.url,download:r.name,style:'display:block;padding:4px 10px;color:var(--tx);font-size:12px'},r.label)));}
+  // nombre de morceaux affichés : en tête de la barre latérale (la barre d'outils tient ainsi sur une ligne)
+  if(lib.count)s.prepend(h('div',{class:'side-count'},lib.count));
   if(lib.addTo){lib.addTo.innerHTML='';lib.addTo.append(h('option',{value:''},'Ajouter à…'),...LIB.playlists.map(p=>h('option',{value:p.id},p.name)));}
 }
 function refDeck(){const m=S.master;if(m&&m.active&&m.track)return m;return decks.find(d=>d.active&&d.playing&&d.track)||null;}
@@ -786,11 +789,15 @@ function buildMidi(){
 /* ---------- clavier ---------- */
 /* Touches physiques (e.code) : mêmes positions en AZERTY, QWERTY ou QWERTZ. Modifiables dans la fenêtre Contrôleur. */
 const KEYS_DEF={KeyQ:'A.play',KeyW:'A.cue',KeyE:'A.sync',KeyA:'A.nudgeL',KeyS:'A.nudgeR',Digit1:'A.pad1',Digit2:'A.pad2',Digit3:'A.pad3',Digit4:'A.pad4',
-  KeyP:'B.play',KeyO:'B.cue',KeyI:'B.sync',KeyK:'B.nudgeL',KeyL:'B.nudgeR',Digit7:'B.pad1',Digit8:'B.pad2',Digit9:'B.pad3',Digit0:'B.pad4',KeyZ:'xf-',KeyX:'xf+'};
+  KeyP:'B.play',KeyO:'B.cue',KeyI:'B.sync',KeyK:'B.nudgeL',KeyL:'B.nudgeR',Digit7:'B.pad1',Digit8:'B.pad2',Digit9:'B.pad3',Digit0:'B.pad4',KeyZ:'xf-',KeyX:'xf+',
+  F2:'ui.libfull',F9:'ui.stage'};
 let KEYS=store.get('keys',null)||{...KEYS_DEF};
+// raccourcis ajoutés depuis (bibliothèque plein écran, mode scène) : proposés aussi à ceux qui ont déjà leurs touches
+for(const c of ['F2','F9'])if(!(c in KEYS)&&!Object.values(KEYS).includes(KEYS_DEF[c]))KEYS[c]=KEYS_DEF[c];
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){const m=$$('.modal').filter(x=>!x.hidden).pop();if(m){m.hidden=true;e.preventDefault();return;}if(midi.learn){setLearn(false);return;}}
-  if(e.target.closest('input,textarea,select')||e.metaKey||e.ctrlKey||e.altKey)return;
+  // les touches de fonction (F2, F9…) marchent aussi depuis la recherche ; Tab reste à la navigation au clavier
+  if((e.target.closest('input,textarea,select')&&!/^F\d+$/.test(e.code))||e.metaKey||e.ctrlKey||e.altKey)return;
   const id=KEYS[e.code];if(!id)return;
   if(id==='xf-'||id==='xf+'){ui.setX(S.xf+(id==='xf-'?-.05:.05));e.preventDefault();return;}
   if(e.repeat)return;const c=ctl(id);if(c){c.press(e);e.preventDefault();}
@@ -840,7 +847,7 @@ function frame(){
     ui.split.classList.toggle('on',S.split);drawLim();
   }
   fxFrame();
-  $('#master-bpm').textContent=ref?ref.bpm.toFixed(2):'—';
+  const mb=$('#master-bpm'),mt=ref?ref.bpm.toFixed(2):'';if(mb.textContent!==mt){mb.textContent=mt;mb.parentElement.hidden=!ref;}
   if(REC.mr)$('#rec-time').textContent=fmtTime((t-REC.t0)/1000,false);
   const sec=Math.floor(t/1000);
   if(sec!==lastSec){

@@ -60,7 +60,7 @@ window.MixCoach=(()=>{
     {id:'key',sev:'warn',after:3,test(x){
       if(!x.inc||gainOf(x.inc)<.3||gainOf(x.main)<.3)return null;
       const a=x.main.keyNow(),b=x.inc.keyNow();if(!a||!b||keysCompatible(a,b))return null;
-      return{msg:`Tonalités qui frottent : ${kname(x.main)} et ${kname(x.inc)}`,
+      return{msg:`Tonalités peu compatibles : ${kname(x.main)} et ${kname(x.inc)}`,
         why:`Garde ce passage court ou baisse les MID de ${x.inc.id}. Avec ${kname(x.main)}, ça sonne juste en ${neighbours(x.main)}.`,target:x.inc.id+'.mid'};}},
     {id:'gain',sev:'warn',after:3,test(x){
       if(!x.inc||!flat(x.main)||!flat(x.inc)||x.main.p.fader<.5||x.inc.p.fader<.5)return null;
@@ -123,7 +123,8 @@ window.MixCoach=(()=>{
     score=clamp(score,0,100);
     const r={from:t.from.id,to:t.to.id,title:t.to.track?t.to.track.title:'',bars,score,good,tips,at:new Date()};
     C.hist.unshift(r);C.hist.length=Math.min(C.hist.length,6);
-    if(C.level!=='off')toast(`Transition ${r.from} → ${r.to} : ${score}/100`,score>=75?'ok':'');
+    // le bilan s'affiche dans le panneau Coach ; panneau fermé, une notification le signale
+    if(C.level!=='off'&&!panelOpen())toast(`Transition ${r.from} → ${r.to} : ${score}/100`,score>=75?'ok':'');
     renderPanel(true);
   }
 
@@ -178,12 +179,21 @@ window.MixCoach=(()=>{
     if(C.target){const c=ctl(C.target);c&&c.el.classList.remove('coach-target');}
     C.target=id;if(id){const c=ctl(id);c&&c.el.classList.add('coach-target');}
   }
-  let lastKey='';
+  let lastKey='',lastSpot='';
+  // Panneau Coach ouvert : il affiche déjà le conseil, le bandeau se tait.
+  const panelOpen=()=>{const p=$('#p-coach');return !!(p&&!p.hidden&&p.offsetParent);};
+  // Sinon le bandeau se range dans la bibliothèque, entre sa barre d'outils et la liste : il ne cache aucune ligne.
+  function place(hud){
+    const lm=$('#p-lib:not([hidden]) .libmain'),tw=lm&&$(':scope>.tw',lm),spot=lm&&tw&&lm.offsetParent?'lib':'body';
+    if(spot===lastSpot&&hud.isConnected)return;lastSpot=spot;
+    if(spot==='lib'){tw.before(hud);hud.classList.add('inlib');}else{document.body.append(hud);hud.classList.remove('inlib');}
+  }
   function render(){
     const b=top(),hud=C.el.hud;setTarget((window.Parcours&&Parcours.target)||(window.Coach&&Coach.target)?null:(b&&b.target||null));
-    const key=b?b.id+b.msg+b.why:'';
+    const open=panelOpen(),key=b?b.id+b.msg+b.why+(open?'|p':''):'';
+    if(b&&!open)place(hud);
     if(key!==lastKey){
-      lastKey=key;hud.hidden=!b;
+      lastKey=key;hud.hidden=!b||open;
       if(b){hud.className='coach-hud '+b.sev;C.el.msg.textContent=b.msg;C.el.why.textContent=b.why;C.el.more.textContent=C.issues.size>1?`+${C.issues.size-1}`:'';}
       renderPanel(false);
     }
