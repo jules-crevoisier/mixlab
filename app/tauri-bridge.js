@@ -21,6 +21,11 @@
     droppedPath:async()=>null,
     loadLibrary:()=>inv('library_load'),
     saveLibrary:json=>inv('library_save',{json}),
+    // Bibliothèque pro : collections d'autres logiciels, exports, liens d'achat.
+    pickLibraryFile:()=>inv('pick_library_file'),
+    allowPaths:paths=>inv('allow_paths',{paths}),
+    saveText:(name,text)=>inv('save_export',{name,text}),
+    openShop:url=>inv('open_shop',{url}),
   };
 
   /* ---------- MIDI ---------- */
