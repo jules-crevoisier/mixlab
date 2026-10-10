@@ -114,6 +114,43 @@ window.ACADEMIE_DATA={
     bar:{label:'Bar',bpm:[100,122],curve:[2,3,3,4,4,5,5,6,6],tip:'La musique accompagne la conversation au début. Monte avec l’heure.'},
     anniversaire:{label:'Anniversaire',bpm:[95,128],curve:[4,5,6,7,8,7,8,9,8],tip:'Des morceaux « souvenirs » choisis pour la personne fêtée.'},
   },
+  /* Simulation « sauve la piste » : une situation, deux morceaux à choisir. fill = part de la piste qui danse (%). */
+  scenarios:[
+    {id:'club',title:'Club, 1 h du matin',fill:45,
+     ctx:'Peak time dans un club house. Tu viens de passer un morceau expérimental à 134 BPM : la moitié de la piste est partie au bar.',
+     rounds:[
+      {q:'Morceau suivant : que mets-tu ?',opts:[
+        {t:'Un classique house que tout le club connaît, 126 BPM, énergie 8',d:28,fb:'Bien vu. Un morceau connu, dans la ligne du club, ramène les gens tout de suite.',k:'ok'},
+        {t:'Encore plus pointu : 7 minutes d’ambiance sans grosse caisse',d:-18,fb:'La piste était déjà en train de partir. Sans rythme, les derniers danseurs s’en vont aussi.',k:'bad'},
+        {t:'Le tube commercial du moment, sans rapport avec le style du club',d:6,fb:'Quelques personnes reviennent, mais d’autres décrochent : tu as cassé la ligne du club.',k:'warn'},
+        {t:'Couper le son et parler au micro pour motiver la salle',d:-22,fb:'Un silence en plein peak time, c’est le meilleur moyen de vider la piste.',k:'bad'}]},
+      {q:'La piste revient. Et maintenant ?',opts:[
+        {t:'Un morceau qui garde l’énergie, 127 BPM, tonalité compatible, un peu plus ta couleur',d:16,fb:'Parfait : tu consolides, puis tu ramènes ta direction par petites touches.',k:'ok'},
+        {t:'Retour direct à ton morceau expérimental à 134 BPM',d:-16,fb:'Trop tôt. La salle vient juste de revenir, elle n’a pas encore confiance.',k:'bad'},
+        {t:'Un morceau calme pour laisser souffler',d:-8,fb:'Une respiration, oui, mais pas juste après avoir relancé la piste.',k:'warn'}]}]},
+    {id:'mariage',title:'Mariage, 23 h',fill:40,
+     ctx:'Tous les âges sont là. Tu viens de passer un morceau électro pointu que tu adores : les parents et les grands-parents sont retournés s’asseoir.',
+     rounds:[
+      {q:'Morceau suivant : que mets-tu ?',opts:[
+        {t:'Un tube disco que les trois générations connaissent par cœur',d:32,fb:'Exactement. En mariage, le fédérateur gagne presque toujours.',k:'ok'},
+        {t:'Un autre morceau électro, plus fort, pour convaincre',d:-14,fb:'Tu insistes dans la direction qui a vidé la piste : ceux qui restaient s’en vont.',k:'bad'},
+        {t:'Un slow, pour faire une pause',d:-6,fb:'Quelques couples dansent, mais tu casses l’élan de la soirée.',k:'warn'}]},
+      {q:'Toute la famille danse. Et ensuite ?',opts:[
+        {t:'La demande notée plus tôt par les mariés, un tube des années 2000',d:14,fb:'Une demande au bon moment : les mariés sont aux anges et la piste reste pleine.',k:'ok'},
+        {t:'Un morceau de la liste « interdits » des mariés, parce qu’il marche toujours',d:-25,fb:'La liste « interdits » est un contrat. Les mariés quittent la piste, et ça se voit.',k:'bad'},
+        {t:'Ta dernière découverte underground',d:-10,fb:'La découverte se place quand la piste est acquise et jeune, pas maintenant.',k:'warn'}]}]},
+    {id:'bar',title:'Bar, 21 h',fill:35,
+     ctx:'Les gens discutent en terrasse et à l’intérieur. Le patron trouve la musique trop agressive : les tables se vident.',
+     rounds:[
+      {q:'Morceau suivant : que mets-tu ?',opts:[
+        {t:'Un morceau groovy à 110 BPM, volume un peu baissé',d:24,fb:'Bien. À 21 h, la musique accompagne la conversation : les gens restent.',k:'ok'},
+        {t:'Un gros drop à 128 BPM pour lancer la soirée',d:-15,fb:'Trop tôt : on ne s’entend plus parler, les gens partent finir leur verre ailleurs.',k:'bad'},
+        {t:'Un morceau très connu, mais à fond',d:2,fb:'Le choix du morceau est bon, le volume non. Écoute aussi le patron.',k:'warn'}]},
+      {q:'L’ambiance revient, l’heure avance. Ensuite ?',opts:[
+        {t:'Monter doucement : 114 BPM, un peu plus d’énergie',d:16,fb:'C’est ça : tu montes avec l’heure, par petites touches.',k:'ok'},
+        {t:'Rester exactement au même niveau jusqu’à la fermeture',d:-4,fb:'Ça tient, mais la salle ne décolle jamais. Monte avec l’heure.',k:'warn'},
+        {t:'Passer à la techno à 132 BPM, la soirée est lancée',d:-18,fb:'Un saut trop brutal. Les habitués du bar ne sont pas venus pour un club.',k:'bad'}]}]}
+  ],
   glossary:{
     'warm-up':'Début de soirée : on installe l’ambiance sans brûler ses meilleurs morceaux.',
     'peak time':'Le moment le plus intense de la soirée, salle pleine.',

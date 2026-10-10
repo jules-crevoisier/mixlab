@@ -732,6 +732,84 @@ pre.tl{margin:0;background:#0a0b0e;border:1px solid var(--ln);border-radius:6px;
 .pc-dl dt{color:var(--white);font-weight:600;margin-top:6px}.pc-dl dd{margin:0;color:var(--mu);line-height:1.45}
 .pc-card{border-color:color-mix(in srgb,var(--coach) 45%,var(--ln));background:linear-gradient(160deg,color-mix(in srgb,var(--coach) 10%,#14161b),var(--s1))}
 body.parcours #coach-body{display:none!important}
+/* ---------- académie : mêmes codes que le parcours ---------- */
+body.academie:not(.parcours) #coach-body,body.academie:not(.parcours) #coach-live{display:none!important}
+body.academie #p-coach{width:360px}
+body.parcours #ac{display:none!important}
+.ac-mod{display:grid;gap:5px}
+.ac-mod>.pc-sub{margin:0}
+.ac-txt{display:grid;gap:7px}
+.ac-txt p{margin:0;color:var(--tx);font:400 12.5px/1.55 var(--ui)}
+.ac-txt b{color:var(--white);font-weight:600}
+.ac-keys{border-left:2px solid var(--coach);padding:8px 10px;background:var(--s1);border-radius:0 9px 9px 0}
+.ac-keys ul{margin:5px 0 0;padding-left:16px;display:grid;gap:3px;font:500 12px/1.45 var(--ui);color:var(--white)}
+.ac-quiz,.ac-ex{display:grid;gap:8px}
+.ac-q{display:grid;gap:6px;padding:9px 10px;border-radius:9px;background:var(--s1);border:1px solid var(--ln)}
+.ac-qq{font:600 12.5px/1.4 var(--ui);color:var(--white)}
+.ac-ch{display:grid;gap:4px}
+.ac-c{text-align:left;padding:7px 9px;border-radius:7px;border:1px solid var(--ln2);background:#14161b;color:var(--tx);font:400 12px/1.4 var(--ui);cursor:pointer}
+.ac-c:hover:not(:disabled),.ac-c:focus-visible{border-color:var(--coach);background:color-mix(in srgb,var(--coach) 8%,#14161b)}
+.ac-c:disabled{cursor:default;opacity:.55}
+.ac-c.ok{opacity:1;border-color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,#14161b);color:var(--white)}
+.ac-c.bad{opacity:1;border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,#14161b);color:var(--white)}
+.ac-fb{font:400 12px/1.45 var(--ui);padding:6px 9px;border-radius:7px;background:var(--s2);color:var(--tx);border-left:2px solid var(--mu)}
+.ac-fb.ok{border-left-color:var(--ok)}.ac-fb.ok b{color:var(--ok)}
+.ac-fb.warn{border-left-color:var(--warn)}.ac-fb.warn b{color:var(--warn)}
+.ac-fb.bad{border-left-color:var(--bad)}.ac-fb.bad b{color:#ff8792}
+.ac-retry{margin-left:6px;vertical-align:middle}
+.ac-ex{padding:10px;border-radius:10px;border:1px solid color-mix(in srgb,var(--coach) 35%,var(--ln));background:linear-gradient(160deg,color-mix(in srgb,var(--coach) 8%,#14161b),#101216)}
+.ac-ex.ok{border-color:color-mix(in srgb,var(--ok) 45%,var(--ln))}
+.ac-ext{color:var(--white);font-size:13.5px}
+.ac-ex>.pc-sub{margin:0}
+.ac-tag{font:600 10px var(--ui);letter-spacing:.06em;padding:2px 7px;border-radius:20px;border:1px solid var(--ln2);color:var(--mu)}
+.ac-tag.ok{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 45%,transparent)}
+.ac-todo .pc-ul li.ok{color:var(--ok)}
+.ac-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:11.5px;color:var(--mu)}
+.ac-row label{display:flex;gap:5px;align-items:center}
+.ac-note{margin:0;color:var(--mu);font:400 11.5px/1.45 var(--ui)}
+.ac-energy,.ac-plan,.ac-crowd,.ac-crate{display:grid;gap:8px}
+.ac-curve{width:100%;height:auto;aspect-ratio:300/130;border-radius:7px;background:#0a0b0e;border:1px solid var(--ln);touch-action:none;cursor:ns-resize}
+.ac-curve .g{stroke:#1d2027;stroke-width:1}
+.ac-curve .gl{font:500 7px var(--num);fill:var(--dim);text-anchor:middle}
+.ac-curve .tpl{fill:none;stroke:var(--mu);stroke-width:1.5;stroke-dasharray:4 3}
+.ac-curve .me{fill:none;stroke:var(--warn);stroke-width:2}
+.ac-curve .pt{fill:var(--warn);stroke:#0a0b0e;stroke-width:2;cursor:grab;outline:none}
+.ac-curve .pt:focus-visible{stroke:var(--white)}
+.ac-einfo{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:11.5px;color:var(--mu)}
+.ac-einfo b{color:var(--white);font-family:var(--num)}
+.ac-leg i{display:inline-block;width:14px;height:0;border-top:2px solid var(--warn);margin:0 4px 0 6px;vertical-align:middle}
+.ac-leg i.tpl{border-top:2px dashed var(--mu)}
+.ac-crit li{color:var(--mu)}.ac-crit li.ok{color:var(--ok)}
+.ac-pcurve{height:46px}
+.ac-pcurve .ac-bar{flex:1;position:relative;height:100%}
+.ac-pcurve .ac-bar i{position:absolute;left:0;right:0;bottom:0;border-radius:3px 3px 0 0}
+.ac-pcurve .ac-bar i.tg{background:color-mix(in srgb,var(--mu) 30%,transparent)}
+.ac-pcurve .ac-bar i.me{left:25%;right:25%;background:var(--warn)}
+.ac-slots{max-height:260px;overflow:auto}
+.ac-slots li>em{min-width:30px}
+.ac-slots li.miss span{color:var(--mu);font-style:italic}
+.ac-sum p{margin:0 0 4px;font:400 12px/1.45 var(--ui);color:var(--tx)}
+.ac-sum b{color:var(--white);font-family:var(--num)}
+.ac-tip{color:var(--coach)!important}
+.ac-ctx{margin:0;font:400 12.5px/1.5 var(--ui);color:var(--tx)}
+.ac-floor{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;padding:10px;border-radius:9px;background:radial-gradient(ellipse at 50% 0,color-mix(in srgb,var(--coach) 14%,#0a0b0e),#0a0b0e);border:1px solid var(--ln)}
+.ac-floor i{aspect-ratio:1;border-radius:50%;background:#262a32;transition:background .3s}
+.ac-floor i.on{background:var(--coach);animation:acBob .48s ease-in-out infinite alternate;animation-delay:var(--d)}
+@keyframes acBob{to{transform:translateY(-3px)}}
+.ac-fill{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;font-size:11px;color:var(--mu)}
+.ac-fill .prog{margin:0}
+.ac-fill b{font:600 12px var(--num);color:var(--white)}
+.ac-cres.ok{border-left-color:var(--ok)}.ac-cres.bad{border-left-color:var(--bad)}
+.ac-cres p{margin:6px 0}
+.ac-rules{display:grid;gap:6px}
+.ac-rule{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--mu)}
+.ac-rule>span:first-child{min-width:84px}
+.ac-rule .in:not(.num){flex:1}
+.ac-pv{font:400 12px/1.45 var(--ui);color:var(--mu)}.ac-pv b{color:var(--ok);font-family:var(--num)}
+.ac-tags .sel{width:118px}
+.ac-gq{width:100%;height:30px}
+@media (max-width:1100px){body.academie #p-coach{width:auto}}
+@media (prefers-reduced-motion:reduce){.ac-floor i.on{animation:none}}
 body.parcours #p-coach{width:360px}
 /* commandes verrouillées : grisées et inactives, ou masquées */
 .pc-lock{opacity:.16!important;filter:grayscale(1);pointer-events:none;transition:opacity .3s}
@@ -857,3 +935,5 @@ body.pc-blind .lane::after,body.pc-blind .dk-ov::after{content:"À l’oreille";
 <script src="structure.js"></script>
 <script src="automix.js"></script>
 <script src="parcours.js"></script>
+<script src="academie-data.js"></script>
+<script src="academie.js"></script>

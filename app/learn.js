@@ -87,6 +87,7 @@ window.Coach=(()=>{
     const el=$('#coach-body');el.innerHTML='';const les=L.active;
     if(!les){
       if(window.Parcours)el.append(Parcours.card());
+      if(window.Academie)el.append(Academie.card());
       el.append(...LESSONS.slice().sort((a,b)=>a.lvl-b.lvl).map(l=>h('div',{class:'lcard'},h('span',{class:'mod'},`Niveau ${l.lvl} · ${l.mod.replace(/^Module \d+ · /,'')} · ${l.mins}`),h('b',{},l.title),h('p',{},l.intro),h('button',{class:'go',onclick:()=>start(l.id)},'Commencer'))));
       el.append(h('div',{},h('div',{class:'lbl',style:'margin-bottom:4px'},'Bientôt'),h('ul',{class:'soon'},SOON.map(s=>h('li',{},s)))));
       return;

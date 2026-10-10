@@ -847,6 +847,7 @@ async function boot(){
   }
   window.Coach&&Coach.ready&&Coach.ready();
   window.Parcours&&Parcours.init();
+  window.Academie&&Academie.init();
   window.Desktop&&Desktop.boot();
 }
 // On attend que tous les scripts de la page (library-pro, coach…) soient exécutés.
