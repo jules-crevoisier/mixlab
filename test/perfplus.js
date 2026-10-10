@@ -247,7 +247,7 @@ const helpers = () => {
   });
   check(seq.n >= 5 && seq.err < 3 && seq.kinds.every(k => [0, 4, 8, 13].includes(k)) && seq.kinds.includes(13), 'Séquenceur calé sur A : chaque coup tombe sur son pas (écart max en ms)', JSON.stringify(seq));
   const intc = await W(async () => {
-    const P = PerfPlus.P; decks.forEach(d => d.pause()); P.seq.bpm = 120; P.seq.steps = PerfPlus.stepsOf('none'); P.seq.steps[0] = Array(16).fill(0).map((_, k) => k % 4 ? 0 : 1);
+    const P = PerfPlus.P; await new Promise(r => setTimeout(r, 600)); /* laisse finir les coups programmés par le séquenceur précédent */ decks.forEach(d => d.pause()); P.seq.bpm = 120; P.seq.steps = PerfPlus.stepsOf('none'); P.seq.steps[0] = Array(16).fill(0).map((_, k) => k % 4 ? 0 : 1);
     const R = await __rec(SAMPLER.gain); PerfPlus.seqStart(); await new Promise(r => setTimeout(r, 2300)); PerfPlus.seqHalt(); await new Promise(r => setTimeout(r, 150));
     const on = __onsets(R.stop()), gaps = on.slice(1).map((t, i) => t - on[i]); return { n: on.length, dev: Math.max(...gaps.map(g => Math.abs(g - .5))) * 1000 };
   });

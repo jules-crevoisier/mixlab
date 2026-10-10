@@ -101,6 +101,8 @@ const measure = page => page.evaluate(() => {
   check(lane1 > lane0, 'Séparateur des waveforms : les waveforms grandissent', `${lane0} → ${lane1} px`);
   const h2 = await libH();
   await page.reload(); await ready(page);
+  // les modules chargés en dernier peuvent encore ajuster la mise en page : on attend qu'elle soit stable
+  for (let i = 0, last = -1; i < 15; i++) { const v = await libH(); if (v === last) break; last = v; await sleep(250); }
   const h3 = await libH(), lane2 = await page.evaluate(() => Math.round(document.querySelector('#lane-A').getBoundingClientRect().height));
   check(Math.abs(h3 - h2) <= 6 && Math.abs(lane2 - lane1) <= 3, 'Tailles retenues après rechargement', `biblio ${h2} → ${h3} px, waveform ${lane1} → ${lane2} px`);
   await page.click('#presets button[data-p=studio]'); await sleep(200);

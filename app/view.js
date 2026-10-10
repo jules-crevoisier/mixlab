@@ -265,7 +265,7 @@ window.View=(()=>{
         if(!el._ph){el._ph=document.createComment(sel);el.before(el._ph);}pop.append(el);if(!overTop(top))break;}
       [...pop.children].sort((a,b)=>a._ph.compareDocumentPosition(b._ph)&Node.DOCUMENT_POSITION_FOLLOWING?-1:1).forEach(e=>pop.append(e));
     }
-    if(!pop.children.length)more.open=false;
+    if(!pop.children.length){more.open=false;more.hidden=true;}
     if(V.topMo)V.topMo.takeRecords();
     $$('#top details[open]').forEach(placePop);
   }
@@ -388,7 +388,7 @@ window.View=(()=>{
     new ResizeObserver(refit).observe(A);
     // barre du haut : boutons ajoutés après coup (auto-mix, parcours), largeur de la fenêtre, textes qui s'allongent
     const top=$('#top'),retop=()=>{if(V.tq)return;V.tq=requestAnimationFrame(()=>{V.tq=0;fitTop();});};
-    new ResizeObserver(retop).observe(top);V.topMo=new MutationObserver(retop);V.topMo.observe(top,{childList:true});
+    new ResizeObserver(retop).observe(top);V.topMo=new MutationObserver(retop);V.topMo.observe(top,{childList:true,subtree:true,attributes:true,attributeFilter:['class','hidden']});
     setInterval(()=>{if(overTop(top))fitTop();},1000);
     addEventListener('resize',closeMenus);
     document.addEventListener('pointerdown',e=>{if(!e.target.closest('#top details'))closeMenus();},true);
