@@ -481,9 +481,11 @@ async function importFiles(files,deck){
     try{
       toast('Analyse de « '+f.name+' »…');
       await new Promise(r=>setTimeout(r,30));
-      const buf=await ctx.decodeAudioData(await f.arrayBuffer());
+      const ab=await f.arrayBuffer(),pre=window.Persist?await Persist.pre(ab,f.name):null; // tags et cache d'analyse
+      const buf=await ctx.decodeAudioData(ab);
       const name=f.name.replace(/\.[^.]+$/,''),m=/^(.+?)\s+-\s+(.+)$/.exec(name);
-      const tr=addTrack(buf,{title:m?m[2]:name,artist:m?m[1]:'',file:f.name,path});
+      const tr=addTrack(buf,{title:m?m[2]:name,artist:m?m[1]:'',file:f.name,path,...(pre?pre.meta:{})});
+      if(pre)await Persist.post(tr,pre);
       const ki=keyInfo(tr.key);toast('« '+tr.title+' » : '+tr.bpm.toFixed(2)+' BPM'+(ki?' · '+ki.code:''),'ok');
       renderSide();renderTable();
       if(deck){loadTo(deck,tr);deck=null;}

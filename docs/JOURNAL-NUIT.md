@@ -110,3 +110,13 @@ L'Académie s'ouvre depuis le bouton Coach, juste sous le parcours débutant.
 - **Ranger ses morceaux** : créer une crate intelligente et taguer ses morceaux par moment du set.
 - **Glossaire** de 65 mots, avec recherche. Les mots en gras des cours ouvrent leur définition.
 - **Vérifié** : les 8 suites de tests passent.
+
+## 03:30 · Assemblé : tags, pochettes, cache d'analyse et historique
+
+- **Tags lus à l'import** : MP3 (ID3), M4A, FLAC et Ogg. Titre, artiste, album, genre, année, commentaire, BPM, tonalité et pochette. Un tag ne remplace jamais une info que tu as modifiée.
+- **Pochettes** dans la bibliothèque et sur la platine.
+- **Analyse gardée** : BPM, grille, tonalité, waveform et structure sont mémorisés. Réimporter un morceau ou relancer l'appli ne relance plus l'analyse.
+- **Historique** : les sets précédents restent dans la barre latérale, classés par date, exportables en texte, CSV et M3U8.
+- **Effets gardés** : les réglages des unités FX sont retrouvés au lancement.
+- **Fiabilisé** : un test des effets comparait deux passages différents du morceau ; il mesure maintenant au même endroit.
+- **Vérifié** : les 9 suites de tests passent. L'inventaire de parité compte maintenant 100 fonctions faites sur 338.

@@ -772,8 +772,12 @@ decks.forEach(applyMix);applyXf();
 /* ---------- bibliothèque ---------- */
 const LIB={tracks:[],seq:0,playlists:[{id:'prep',name:'Préparation',ids:[]},{id:'warm',name:'Warm-up',ids:[]},{id:'peak',name:'Peak time',ids:[]}],history:[]};
 function addTrack(buffer,meta){
-  const a=analyze(buffer,!!meta.key,meta.demo?[87.5,175]:null);
+  // meta.analysis : résultat gardé en cache (persist.js), meta.range : BPM lu dans les tags
+  const a=meta.analysis||analyze(buffer,!!meta.key,meta.range||(meta.demo?[87.5,175]:null));
   const tr={id:++LIB.seq,title:meta.title,artist:meta.artist||'',genre:meta.genre||'',buffer,duration:buffer.duration,
-    bpm:a.bpm,grid:a.grid,key:meta.key||a.key,rmsDb:a.rmsDb,wf:a.wf,cue:null,hot:Array(8).fill(null),hotMeta:Array(8).fill(null),memCues:[],loops:[],ov:null,demo:!!meta.demo,added:new Date(),plays:0,file:meta.file||null,path:meta.path||null};
-  tr.cue=tr.grid;LIB.tracks.push(tr);window.Structure&&Structure.queue(tr);return tr;
+    bpm:a.bpm,grid:a.grid,key:meta.key||a.key,rmsDb:a.rmsDb,wf:a.wf,cue:null,hot:Array(8).fill(null),hotMeta:Array(8).fill(null),memCues:[],loops:[],ov:null,demo:!!meta.demo,added:new Date(),plays:0,file:meta.file||null,path:meta.path||null,_a:{bpm:a.bpm,grid:a.grid,key:a.key}};
+  tr.cue=tr.grid;LIB.tracks.push(tr);
+  if(a.sections){tr.sections=a.sections;tr.energy=a.energy;tr.musicEnd=a.musicEnd;tr.memCues=a.memCues.slice();}
+  else window.Structure&&Structure.queue(tr);
+  return tr;
 }

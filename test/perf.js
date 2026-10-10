@@ -150,14 +150,15 @@ const helpers = () => {
   // Effets : FX1 sur A, mesure à l'analyseur de la voie.
   const an = 'decks[0].an';
   const meas = ms => page.evaluate(([e, ms]) => __meas(eval(e), ms), [an, ms]);
-  await W(() => { const u = FXU[0]; u.setMode('single'); u.toggle('A', true); S.quantize = false; });
+  await W(() => { const u = FXU[0]; u.setMode('single'); u.toggle('A', true); S.quantize = false; window.__dryPos = decks[0].position(); });
   const dry = await meas(1500);
   await W(() => { const u = FXU[0]; u.beats = .5; u.setSlot(0, { type: 'gate', amount: 1, p1: 0 }); u.setOn(true); });
   await sleep(150);
   const gated = await meas(1500);
   check(gated.rms < dry.rms * .75, 'Trans / Gater sur A : le niveau chute', `${dry.rms.toFixed(3)} → ${gated.rms.toFixed(3)}`);
-  await W(() => { const u = FXU[0]; u.setSlot(0, { type: 'crush', amount: 1, p1: 1, p2: 0 }); });
+  await W(() => { const u = FXU[0]; u.setSlot(0, { type: 'crush', amount: 1, p1: 1, p2: 0 }); decks[0].seek(window.__dryPos); });
   await sleep(200);
+  // même passage du morceau que la mesure à sec, pour comparer des aigus comparables
   const crushed = await meas(1500);
   check(crushed.hf > dry.hf * 2, 'Bitcrusher sur A : les aigus explosent', `${(dry.hf * 1000).toFixed(2)}‰ → ${(crushed.hf * 1000).toFixed(2)}‰`);
   // Écho : on coupe la platine, la queue continue de résonner.
