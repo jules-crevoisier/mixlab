@@ -130,11 +130,13 @@ window.View=(()=>{
   /* ---------- séparateurs ---------- */
   function splitter(id,area,title,drag,reset){
     const el=h('div',{class:'split',id,style:'grid-area:'+area,role:'separator','aria-orientation':'horizontal','aria-label':title,title:title+' · double-clic : taille par défaut',tabindex:0});
-    let y0=null,st=null,raf=0;
-    const run=y=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;drag(st,(y-y0)/V.zoom);fit();});};
+    let y0=null,st=null,raf=0,ly=0;
+    // une image par rafraîchissement, toujours avec la dernière position ; rien ne s'applique après le relâchement
+    const apply=()=>{raf=0;if(y0==null)return;drag(st,(ly-y0)/V.zoom);fit();};
+    const run=y=>{ly=y;if(!raf)raf=requestAnimationFrame(apply);};
     el.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();el.setPointerCapture(e.pointerId);el.classList.add('drag');y0=e.clientY;st=start();});
     el.addEventListener('pointermove',e=>{if(y0==null||!el.hasPointerCapture(e.pointerId))return;run(e.clientY);});
-    const end=()=>{if(y0==null)return;y0=null;el.classList.remove('drag');store.set('splits',V.splits);};
+    const end=e=>{if(y0==null)return;if(e&&e.type==='pointerup')ly=e.clientY;if(raf){cancelAnimationFrame(raf);apply();}y0=null;el.classList.remove('drag');store.set('splits',V.splits);};
     el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end);
     el.addEventListener('dblclick',()=>{reset();store.set('splits',V.splits);fit();});
     el.addEventListener('keydown',e=>{const s=e.key==='ArrowUp'?-12:e.key==='ArrowDown'?12:0;if(!s)return;e.preventDefault();drag(start(),s);store.set('splits',V.splits);fit();});
