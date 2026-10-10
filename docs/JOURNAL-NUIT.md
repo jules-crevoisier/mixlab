@@ -120,3 +120,16 @@ L'Académie s'ouvre depuis le bouton Coach, juste sous le parcours débutant.
 - **Effets gardés** : les réglages des unités FX sont retrouvés au lancement.
 - **Fiabilisé** : un test des effets comparait deux passages différents du morceau ; il mesure maintenant au même endroit.
 - **Vérifié** : les 9 suites de tests passent. L'inventaire de parité compte maintenant 100 fonctions faites sur 338.
+
+## 04:00 · Assemblé : platines et mixer pro
+
+- **Modes de cue** CDJ, Denon et Numark, et Cue Play.
+- **Pitch** : sens du fader au choix, transposition fine en cents, accord automatique sur la platine maître, correction manuelle de la tonalité.
+- **Instant doubles** : copie d'une platine sur une autre (morceau, position, tempo, boucle).
+- **Pré-écoute dans la bibliothèque**, au casque, sans toucher aux platines.
+- **Chargement automatique** du morceau suivant à la fin d'une platine.
+- **Courbes** des faders et du crossfader, inversion (hamster), résonance du filtre, balance du master.
+- **Grille verrouillée** par morceau, métronome au casque, sync à la mesure ou à la phrase, décompte jusqu'au prochain cue.
+- **Enregistrement WAV** 16 ou 24 bits, enregistré par la fenêtre native dans l'appli.
+- **Inventaire de parité revérifié ligne par ligne** : 176 fonctions faites sur 335 (53 %), 53 partielles, 106 manquantes. Les plus gros manques : stems, mappings validés sur de vrais contrôleurs, moteur audio natif.
+- **Vérifié** : les 10 suites de tests passent, et les tests Rust aussi.
