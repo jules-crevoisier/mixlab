@@ -384,11 +384,11 @@
 | Auto-mix « intelligent » (phrases, EQ, effets) | DJAY *(Automix AI)*, VDJ, RB | **Fait** : départ sur les phrases, échange des basses, filtre, écho ou coupe selon les morceaux | P2 | L |
 | Réglage de la durée et du type de transition auto | VDJ, MX, DJAY | **Fait** : style et durée en mesures | P2 | S |
 | Suggestion du morceau suivant (Related / Track Suggestion / GeniusDJ) | RB, VDJ, DJAY, S, DJS | **Fait** : note sur 100 (tonalité, tempo, énergie, déjà joué) avec les raisons | P2 | M |
-| Mix Point Link (préparer la transition entre deux pistes) | RB *(Free bloqué si contrôleur)* | **Manque** | P3 | M |
-| Playlists générées par IA (requête en langage naturel) | VDJ 2026, DJAY | **Manque** | P3 | L |
-| Planificateur de set en timeline (ordre, chevauchements, automation) | DJS | **Manque** : prévu (ROADMAP) | P3 | L |
-| Rendu hors ligne d'un set planifié (MP3, WAV, vidéo) | DJS | **Manque** | P3 | L |
-| Export du set planifié vers d'autres logiciels | DJS (vers RB, S, Ableton) | **Manque** | P3 | M |
+| Mix Point Link (préparer la transition entre deux pistes) | RB *(Free bloqué si contrôleur)* | **Fait** : chaque transition du planificateur devient un point de mix (sortie, entrée, durée, style). L'auto-mix part à ce point et cale la piste entrante, une platine chargée à la main se cale sur l'entrée prévue, le coach annonce le départ. L'auto-mix rejoue le style, pas les courbes dessinées | P3 | M |
+| Playlists générées par IA (requête en langage naturel) | VDJ 2026, DJAY | **Partiel** : phrase en français analysée en local, sans service en ligne (genre, tempo, durée, nombre, énergie et sa forme, trames, tonalité, « compatible », « après tel morceau », exclusions), playlist tirée de la bibliothèque avec la note de Suggest. Pas de compréhension libre : les mots non compris sont affichés | P3 | L |
+| Planificateur de set en timeline (ordre, chevauchements, automation) | DJS | **Fait** : vue en grand, frise glissable (ordre, point de transition, point d'entrée, durée), courbes volume, EQ, filtre et écho par transition avec préréglages, compatibilité tonalité et tempo entre voisins, courbe d'énergie et trame de l'Académie, écoute au casque ou au master, lecture du set | P3 | L |
+| Rendu hors ligne d'un set planifié (MP3, WAV, vidéo) | DJS | **Partiel** : WAV 16 ou 24 bits, tempos calés (naturel ou verrouillé), courbes appliquées, limiteur, par tranches avec progression ; enregistré sur le disque (appli) ou téléchargé. Pas de MP3 ni de vidéo, pas de key lock dans le rendu (la hauteur suit le tempo) | P3 | L |
+| Export du set planifié vers d'autres logiciels | DJS (vers RB, S, Ableton) | **Partiel** : M3U8, rekordbox XML (playlist du set) et tracklist horodatée ; pas de projet Ableton ni de courbes exportées | P3 | M |
 
 ## 12. Enregistrement et diffusion
 
@@ -494,7 +494,7 @@
 | Progression sauvegardée et badges | DJAY (DJ School, en vidéo) | **Fait** | P2 | M |
 | Glossaire intégré | aucun | **Fait** : mots cliquables dans le parcours et l'Académie | P2 | S |
 | Mode « à l'oreille » (waveforms et BPM masqués) | aucun | **Partiel** : dans les exercices du parcours ; pas de bouton pour tout le jeu | P2 | S |
-| Relecture d'une transition sur une mini-timeline (courbes des faders et des EQ) | DJS (hors ligne) | **Manque** | P2 | M |
+| Relecture d'une transition sur une mini-timeline (courbes des faders et des EQ) | DJS (hors ligne) | **Fait** : faders (avec le crossfader), graves et filtre enregistrés pendant chaque transition jouée, mini frise dans le bilan du coach et dans la préparation, gestes réutilisables comme courbes d'une transition du set | P2 | M |
 | Bac à sable / essai au casque | VDJ (Sandbox) | **Manque** | P2 | M |
 | Morceaux d'entraînement libres de droits | aucun | **Partiel** : 4 démos synthétisées | P2 | M |
 | Tutoriels vidéo et visite guidée | DJAY, TR (Play) | **Manque** | P3 | M |

@@ -107,7 +107,8 @@ window.AutoMix=(()=>{
     let start=Math.floor((endBeat-len)/32)*32;
     if(start<cur+1.5){start=Math.ceil((cur+1.5)/4)*4;len=Math.max(4,Math.min(len,Math.floor((endBeat-start)/4)*4));}
     const swap=Math.min(len,Math.round(len/8)*4||4);
-    return{start,len,style,why,swapP:swap/len};
+    const res={start,len,style,why,swapP:swap/len};
+    return window.Planner?Planner.linkPlan(out,inc,res):res; // point de mix préparé (planner.js)
   }
   function prepare(){
     const m=A.main,d=freeDeck(m);
@@ -118,7 +119,7 @@ window.AutoMix=(()=>{
     d.load(tr);A.w={};
     neutral(d,0);set(P(d,'low'),0);
     if(!d.sync)press(P(d,'sync'));
-    d.seek(d.timeOfBeat(0));
+    const ip=window.Planner&&Planner.inPoint(m.track,tr);d.seek(ip!=null?ip:d.timeOfBeat(0));
     A.inc=d;A.plan=plan(m,d);A.msg='';
     renderQueue();renderSug();return true;
   }
