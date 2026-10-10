@@ -23,51 +23,51 @@ window.Coach=(()=>{
   }
 
   const LESSONS=[
-    {id:'tempo',mod:'Module 3 · Caler le tempo',title:'Caler le tempo à l’oreille',mins:'5 min',
+    {id:'tempo',lvl:3,mod:'Module 3 · Caler le tempo',title:'Caler le tempo à l’oreille',mins:'5 min',
      intro:'Sans Sync : tu égalises les BPM avec le pitch, puis tu alignes les temps avec le nudge. C’est le geste de base de tous les DJ.',
      setup(){prep();A().seek(A().timeOfBeat(64));B().seek(B().timeOfBeat(64));},
      steps:[
-       {t:'Lance la platine A',why:'A joue « Néons » à 124 BPM. Écoute la grosse caisse : boum, boum, boum, boum.',check:()=>A().playing},
-       {t:'Lance la platine B, quand tu veux',why:'B joue « Quai 9 » à 127 BPM. Les deux grosses caisses ne tombent pas ensemble : on entend un « galop ».',check:()=>B().playing},
-       {t:'Égalise les tempos avec le pitch de B',why:'B est plus rapide. Le fader de pitch change sa vitesse. Vise moins de 0,05 BPM d’écart.',
+       {t:'Lance la platine A',target:'A.play',why:'A joue « Néons » à 124 BPM. Écoute la grosse caisse : boum, boum, boum, boum.',check:()=>A().playing},
+       {t:'Lance la platine B, quand tu veux',target:'B.play',why:'B joue « Quai 9 » à 127 BPM. Les deux grosses caisses ne tombent pas ensemble : on entend un « galop ».',check:()=>B().playing},
+       {t:'Égalise les tempos avec le pitch de B',target:()=>B().sync?'B.sync':'B.pitch',why:'B est plus rapide. Le fader de pitch change sa vitesse. Vise moins de 0,05 BPM d’écart.',
         hint(){const df=B().bpm-A().bpm;if(B().sync)return'Désactive SYNC : dans cette leçon on cale à l’oreille.';if(Math.abs(df)<.05)return'Tempos égaux.';return df>0?`B est plus rapide de ${df.toFixed(2)} BPM : monte le pitch de B (vers le haut).`:`B est plus lent de ${(-df).toFixed(2)} BPM : descends le pitch de B (vers le bas).`;},
         check:()=>!B().sync&&Math.abs(B().bpm-A().bpm)<.05,hold:.4},
-       {t:'Aligne les grosses caisses avec le nudge',why:'Même tempo ne veut pas dire mêmes temps. Pousse ou retiens B un instant (‹ › ou la platine) jusqu’à ce que les deux kicks n’en fassent plus qu’un.',
+       {t:'Aligne les grosses caisses avec le nudge',target:()=>{const ms=phaseMs();return ms==null?(A().playing?'B.play':'A.play'):Math.abs(B().bpm-A().bpm)>=.05?'B.pitch':ms>0?'B.nudgeL':'B.nudgeR';},why:'Même tempo ne veut pas dire mêmes temps. Pousse ou retiens B un instant (‹ › ou la platine) jusqu’à ce que les deux kicks n’en fassent plus qu’un.',
         hint(){const ms=phaseMs();if(!A().playing||!B().playing)return'Les deux platines doivent jouer.';if(Math.abs(B().bpm-A().bpm)>=.05)return'Les tempos ont bougé : réajuste le pitch de B.';return Math.abs(ms)<12?'C’est calé. Tiens 4 secondes…':ms>0?`B est en avance de ${ms.toFixed(0)} ms : retiens-le avec ‹.`:`B est en retard de ${(-ms).toFixed(0)} ms : pousse-le avec ›.`;},
         check:()=>{const ms=phaseMs();return ms!=null&&Math.abs(ms)<12&&Math.abs(B().bpm-A().bpm)<.05&&!B().sync;},hold:4}
      ],
      finish:()=>['Tempo calé à moins de 0,05 BPM, sans Sync.','Temps alignés à moins de 12 ms.','En vrai, ce calage se fait au casque : bouton CUE de B, fader de B en bas.']},
-    {id:'swap',mod:'Module 4 · Transitions',title:'Première transition : l’échange des basses',mins:'8 min',
+    {id:'swap',lvl:1,mod:'Module 4 · Transitions',title:'Première transition : l’échange des basses',mins:'8 min',
      intro:'La transition la plus jouée en house et en techno : B entre sans ses graves, puis on échange les basses des deux pistes sur un début de phrase.',
      setup(){prep();A().seek(A().timeOfBeat(160));B().track.cue=B().timeOfBeat(0);B().seek(B().track.cue);B().ui.fader.set(0);L.stats={tA:null,tB:null};},
      steps:[
-       {t:'Lance la platine A',why:'A est à la mesure 41 : il lui reste une phrase avant son outro. Regarde le compteur de phrase : une phrase = 8 mesures de 4 temps.',check:()=>A().playing},
-       {t:'Appuie sur SYNC sur la platine B',why:'B prend le tempo de A (124 BPM). Avec Sync, son départ tombera aussi pile sur un temps de A.',check:()=>B().sync||Math.abs(B().bpm-A().bpm)<.05},
-       {t:'Coupe les basses de B (LOW à fond à gauche, ou son bouton kill)',why:'Deux grosses caisses et deux basses en même temps, c’est un mix boueux qui sature. B va entrer sans ses graves.',check:()=>!bassOn(B())},
-       {t:'Lance B au début d’une phrase de A',why:'Les morceaux sont construits en phrases de 8 mesures. Démarrer B sur le « 1 » d’une phrase de A fait coïncider leurs structures.',
+       {t:'Lance la platine A',target:'A.play',why:'A est à la mesure 41 : il lui reste une phrase avant son outro. Regarde le compteur de phrase : une phrase = 8 mesures de 4 temps.',check:()=>A().playing},
+       {t:'Appuie sur SYNC sur la platine B',target:'B.sync',why:'B prend le tempo de A (124 BPM). Avec Sync, son départ tombera aussi pile sur un temps de A.',check:()=>B().sync||Math.abs(B().bpm-A().bpm)<.05},
+       {t:'Coupe les basses de B (LOW à fond à gauche, ou son bouton kill)',target:'B.low',why:'Deux grosses caisses et deux basses en même temps, c’est un mix boueux qui sature. B va entrer sans ses graves.',check:()=>!bassOn(B())},
+       {t:'Lance B au début d’une phrase de A',target:()=>B().sync?'B.play':'B.sync',why:'Les morceaux sont construits en phrases de 8 mesures. Démarrer B sur le « 1 » d’une phrase de A fait coïncider leurs structures.',
         hint(){const bi=A().barInfo(),ls=B().lastStart;if(B().playing&&ls&&ls.otherBeat!=null&&!startOk())return`B est parti à la ${posText(ls.otherBeat)} de A. Mets B en pause, appuie sur CUE pour revenir au début, et réessaie.`;if(!B().sync)return'Remets SYNC sur B pour un départ calé.';if(!bi||bi.pre)return'';return`A : mesure ${bi.barIn+1}/8, temps ${bi.beat+1}. Appuie sur PLAY de B pendant le dernier temps de la mesure 8 : B partira sur le 1.`;},
         check:()=>B().playing&&startOk()},
-       {t:'Monte le fader de B jusqu’en haut',why:'Progressivement, sur 4 à 8 mesures : les aigus et les médiums de B se glissent sous A, sans conflit de basses.',check:()=>B().p.fader>=.8},
-       {t:'Échange des basses : coupe celles de A, remets celles de B',why:'Sur le 1 d’une phrase, tourne les deux LOW en même temps : A perd ses graves pendant que B récupère les siens. Une seule basse à la fois.',
+       {t:'Monte le fader de B jusqu’en haut',target:'B.fader',why:'Progressivement, sur 4 à 8 mesures : les aigus et les médiums de B se glissent sous A, sans conflit de basses.',check:()=>B().p.fader>=.8},
+       {t:'Échange des basses : coupe celles de A, remets celles de B',target:()=>bassOn(A())?'A.low':'B.low',why:'Sur le 1 d’une phrase, tourne les deux LOW en même temps : A perd ses graves pendant que B récupère les siens. Une seule basse à la fois.',
         hint(){const bi=A().barInfo();return bi&&!bi.pre?`A : mesure ${bi.barIn+1}/8. Vise le prochain 1.`:'';},
         check:()=>!bassOn(A())&&B().p.low>=.45&&!B().p.kill.low,hold:.3},
-       {t:'Sors A en baissant son fader',why:'B porte maintenant le morceau. Retire A en douceur, ou d’un coup sur un début de phrase.',check:()=>A().p.fader<=.05||!A().playing||xfGainOf(A())<.05}
+       {t:'Sors A en baissant son fader',target:'A.fader',why:'B porte maintenant le morceau. Retire A en douceur, ou d’un coup sur un début de phrase.',check:()=>A().p.fader<=.05||!A().playing||xfGainOf(A())<.05}
      ],
      finish(){const s=L.stats,res=['Transition terminée : B a pris le relais de A.'];
        if(s.tA!=null&&s.tB!=null){const gap=Math.abs(s.tA-s.tB)*A().track.bpm*A().rate/60;res.push(gap<1.5?`Échange des basses net : ${gap.toFixed(1)} temps d’écart entre les deux potards.`:`Échange des basses en ${gap.toFixed(1)} temps : essaie de tourner les deux potards ensemble (sur une table, une main sur chaque LOW).`);}
        res.push(clash<.5?'Aucun conflit de basses.':`Basses qui se battent pendant ${clash.toFixed(1)} s : à réduire au prochain essai.`);return res;}},
-    {id:'echo',mod:'Module 4 · Transitions',title:'Sortie en écho',mins:'5 min',
+    {id:'echo',lvl:2,mod:'Module 4 · Transitions',title:'Sortie en écho',mins:'5 min',
      intro:'Pour changer d’ambiance d’un coup : on coupe A sur la fin d’une phrase en laissant résonner un écho calé sur le tempo, puis B démarre sur le 1.',
      setup(){prep();A().seek(A().timeOfBeat(160));B().track.cue=B().timeOfBeat(0);B().seek(B().track.cue);B().ui.fader.set(0);
        A().fx.setType('reverb');A().fx.beats=.5;A().fx.on=false;A().fx.apply();setFxUi(A());layout.visible.add('fx');applyLayout();L.stats={cut:null};},
      steps:[
-       {t:'Lance la platine A',why:'A joue sa dernière phrase avant l’outro. Les effets sont dans la bande FX, sous les platines.',check:()=>A().playing},
-       {t:'Sur FX A, choisis « Écho » et une durée de 1 temps',why:'Un écho d’un temps répète chaque son exactement sur le temps suivant : il reste dans le groove.',check:()=>A().fx.type==='echo'&&A().fx.beats===1},
-       {t:'Monte le dosage vers 60 % et active l’effet (On)',why:'L’écho s’ajoute au son de A. Pour l’instant on l’entend à peine : il va prendre toute la place quand A sera coupé.',check:()=>A().fx.on&&A().fx.amount>=.4},
-       {t:'Coupe le fader de A d’un coup, sur le dernier temps d’une phrase',why:'Le son de A disparaît mais l’écho, placé après le fader dans la chaîne de A, continue de résonner et s’éteint tout seul.',
+       {t:'Lance la platine A',target:'A.play',why:'A joue sa dernière phrase avant l’outro. Les effets sont dans la bande FX, sous les platines.',check:()=>A().playing},
+       {t:'Sur FX A, choisis « Écho » et une durée de 1 temps',target:()=>A().fx.type==='echo'?'#fx-A .bt':'#fx-A select',why:'Un écho d’un temps répète chaque son exactement sur le temps suivant : il reste dans le groove.',check:()=>A().fx.type==='echo'&&A().fx.beats===1},
+       {t:'Monte le dosage vers 60 % et active l’effet (On)',target:()=>A().fx.amount<.4?'A.fxamt':'A.fxon',why:'L’écho s’ajoute au son de A. Pour l’instant on l’entend à peine : il va prendre toute la place quand A sera coupé.',check:()=>A().fx.on&&A().fx.amount>=.4},
+       {t:'Coupe le fader de A d’un coup, sur le dernier temps d’une phrase',target:'A.fader',why:'Le son de A disparaît mais l’écho, placé après le fader dans la chaîne de A, continue de résonner et s’éteint tout seul.',
         hint(){const bi=A().barInfo();return bi&&!bi.pre?`A : mesure ${bi.barIn+1}/8, temps ${bi.beat+1}.`:'';},
         check:()=>A().p.fader<=.05&&A().fx.on},
-       {t:'Appuie sur SYNC de B, lance-le et monte son fader',why:'B arrive pendant que l’écho s’éteint. Un départ franc sur le 1 marque le changement.',check:()=>B().playing&&B().p.fader>=.6}
+       {t:'Appuie sur SYNC de B, lance-le et monte son fader',target:()=>!B().sync&&!B().playing?'B.sync':!B().playing?'B.play':'B.fader',why:'B arrive pendant que l’écho s’éteint. Un départ franc sur le 1 marque le changement.',check:()=>B().playing&&B().p.fader>=.6}
      ],
      finish(){const s=L.stats,res=['Sortie en écho réussie.'];if(s.cut!=null){const r=((Math.round(s.cut)%32)+32)%32;res.push(r>=28||r===0?'Coupure bien placée, en fin de phrase.':`A coupé à la ${posText(s.cut)} : essaie plutôt sur la mesure 8, avant le 1 suivant.`);}res.push('Pense à couper l’effet de A avant de recharger cette platine.');return res;}}
   ];
@@ -86,7 +86,8 @@ window.Coach=(()=>{
   function render(){
     const el=$('#coach-body');el.innerHTML='';const les=L.active;
     if(!les){
-      el.append(...LESSONS.map(l=>h('div',{class:'lcard'},h('span',{class:'mod'},l.mod+' · '+l.mins),h('b',{},l.title),h('p',{},l.intro),h('button',{class:'go',onclick:()=>start(l.id)},'Commencer'))));
+      if(window.Parcours)el.append(Parcours.card());
+      el.append(...LESSONS.slice().sort((a,b)=>a.lvl-b.lvl).map(l=>h('div',{class:'lcard'},h('span',{class:'mod'},`Niveau ${l.lvl} · ${l.mod.replace(/^Module \d+ · /,'')} · ${l.mins}`),h('b',{},l.title),h('p',{},l.intro),h('button',{class:'go',onclick:()=>start(l.id)},'Commencer'))));
       el.append(h('div',{},h('div',{class:'lbl',style:'margin-bottom:4px'},'Bientôt'),h('ul',{class:'soon'},SOON.map(s=>h('li',{},s)))));
       return;
     }
@@ -108,7 +109,14 @@ window.Coach=(()=>{
     else if(!skip)toast('✓ '+les.steps[L.i-1].t,'ok');
     render();const now=$('#coach-now');if(now&&!skip)now.classList.add('flash');
   }
+  // Halo sur la commande à toucher (même mécanisme que le coach en direct et le parcours).
+  let tEl=null,tId=null;
+  function setTarget(id){
+    const el=!id?null:/^[#.\[]/.test(id)?$(id):(ctl(id)||{}).el||null;
+    if(tEl&&tEl!==el)tEl.classList.remove('coach-target');tEl=el;tId=el?id:null;if(el)el.classList.add('coach-target');
+  }
   function tick(dt){
+    {const s=L.active&&!L.done&&!$('#p-coach').hidden?L.active.steps[L.i]:null;let id=null;try{id=s?(typeof s.target==='function'?s.target():s.target):null;}catch(e){}setTarget(id);}
     if($('#p-coach').hidden)return;
     const a=A(),b=B();
     if(a.track&&b.track){const df=b.bpm-a.bpm;live.tempo.textContent=`A ${a.bpm.toFixed(2)} · B ${b.bpm.toFixed(2)} · écart ${df>=0?'+':''}${df.toFixed(2)}`;live.tempo.style.color=Math.abs(df)<.05?'var(--ok)':'';}
@@ -129,5 +137,5 @@ window.Coach=(()=>{
     if(s.check()){L.hold+=dt;if(L.hold>=(s.hold||.25)){advance();return;}}else L.hold=0;
     const ht=s.hint?s.hint():'';if(L.hintEl&&ht!==L.lastHint){L.hintEl.textContent=ht;L.lastHint=ht;}
   }
-  return{build,tick,start,phaseMs,L,LESSONS};
+  return{build,tick,start,render,phaseMs,L,LESSONS,get target(){return tId;}};
 })();
