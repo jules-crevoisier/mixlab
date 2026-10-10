@@ -116,7 +116,7 @@
 | Clone de platine (instant doubles) | S, RB, TR, ENG, MX | **Fait** : bouton Doubler (morceau, position, tempo, ton et boucle) | P2 | S |
 | Platine de pré-écoute dans la bibliothèque | RB, TR, VDJ, ENG, MX | **Fait** : lecteur au casque dans la barre de la bibliothèque, waveform cliquable, platines intactes | P1 | M |
 | Lecture du morceau suivant de la file (auto-chargement) | VDJ, DJAY, RB | **Fait** : option des Réglages de jeu (file de l'auto-mix, sinon la liste affichée) | P2 | S |
-| Platines d'entrée ligne ou micro (« Live Input ») | TR, VDJ, MX, RB | **Manque** | P2 | M |
+| Platines d'entrée ligne ou micro (« Live Input ») | TR, VDJ, MX, RB | **Fait** : une entrée de la carte son dans la voie d'une platine (gain, EQ, filtre, effets, fader), choix de l'entrée dans Entrées et sorties (io.js) | P2 | M |
 | Mode entraînement sans matériel (« Practice Mode ») | S | **Fait** : Mixlab marche sans matériel | P2 | S |
 | Platine principale ou maître (Master) | tous | **Fait** : bouton Master | P1 | S |
 | Formats MP3, AAC/M4A, WAV, AIFF, FLAC, OGG | tous | **Fait** : décodage du navigateur ; symphonia dans le moteur Rust | P1 | S |
@@ -217,7 +217,7 @@
 | Gain automatique | tous | **Partiel** : RMS ; le passage en LUFS ou ReplayGain est prévu | P1 | S |
 | EQ 3 bandes | tous | **Fait** : shelf et peak, de kill à +6 dB | P1 | S |
 | Kill par bande | tous | **Fait** | P1 | S |
-| EQ 4 bandes | TR, RB (DJM), VDJ | **Manque** | P3 | S |
+| EQ 4 bandes | TR, RB (DJM), VDJ | **Fait** : mode « EQ 4 bandes » (100 Hz, 400 Hz, 2,5 kHz, 8 kHz), potard H-mid avec kill dans chaque voie | P3 | S |
 | Modèles d'EQ (isolateur, DJM, Xone, etc.) | TR, RB, MX, VDJ | **Partiel** : isolateur ou classique (plancher à −26 dB) ; pas de modèles DJM ou Xone | P2 | M |
 | Filtre bipolaire passe-bas / passe-haut | tous | **Fait** | P1 | S |
 | Résonance du filtre réglable | TR, VDJ, MX | **Fait** : réglage de 0,5 à 8 (Réglages de jeu) | P3 | S |
@@ -231,20 +231,20 @@
 | VU pré-fader | RB, TR, S | **Partiel** : le coach mesure le pré-fader, mais il n'est pas affiché | P3 | S |
 | Limiteur master | tous | **Fait** | P1 | S |
 | Indicateur de compression du limiteur | TR, RB | **Fait** : jauge et voyant LIM sur le master | P3 | S |
-| Maximiseur ou mastering de sortie | TR 4 *(Ozone Maximizer)* | **Manque** | P3 | M |
+| Maximiseur ou mastering de sortie | TR 4 *(Ozone Maximizer)* | **Fait** : 3 bandes compressées, limiteur et écrêteur doux au plafond (-0,1 à -6 dB), plafond vérifié à la mesure ; pas de lookahead ni de suréchantillonnage | P3 | M |
 | Volume master | tous | **Fait** | P1 | S |
 | Balance master | TR, MX, VDJ | **Fait** : Réglages de jeu, mappable ; l'enregistrement reste centré | P3 | S |
-| Sortie booth (volume à part) | RB, TR, VDJ, MX | **Manque** | P2 | M |
+| Sortie booth (volume à part) | RB, TR, VDJ, MX | **Fait** : copie du mix avant le volume master, son volume et son limiteur, vers une autre carte son ou les canaux 3-4 d'une carte multicanal | P2 | M |
 | Cue casque par voie | tous | **Fait** | P1 | S |
 | Mix cue/master et volume casque | tous | **Fait** | P1 | S |
 | Split cue (casque en mono sur un canal, master sur l'autre) | tous | **Fait** | P1 | S |
 | Casque sur une deuxième carte son | tous | **Fait** : `setSinkId` | P1 | S |
 | Casque sur une carte 4 canaux (sorties 3-4) | tous | **Partiel** : existe dans le moteur Rust, qui n'est pas branché | P1 | L |
 | ASIO, CoreAudio, faible latence (3 à 10 ms) | tous | **Partiel** : Web Audio en mode interactif ; le moteur `cpal` est prêt mais pas branché | P1 | L |
-| Réglage de la taille du buffer et de la fréquence | tous | **Manque** : la latence est seulement affichée | P2 | M |
-| Mixer interne ou mixer externe (mode table) | tous | **Partiel** : le mixer peut être masqué, mais il n'y a pas de sorties par platine | P1 | L |
-| Sorties séparées par platine (mixer externe) | tous | **Manque** | P2 | L |
-| Entrée micro avec talkover / ducking | VDJ, RB, S, MX | **Manque** | P2 | M |
+| Réglage de la taille du buffer et de la fréquence | tous | **Partiel** : buffer (latencyHint, de 3 à 40 ms) et fréquence choisis au démarrage, ce que le navigateur donne vraiment est affiché, mesure aller-retour par clics ; le navigateur arrondit le buffer, l'ASIO reste au moteur natif | P2 | M |
+| Mixer interne ou mixer externe (mode table) | tous | **Partiel** : le mixer peut être masqué et chaque platine peut sortir à part (voir ligne suivante) ; latence et dérive des cartes comme ci-dessous | P1 | L |
+| Sorties séparées par platine (mixer externe) | tous | **Partiel** : chaque platine (après le gain, avant l'EQ) vers une autre carte son (setSinkId) ou une paire de canaux d'une carte multicanal ; par une autre carte, 20 à 60 ms de plus et pas de correction de dérive d'horloge : pour une table, préférer une carte multicanal ou le moteur natif | P2 | L |
+| Entrée micro avec talkover / ducking | VDJ, RB, S, MX | **Fait** : voie micro (passe-haut, volume) vers master et booth, talkover à la voix ou permanent, baisse réglable de 3 à 30 dB | P2 | M |
 | Pré-écoute du sampler au casque | S, RB, MX | **Manque** | P3 | S |
 
 ## 6. Effets
@@ -264,21 +264,21 @@
 | Spiral, ping-pong, tape delay | S, RB, TR | **Partiel** : Spirale et Ping-pong ; pas de tape delay | P2 | S |
 | Noise / white noise riser | S, RB, TR | **Fait** : Bruit montant, calé sur la durée choisie | P2 | S |
 | Beatmasher, Gater, Turntable FX, Reverse FX | TR | **Partiel** : Trans / Gater, Répétition, Frein et Backspin ; pas de Reverse en effet (seulement le bouton Censor) | P3 | M |
-| Pitch / Helix / Shimmer / Mobius | RB, S *(packs payants autrefois)* | **Manque** | P3 | M |
-| Reverb Rise / Drop sur 32 temps | ENG 5, RB | **Manque** | P3 | S |
+| Pitch / Helix / Shimmer / Mobius | RB, S *(packs payants autrefois)* | **Fait** : Pitch (-12 à +12 demi-tons), Hélice, Shimmer, Möbius dans les unités FX (fx-plus.js) ; pitch shifter granulaire, moins propre qu'un vocodeur de phase | P3 | M |
+| Reverb Rise / Drop sur 32 temps | ENG 5, RB | **Fait** : Reverb montante et Reverb qui retombe sur 8, 16 ou 32 temps de la platine | P3 | S |
 | Unités d'effets assignables (2 à 4) par voie ou au master | tous | **Fait** : FX1 et FX2, chacune sur les platines A à D et le master | P1 | M |
 | Chaînage de 3 effets par unité | S, TR, MX, VDJ | **Fait** : mode Chaîne | P2 | M |
 | Effet sur le master | tous | **Fait** : cible M des unités FX1 et FX2 | P2 | S |
 | Effets par voie à un bouton (Sound Color / Mixer FX / Quick effect) | RB, TR, MX, VDJ, DJAY (Fusion) | **Fait** : Filtre, Écho, Bruit ou Espace sur le potard FILTRE | P1 | M |
-| Effets de crossfader ou de fader (Crossfader FX) | DJAY *(Crossfader Fusion)*, VDJ | **Manque** | P3 | M |
+| Effets de crossfader ou de fader (Crossfader FX) | DJAY *(Crossfader Fusion)*, VDJ | **Fait** : filtre, écho ou reverb qui monte sur la platine que le crossfader éloigne (réglages du mixer) | P3 | M |
 | Paramètres avancés d'effet (feedback, X-pad, temps en ms) | tous | **Partiel** : deux réglages par effet (retour, tonalité, largeur…) et durée en temps ; pas de temps en ms ni de X-pad | P2 | S |
 | Effet déclenché quantisé (Beat FX on sur le temps) | RB, S | **Fait** : avec Quantize, l'unité démarre sur le temps suivant | P2 | S |
 | Post-fader / pré-fader au choix (queue d'écho après la coupe) | RB, TR, MX | **Partiel** : l'effet est avant le fader, mais une queue existe pour l'écho | P2 | S |
 | Effets par stem | S *(Stems FX)*, RB, VDJ, MX 2.6 | **Manque** | P2 | M |
 | Réglages des effets gardés d'une session à l'autre | tous | **Fait** : type, durée, dosage, réglages, mode et cibles rendus au démarrage (l'unité reste coupée) | P2 | S |
-| Banques ou favoris d'effets | VDJ 2026, TR | **Manque** | P3 | S |
-| Effets en plugin (VST/AU) | VDJ, MX (LV2), DJS | **Manque** | P3 | L |
-| Effets « RMX » (Build-up, Break-down, Scene) | RB *(Creative, RMX EFFECTS)* | **Manque** | P3 | M |
+| Banques ou favoris d'effets | VDJ 2026, TR | **Fait** : bouton Fav de chaque unité, chaîne gardée sous un nom (mode, durée, effets, réglages), 4 premiers rappelables en MIDI | P3 | S |
+| Effets en plugin (VST/AU) | VDJ, MX (LV2), DJS | **Manque** : impossible dans le moteur web (pas de chargement de code natif) ; à faire dans le moteur natif `engine/` une fois branché | P3 | L |
+| Effets « RMX » (Build-up, Break-down, Scene) | RB *(Creative, RMX EFFECTS)* | **Fait** : macros Montée, Descente (8, 16 ou 32 temps) et Scène (le Dosage pilote filtre, écho et reverb) | P3 | M |
 
 ## 7. Sampler, séquenceur et remix
 
@@ -396,8 +396,8 @@
 |---|---|---|---|---|
 | Enregistrement du mix | tous *(RB Free : non ; S : pas avec le streaming)* | **Fait** : WAV 16 ou 24 bits sur le disque (appli) ou téléchargé (navigateur), ou WebM/Opus léger | P1 | S |
 | Enregistrement WAV, FLAC, MP3 et AIFF sur le disque | tous | **Partiel** : WAV 16 et 24 bits ; pas de FLAC, MP3 ni AIFF | P1 | M |
-| Tracklist horodatée liée à l'enregistrement (cue sheet) | RB, VDJ, TR, MX | **Manque** | P2 | S |
-| Enregistrement de l'entrée micro ou de la table | TR, VDJ, MX | **Manque** | P3 | M |
+| Tracklist horodatée liée à l'enregistrement (cue sheet) | RB, VDJ, TR, MX | **Fait** : .cue et tracklist texte créées à chaque enregistrement, datées quand un morceau passe devant (fader × crossfader) | P2 | S |
+| Enregistrement de l'entrée micro ou de la table | TR, VDJ, MX | **Fait** : le micro ou une platine d'entrée enregistrés à part (WebM), rangés dans Enregistrements | P3 | M |
 | Diffusion Icecast / Shoutcast | TR, VDJ, MX | **Manque** | P2 | M |
 | Diffusion Twitch, YouTube, Mixcloud Live | VDJ, RB, DJS (Mixcloud) | **Manque** | P3 | L |
 | Partage du mix (Mixcloud, SoundCloud) | RB *(Core)*, S | **Manque** | P3 | M |

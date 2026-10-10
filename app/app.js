@@ -1000,6 +1000,7 @@ async function boot(){
   buildTop();buildFx();buildLanes();decks.forEach(buildDeck);buildMixer();buildLib();buildMidi();Perf.init();
   window.View&&View.build();
   window.Desktop&&Desktop.init();
+  window.IO&&IO.init();window.FxPlus&&FxPlus.init();
   layout.coach=!!PRESETS[layout.preset].coach;
   applyLayout();
   window.Coach&&Coach.build();

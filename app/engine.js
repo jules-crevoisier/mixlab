@@ -9,7 +9,8 @@ const frac=x=>x-Math.floor(x);
 const wrapHalf=x=>{x=frac(x);return x>=.5?x-1:x;};
 const dbToGain=db=>Math.pow(10,db/20);
 const AC=window.AudioContext||window.webkitAudioContext;
-const ctx=new AC({latencyHint:'interactive'});
+/* buffer et fréquence choisis dans Entrées et sorties (io.js, chargé avant) */
+const ctx=(()=>{const o=window.MixlabCtxOpts;if(o)try{return new AC(o);}catch(e){window.MixlabCtxErr=String(e);}return new AC({latencyHint:'interactive'});})();
 function resumeAudio(){if(ctx.state!=='running')ctx.resume().catch(()=>{});}
 
 const S={quantize:true,autoGain:true,xf:.5,curve:'mix',numDecks:2,split:false,hpDevice:null,cueMix:.0,cueVol:.8,masterVol:.8,master:null,samplerVol:.7,
