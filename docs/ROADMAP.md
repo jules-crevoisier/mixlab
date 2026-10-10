@@ -160,11 +160,11 @@ En soirée, on joue souvent sur un portable de 13 à 15 pouces, dans le noir. To
 1. Parcours « De zéro à ton premier set » : moteur de parcours, interface qui grandit, chapitres 1 à 14, sauvegarde et glossaire.
 2. L'Académie (construire un set, lire le public, trouver sa musique), bâtie sur le moteur du parcours.
 3. Analyse de structure, cues automatiques et auto-mix.
-3. Bibliothèque : tags, notes, couleurs, crates intelligentes, import et export rekordbox XML, M3U, iTunes.
-4. Performance : cues mémoire nommés, slicer, effets supplémentaires, suggestion du morceau suivant.
-5. Import de playlists externes (métadonnées) et correspondance avec la collection.
-6. Interface live : zoom, tailles de platine, bibliothèque plein écran, séparateurs, mode scène.
-7. Inventaire complet de parité (docs/PARITE.md), puis les fonctions manquantes par ordre de priorité.
-8. Si le temps le permet : relecture des transitions, planificateur de set, défis.
+4. Bibliothèque : tags, notes, couleurs, crates intelligentes, import et export rekordbox XML, M3U, iTunes.
+5. Performance : cues mémoire nommés, slicer, effets supplémentaires, suggestion du morceau suivant.
+6. Import de playlists externes (métadonnées) et correspondance avec la collection.
+7. Interface live : zoom, tailles de platine, bibliothèque plein écran, séparateurs, mode scène.
+8. Inventaire complet de parité (docs/PARITE.md), puis les fonctions manquantes par ordre de priorité.
+9. Si le temps le permet : relecture des transitions, planificateur de set, défis.
 
 Chaque étape est vérifiée par des tests (navigateur headless et Rust), poussée sur la branche `nuit` et visible dans la pull request.
