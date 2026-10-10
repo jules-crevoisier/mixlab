@@ -51,7 +51,7 @@ window.Parcours=(()=>{
     'nudge':'Pousser ou retenir une platine un instant pour aligner les temps.',
     'caler':'Mettre deux morceaux au même tempo, temps contre temps.',
     'eq':'L’égaliseur : trois potards par voie. HI pour les aigus, MID pour les médiums, LOW pour les graves.',
-    'kill':'Le petit bouton qui coupe complètement une bande de l’EQ.',
+    'kill':'Le bouton qui coupe complètement une bande de l’EQ : le mot sous le potard (Hi, Mid, Low), ou Maj+clic sur le potard.',
     'basses':'Les sons graves : grosse caisse et ligne de basse. Une seule piste à la fois.',
     'échange des basses':'On coupe les graves de l’ancien morceau pendant qu’on rend ceux du nouveau, sur le 1 d’une phrase.',
     'transition':'Le passage d’un morceau au suivant.',
@@ -128,8 +128,8 @@ window.Parcours=(()=>{
     [6,'.dk-plat','grey'],
     [7,'.ch .eq'],
     [8,'.xf,.xfa'],[8,'#coach-direct','hide'],
-    [9,'.dk-loop,[data-ctl$=".filter"],.mst .cfx,.xf select,.fxu'],
-    [10,'.dk-stat.k,.dk-ks,.libbar .compat'],
+    [9,'.dk-loop,[data-ctl$=".filter"],.mst .cfx,.mxset,.xf select,.fxu'],
+    [10,'.dk-stat.k,.dk-ks,[data-ctl$=".keylock"],.dk-protg,.libbar .compat'],
     [11,'.dk-pads,.dk-sl,[data-ctl="samplervol"]'],
     [12,'.dk-pads .tabs .b:not([data-m="hot"]):not([data-m="smp"])'],
     [12,'.dk-pads .lst,.dk-grid,#lib-side,.libbar>:not(input[type="search"]):not(.compat):not(.imp):not(.count),#lib-btn'],
@@ -258,7 +258,7 @@ window.Parcours=(()=>{
       {t:'Trois potards : HI, MID, LOW',why:'L’{EQ} sépare le son en trois. HI : charleys et cymbales. MID : voix et mélodies. LOW : grosse caisse et basse.',next:true,target:'#ch-A'},
       {t:'Lance A et coupe ses basses : LOW tout à gauche',why:'Écoute : la grosse caisse et la basse disparaissent. Le morceau devient léger.',check:()=>A().playing&&A().p.low<.1,target:'A.low'},
       {t:'Remets LOW au centre',why:'Au centre, l’EQ ne change rien. Double-clic sur un potard pour le recentrer.',check:()=>Math.abs(A().p.low-.5)<.05,target:'A.low'},
-      {t:'Appuie sur le petit carré à côté de LOW',why:'C’est le {kill} : il coupe la bande d’un coup, sans tourner le potard.',check:()=>A().p.kill.low,target:'A.killlow'},
+      {t:'Appuie sur le mot « Low » sous le potard des graves',why:'C’est le {kill} : il coupe la bande d’un coup, sans tourner le potard.',check:()=>A().p.kill.low,target:'A.killlow'},
       {t:'Rallume-le',why:'Un appui coupe, un appui rallume. Pratique pour un effet sur le 1 d’une phrase.',check:()=>!A().p.kill.low,target:'A.killlow'},
      ]),...wrap('swap')]},
     {title:'Première transition complète',sub:'De A vers B, notée par le coach.',badge:'Première transition',mins:10,coach:'all',
@@ -316,7 +316,7 @@ window.Parcours=(()=>{
       {t:'Sors de la boucle',why:'Appuie sur LOOP ou RELOOP.',check:()=>!A().loop.on,target:'A.loop'},
       {t:'Effet : choisis « Écho » sur l’unité FX de A et active-le',why:'Un {effet} marque un moment. Il est calé sur le tempo.',check:()=>A().fx.on&&A().fx.type==='echo',target:()=>A().fx.type==='echo'?'A.fxon':'#fxu-'+A().fx.n+' select'},
       {t:'Règle le dosage vers 50 %',why:'Le {dosage} mélange l’effet au son. Trop fort, il noie le morceau.',check:()=>A().fx.amount>=.35&&A().fx.amount<=.65,target:'A.fxamt'},
-      {t:'Durée : 1/2 temps',why:'Les flèches ‹ › changent la durée de l’écho, en temps.',check:()=>A().fx.beats===.5,target:()=>'#fxu-'+A().fx.n+' .bt'},
+      {t:'Durée : 1/2 temps',why:'Les flèches ‹ › changent la durée de l’écho, en temps.',check:()=>A().fx.beats===.5,target:()=>'#fxu-'+A().fx.n+' .bseg'},
       {t:'Coupe l’effet',why:'Un effet laissé en continu fatigue l’oreille.',check:()=>!A().fx.on,target:'A.fxon'},
       {t:'Le sampler : onglet Sampler, puis un pad',why:'Le {sampler} lance des sons courts par-dessus le mix.',check:()=>SAMPLER.playing.some(Boolean),target:()=>A().padMode==='smp'?'A.pad1':'#p-deckA .tabs [data-m="smp"]'},
       {t:'Reviens à l’onglet Hot cue',why:'Les pads reprennent leur rôle de repères.',check:()=>A().padMode==='hot',target:'#p-deckA .tabs [data-m="hot"]'},
@@ -481,7 +481,7 @@ window.Parcours=(()=>{
   function setTarget(tg){
     const el=elOf(tg);
     if(P.tEl&&P.tEl!==el)P.tEl.classList.remove('coach-target','pc-target');
-    P.target=el?tg:null;P.tEl=el;if(el)el.classList.add('coach-target','pc-target');
+    P.target=el?tg:null;P.tEl=el;if(el){el.classList.add('coach-target','pc-target');window.revealCtl&&revealCtl(el);}
   }
 
   /* ---------- affichage ---------- */

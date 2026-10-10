@@ -177,7 +177,7 @@ window.MixCoach=(()=>{
   function setTarget(id){
     if(C.target===id)return;
     if(C.target){const c=ctl(C.target);c&&c.el.classList.remove('coach-target');}
-    C.target=id;if(id){const c=ctl(id);c&&c.el.classList.add('coach-target');}
+    C.target=id;if(id){const c=ctl(id);if(c){c.el.classList.add('coach-target');window.revealCtl&&revealCtl(c.el);}}
   }
   let lastKey='',lastSpot='';
   // Panneau Coach ouvert : il affiche déjà le conseil, le bandeau se tait.

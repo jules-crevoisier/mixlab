@@ -11,7 +11,7 @@ window.Structure=(()=>{
   const TYPES={
     intro:{label:'Intro',col:'#2fa8ff',name:'bleu'},
     couplet:{label:'Couplet',col:'#7d8799',name:'gris'},
-    break:{label:'Break',col:'#a78bfa',name:'violet'},
+    break:{label:'Break',col:'#d9dee6',name:'blanc'},
     montee:{label:'Montée',col:'#f5b83d',name:'jaune'},
     drop:{label:'Drop',col:'#ff4d5e',name:'rouge'},
     outro:{label:'Outro',col:'#31d3c8',name:'turquoise'}
@@ -154,30 +154,29 @@ window.Structure=(()=>{
   const tag=(tr,t)=>{const s=at(tr,t);return s?'  ·  '+s.label.toUpperCase():'';};
 
   /* ---------- dessin ---------- */
-  // waveform défilante : voile léger par section, bandeau en haut, nom en bas, cues mémoire
+  // waveform défilante : sections en bandeau de 4 px sous la forme (le nom de la section en cours est dans
+  // l'en-tête de la lane, pas sur la forme), cues mémoire en triangles à leur couleur
   function drawLane(g,d,t0,pps,W,H,dpr){
     const tr=d.track;if(!tr||!tr.sections)return;
-    g.save();g.font=`600 ${8.5*dpr}px "IBM Plex Sans Condensed","Arial Narrow",sans-serif`;g.textBaseline='alphabetic';
+    g.save();
+    const bg=(typeof TK!=='undefined'&&TK['surface-0'])||'#000';
     for(const s of tr.sections){
       const x0=(s.start-t0)*pps,x1=(s.end-t0)*pps;if(x1<0||x0>W)continue;
       const c=TYPES[s.type].col;
-      g.globalAlpha=.07;g.fillStyle=c;g.fillRect(x0,0,x1-x0,H);
-      g.globalAlpha=.9;g.fillRect(x0,0,x1-x0,3*dpr);
-      if(x0>-40*dpr){const txt=s.label.toUpperCase(),tw=g.measureText(txt).width,x=x0+24*dpr;
-        g.globalAlpha=.8;g.fillStyle='#05070a';g.fillRect(x-3*dpr,H-13*dpr,tw+6*dpr,11*dpr);
-        g.globalAlpha=1;g.fillStyle=c;g.fillText(txt,x,H-4.5*dpr);}
+      g.globalAlpha=.85;g.fillStyle=c;g.fillRect(x0+dpr,H-4*dpr,x1-x0-dpr,4*dpr);
     }
     g.globalAlpha=1;
     (tr.memCues||[]).forEach(m=>{const x=(m.t-t0)*pps;if(x<-10||x>W+10)return;
-      g.fillStyle=m.color;g.beginPath();g.moveTo(x-4*dpr,3*dpr);g.lineTo(x+4*dpr,3*dpr);g.lineTo(x,9*dpr);g.closePath();g.fill();
-      g.strokeStyle='rgba(5,7,10,.8)';g.lineWidth=dpr;g.stroke();});
+      g.fillStyle=m.color;g.beginPath();g.moveTo(x-4*dpr,H-5*dpr);g.lineTo(x+4*dpr,H-5*dpr);g.lineTo(x,H-11*dpr);g.closePath();g.fill();
+      g.strokeStyle=bg;g.lineWidth=dpr;g.stroke();});
     g.restore();
   }
-  // vue d'ensemble : voile, bande de couleur en bas, triangles des cues mémoire en haut
+  // vue d'ensemble : bande de couleur en bas, triangles des cues mémoire en haut
   function drawOv(og,tr,W,H){
     if(!tr.sections)return;
+    const bg=(typeof TK!=='undefined'&&TK['surface-0'])||'#000';
     for(const s of tr.sections){const x0=Math.round(s.start/tr.duration*W),x1=Math.round(s.end/tr.duration*W),c=TYPES[s.type].col;
-      og.globalAlpha=.1;og.fillStyle=c;og.fillRect(x0,0,x1-x0,H);og.globalAlpha=1;og.fillStyle='#05070a';og.fillRect(x0,H-5,x1-x0,5);og.fillStyle=c;og.fillRect(x0,H-4,Math.max(1,x1-x0-1),4);}
+      og.globalAlpha=1;og.fillStyle=bg;og.fillRect(x0,H-4,x1-x0,4);og.globalAlpha=.85;og.fillStyle=c;og.fillRect(x0+1,H-3,Math.max(1,x1-x0-1),3);og.globalAlpha=1;}
     og.globalAlpha=1;
     (tr.memCues||[]).forEach(m=>{const x=m.t/tr.duration*W;og.fillStyle=m.color;og.beginPath();og.moveTo(x-4,0);og.lineTo(x+4,0);og.lineTo(x,6);og.closePath();og.fill();});
   }

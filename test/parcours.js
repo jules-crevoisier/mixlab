@@ -157,6 +157,8 @@ const check = (ok, what, extra = '') => { console.log((ok ? 'OK   ' : 'ÉCHEC ')
   check(await W(() => !document.getElementById('coachlive-btn') && !!document.querySelector('#coach-btn #coachlive-dot.on') && !!document.querySelector('#coach-direct select')), 'Bouton Coach unique, niveau des conseils dans le panneau');
 
   // Jargon des boutons : la définition s'affiche au survol.
+  // Slip est rangé dans les commandes Pro de la platine : on les déplie d'abord
+  if (!(await W(() => decks[0].ui.panel.classList.contains('pro-open')))) await page.click('#p-deckA .dk-protg');
   await page.hover('[data-ctl="A.slip"]'); await sleep(700);
   check(await page.isVisible('.pc-pop') && /Slip/.test(await page.textContent('.pc-pop')), 'Survol de SLIP : définition du glossaire', await page.textContent('.pc-pop'));
   check(await W(() => ['A.censor', 'A.keylock'].every(id => controls.get(id).el.dataset.gloss) && document.querySelector('#q-btn').dataset.gloss === 'quantize' && document.querySelector('.dk-grid>button:last-child').dataset.gloss === '1 ici'), 'CENSOR, KEY LOCK, QUANTIZE, « 1 ICI » expliqués');
@@ -222,7 +224,9 @@ const check = (ok, what, extra = '') => { console.log((ok ? 'OK   ' : 'ÉCHEC ')
       const id = e.dataset.ctl || e.id || (e.textContent || e.title || e.getAttribute('aria-label') || '').trim().slice(0, 18);
       if (e.closest('[inert]')) grey.push(id); else act.push(id);
     }
-    return { act, grey, hidden: document.querySelectorAll('.pc-hide').length, lock: [...document.querySelectorAll('.pc-lock')].map(e => e.dataset.ctl || e.id || e.className) };
+    // commandes rangées dans la rangée Pro repliée d'une platine : atteignables en un clic si le bouton Pro est actif et qu'elles ne sont pas verrouillées
+    const folded = [...document.querySelectorAll('.deck:not(.pro-open) :is(.dk-xtra,.dk-grid,.dk-pro) [data-ctl]')].filter(e => { const t = e.closest('.deck').querySelector('.dk-protg'); return t && t.getBoundingClientRect().width && !t.closest('[inert],.pc-lock,.pc-hide') && !e.closest('[inert],.pc-lock,.pc-hide,.pc-lockp'); }).map(e => e.dataset.ctl);
+    return { act, grey, folded, hidden: document.querySelectorAll('.pc-hide').length, lock: [...document.querySelectorAll('.pc-lock')].map(e => e.dataset.ctl || e.id || e.className) };
   });
   // plafond de commandes actives par chapitre (l'interface ne grandit qu'au rythme des leçons)
   const CAPS = [7, 20, 24, 32, 34, 34, 45, 60, 70, 110, 115, 140, 170, 999];
@@ -244,7 +248,7 @@ const check = (ok, what, extra = '') => { console.log((ok ? 'OK   ' : 'ÉCHEC ')
   check(counts.every((n, i) => n <= CAPS[i]), 'Commandes actives sous le plafond de chaque chapitre', counts.join(' '));
   check(counts.every((n, i) => !i || n >= counts[i - 1]), 'L’interface ne fait que grandir d’un chapitre à l’autre', counts.join(' '));
   check(seen[4].grey.includes('A.keylock') && !seen[4].act.includes('A.keylock'), 'Chapitre 5 : les commandes à venir apparaissent grisées');
-  check(seen[10].act.includes('A.keylock') && seen[11].act.includes('A.pad1') && seen[11].act.includes('A.slip') && seen[13].act.includes('am-btn'), 'Chaque commande se débloque à son chapitre (KEY LOCK 11, pads et SLIP 12, Auto-mix 14)', [10, 11, 13].map(c => seen[c].act.filter(x => /keylock|pad1|slip|am-btn/.test(x)).join('+')).join(' / '));
+  check(seen[10].act.includes('A.keylock') && seen[11].act.includes('A.pad1') && (seen[11].act.includes('A.slip') || seen[11].folded.includes('A.slip')) && seen[13].act.includes('am-btn'), 'Chaque commande se débloque à son chapitre (KEY LOCK 11, pads et SLIP 12, Auto-mix 14)', [10, 11, 13].map(c => seen[c].act.filter(x => /keylock|pad1|slip|am-btn/.test(x)).join('+')).join(' / '));
   // une commande reconstruite pendant le parcours (platine rechargée, bibliothèque redessinée) reste verrouillée
   await p4.evaluate(() => Parcours.go(0, 0)); await sleep(100);
   await p4.evaluate(() => { buildDeck(decks[0]); buildLib(); }); await sleep(150);
@@ -252,7 +256,7 @@ const check = (ok, what, extra = '') => { console.log((ok ? 'OK   ' : 'ÉCHEC ')
   check(!reb.act.includes('A.keylock') && !reb.act.includes('A.pad1') && !reb.act.includes('A.cue'), 'Commandes reconstruites : de nouveau masquées', reb.act.join(','));
   await p4.evaluate(() => Parcours.exit()); await sleep(150);
   const all = await census();
-  check(all.grey.length === 0 && ['A.keylock', 'A.slip', 'A.rev', 'A.censor', 'am-btn', 'midi-btn', 'A.pad1', 'B.play'].every(x => all.act.includes(x)) && all.act.length > counts[11], 'Sortie du parcours : toutes les commandes reviennent', all.act.length + ' actives');
+  check(all.grey.length === 0 && ['A.keylock', 'A.slip', 'A.rev', 'A.censor', 'am-btn', 'midi-btn', 'A.pad1', 'B.play'].every(x => all.act.includes(x) || all.folded.includes(x)) && all.act.length > counts[11], 'Sortie du parcours : toutes les commandes reviennent', all.act.length + ' actives');
   await ctx4.close();
 
   // 6. Tour complet : chaque étape des 14 chapitres s'affiche, cible une commande qui existe, et se passe.

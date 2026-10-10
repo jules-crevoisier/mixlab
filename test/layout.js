@@ -180,7 +180,7 @@ const measure = page => page.evaluate(() => {
   const normal = await fontStats();
   await page.evaluate(() => View.setStage(true)); await sleep(250);
   const stage = await fontStats();
-  check(stage.min >= 11 && stage.min > normal.min, 'Mode scène : aucun texte sous 11 px', `normal ${normal.min} px (${normal.where}), scène ${stage.min} px (${stage.where})`);
+  check(normal.min >= 11 && stage.min >= 11 && stage.min >= normal.min, 'Aucun texte sous 11 px, en mode normal comme en mode scène', `normal ${normal.min} px (${normal.where}), scène ${stage.min} px (${stage.where})`);
   const big = await page.evaluate(() => [parseFloat(getComputedStyle(decks[0].ui.bpm).fontSize), parseFloat(getComputedStyle(decks[0].ui.time).fontSize)]);
   check(big[0] >= 26 && big[1] >= 20, 'Mode scène : BPM et temps restant agrandis', big.join(' / ') + ' px');
   check((await measure(page)).plays.every(Boolean) && (await measure(page)).page[0] <= 768, 'Mode scène : tout tient encore');
@@ -189,7 +189,7 @@ const measure = page => page.evaluate(() => {
     const lum = c => { const m = c.match(/[\d.]+/g).map(Number); return m.slice(0, 3).map(v => v / 255).map(v => v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4).reduce((s, v, i) => s + v * [.2126, .7152, .0722][i], 0); };
     const bgOf = e => { const out = []; for (let x = e; x; x = x.parentElement) { const cs = getComputedStyle(x); const g = cs.backgroundImage.match(/rgba?\([^)]+\)/g); if (g) out.push(...g); if (!/rgba?\(0, 0, 0, 0\)|transparent/.test(cs.backgroundColor)) { out.push(cs.backgroundColor); break; } } return out.length ? out : ['rgb(0,0,0)']; };
     const ratio = e => { const fg = lum(getComputedStyle(e).color); return Math.min(...bgOf(e).map(b => { const l = lum(b); return (Math.max(fg, l) + .05) / (Math.min(fg, l) + .05); })); };
-    const sel = ['.dk-stat .lbl', '.kn span', '.lt th', '.side .sec', '#p-mixer .ch .kn span', '.pad', '.lbl', '.tb', '.dk-artist', '.side-count .count', '.xfa button'];
+    const sel = ['.dk-stat .lbl', '.kn span', '.lt th', '.side .sec', '#p-mixer .ch .kn span', '.pad', '.lbl', '.tb', '.dk-artist', '.side-count .count', '.xfa'];
     return sel.map(s => { const e = [...document.querySelectorAll(s)].find(x => x.offsetParent && x.textContent.trim()); return e ? [s, +ratio(e).toFixed(2)] : [s, null]; }).filter(x => x[1] != null);
   });
   await page.evaluate(() => View.setStage(false)); await sleep(150);
@@ -225,6 +225,8 @@ const measure = page => page.evaluate(() => {
   /* ---------- 9. Waveforms : cache par tuiles et temps d'image, 4 platines en lecture ---------- */
   page = await open(browser, 1366, 768, { preset: 'perf', decks: 4 });
   await page.mouse.click(683, 5);
+  // fenêtre au premier plan : sans focus, l'affichage se limite volontairement à 30 images par seconde
+  await (await page.context().newCDPSession(page)).send('Emulation.setFocusEmulationEnabled', { enabled: true });
   await page.evaluate(() => decks.forEach(d => !d.playing && d.togglePlay()));
   await sleep(1000);
   const cache = await page.evaluate(() => new Promise(res => { const c = decks[0].ui.lane, a = c._wc; requestAnimationFrame(() => requestAnimationFrame(() => res({ same: c._wc === a && !!a, tiles: a ? a.t.size : 0 }))); }));
