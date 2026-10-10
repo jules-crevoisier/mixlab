@@ -281,7 +281,7 @@ function revBuffer(tr){
 class Deck{
   constructor(id){
     this.id=id;this.track=null;this.src=null;this.srcGain=null;this.playing=false;this.anchorPos=0;this.anchorTime=0;
-    this.pitch=0;this.pitchRange=.08;this.keyLock=false;this.keyShift=0;this.nudgeDir=0;this.jogAcc=0;this.bend=0;
+    this.pitch=0;this.pitchRange=.08;this.keyLock=false;this.keyShift=0;this.nudgeDir=0;this.jogAcc=0;this.bend=0;this.scratching=null;
     this.sync=false;this.previewing=false;this.reverse=false;this.slip=false;this.slipShadow=null;this.slipDepth=0;
     this.loop={on:false,start:0,end:0,beats:0};this.lastLoop=null;this.loopIn=null;this.loopSize=4;this.jumpSize=4;this.rolling=0;this.hotHeld=-1;
     this.padMode='hot';this.lastStart=null;this.taps=[];this.cueOn=false;this.xfa=(id==='A'||id==='C')?'A':'B';this.playStart=0;
@@ -497,6 +497,19 @@ class Deck{
     if(!this.track)return;
     if(this.playing)this.jogAcc+=delta;else this.seek(this.position()+delta*.012);
   }
+  /* Scratch (mode vinyle) : tant que le plateau est touché, la tête de lecture suit le plateau
+     et de courts grains rendent le mouvement audible ; au relâché, la lecture reprend si elle tournait. */
+  scratchStart(){if(!this.track||this.scratching)return;this.scratching={was:this.playing};if(this.playing)this.pause();this.jogAcc=0;}
+  scratchMove(sec){
+    if(!this.scratching||!this.track)return;
+    const p=clamp(this.anchorPos+sec,0,this.track.duration-.01),dp=p-this.anchorPos;this.anchorPos=p;if(Math.abs(dp)<1e-4)return;
+    const t=ctx.currentTime,L=.035,s=ctx.createBufferSource(),g=ctx.createGain(),rev=dp<0;
+    s.buffer=rev?revBuffer(this.track):this.track.buffer;s.playbackRate.value=clamp(Math.abs(dp)/L,.05,4);
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(1,t+.004);g.gain.setValueAtTime(1,t+L-.006);g.gain.linearRampToValueAtTime(0,t+L);
+    s.connect(g);g.connect(this.srcBus);s.start(t,rev?clamp(this.track.duration-p+dp,0,this.track.duration-.001):clamp(p-dp,0,this.track.duration-.001));s.stop(t+L+.01);
+    s.onended=()=>{try{g.disconnect();}catch(e){}};
+  }
+  scratchEnd(){const s=this.scratching;if(!s)return;this.scratching=null;if(s.was&&this.track)this.startSource(this.anchorPos,ctx.currentTime);}
   tap(){
     const now=performance.now();if(this.taps.length&&now-this.taps[this.taps.length-1]>2000)this.taps=[];
     this.taps.push(now);if(this.taps.length>8)this.taps.shift();

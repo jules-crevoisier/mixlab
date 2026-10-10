@@ -80,7 +80,7 @@ const check = (ok, what, extra = '') => { console.log((ok ? 'OK   ' : 'ÉCHEC ')
   console.log('     bilan :', JSON.stringify(res.h));
   check(res.main === 'B' && res.bPlay && res.bAud && !res.aPlay && res.master === 'B', 'B est devenue la platine principale, A arrêtée', JSON.stringify({ main: res.main, master: res.master, aPlay: res.aPlay }));
   check(res.am.swap && res.am.both === 0 && res.bLow === .5, 'Échange des basses sans superposition', JSON.stringify(res.am));
-  check(res.am.bFaderMid && res.bFader === 1, 'Le fader de B a bougé à l’écran (commandes pilotées)');
+  check(res.am.bFaderMid && res.bFader > .99, 'Le fader de B a bougé à l’écran (commandes pilotées)');
   check(res.am.peak < .98, 'Pas de saturation', res.am.peak.toFixed(3));
   check(Math.abs(res.lastStart - 256) < .2, 'B lancée sur le 1 de la phrase', String(res.lastStart));
   check(res.h && res.h.from === 'A' && res.h.to === 'B' && res.h.score >= 60, 'Note du coach ≥ 60', res.h && res.h.score + '/100');

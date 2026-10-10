@@ -1,0 +1,189 @@
+{
+ "format": "mixlab-mapping",
+ "version": 2,
+ "name": "Générique 2 platines",
+ "device": "",
+ "template": true,
+ "notes": "Modèle de départ, pas le mapping d'une marque. Canal 1 : platine gauche (A, ou C avec le bouton de platine), canal 2 : platine droite (B ou D), canal 3 : crossfader. Notes 11 à 20 : play, cue, sync, shift, platine, boucle, ÷2, ×2, casque, toucher du jog ; notes 24 à 31 : pads. CC 0+32 : pitch en 14 bits, CC 1 à 5 : aigus, médiums, graves, filtre, gain, CC 6 : jog relatif, CC 7 : fader. Ces numéros sont ceux de Mixlab, pas ceux d'une table du commerce : adapte-les à la tienne avec l'assistant ou MIDI Learn.",
+ "map": {
+  "n0.11": {
+   "id": "L.play",
+   "shift": "L.rev"
+  },
+  "n0.12": {
+   "id": "L.cue"
+  },
+  "n0.13": {
+   "id": "L.sync",
+   "shift": "L.master"
+  },
+  "n0.14": {
+   "type": "shift"
+  },
+  "n0.15": {
+   "type": "layer",
+   "side": "L"
+  },
+  "n0.16": {
+   "id": "L.loop",
+   "shift": "L.reloop"
+  },
+  "n0.17": {
+   "id": "L.loophalf",
+   "shift": "L.jumpback"
+  },
+  "n0.18": {
+   "id": "L.loopdbl",
+   "shift": "L.jumpfwd"
+  },
+  "n0.19": {
+   "id": "L.cuech"
+  },
+  "n0.20": {
+   "id": "L.jog",
+   "type": "touch"
+  },
+  "n0.24": {
+   "id": "L.pad1"
+  },
+  "n0.25": {
+   "id": "L.pad2"
+  },
+  "n0.26": {
+   "id": "L.pad3"
+  },
+  "n0.27": {
+   "id": "L.pad4"
+  },
+  "n0.28": {
+   "id": "L.pad5"
+  },
+  "n0.29": {
+   "id": "L.pad6"
+  },
+  "n0.30": {
+   "id": "L.pad7"
+  },
+  "n0.31": {
+   "id": "L.pad8"
+  },
+  "c0.0": {
+   "id": "L.pitch",
+   "hi": true
+  },
+  "c0.1": {
+   "id": "L.high"
+  },
+  "c0.2": {
+   "id": "L.mid"
+  },
+  "c0.3": {
+   "id": "L.low"
+  },
+  "c0.4": {
+   "id": "L.filter"
+  },
+  "c0.5": {
+   "id": "L.trim"
+  },
+  "c0.6": {
+   "id": "L.jog",
+   "type": "jog",
+   "mode": "2c"
+  },
+  "c0.7": {
+   "id": "L.fader"
+  },
+  "n1.11": {
+   "id": "R.play",
+   "shift": "R.rev"
+  },
+  "n1.12": {
+   "id": "R.cue"
+  },
+  "n1.13": {
+   "id": "R.sync",
+   "shift": "R.master"
+  },
+  "n1.14": {
+   "type": "shift"
+  },
+  "n1.15": {
+   "type": "layer",
+   "side": "R"
+  },
+  "n1.16": {
+   "id": "R.loop",
+   "shift": "R.reloop"
+  },
+  "n1.17": {
+   "id": "R.loophalf",
+   "shift": "R.jumpback"
+  },
+  "n1.18": {
+   "id": "R.loopdbl",
+   "shift": "R.jumpfwd"
+  },
+  "n1.19": {
+   "id": "R.cuech"
+  },
+  "n1.20": {
+   "id": "R.jog",
+   "type": "touch"
+  },
+  "n1.24": {
+   "id": "R.pad1"
+  },
+  "n1.25": {
+   "id": "R.pad2"
+  },
+  "n1.26": {
+   "id": "R.pad3"
+  },
+  "n1.27": {
+   "id": "R.pad4"
+  },
+  "n1.28": {
+   "id": "R.pad5"
+  },
+  "n1.29": {
+   "id": "R.pad6"
+  },
+  "n1.30": {
+   "id": "R.pad7"
+  },
+  "n1.31": {
+   "id": "R.pad8"
+  },
+  "c1.0": {
+   "id": "R.pitch",
+   "hi": true
+  },
+  "c1.1": {
+   "id": "R.high"
+  },
+  "c1.2": {
+   "id": "R.mid"
+  },
+  "c1.3": {
+   "id": "R.low"
+  },
+  "c1.4": {
+   "id": "R.filter"
+  },
+  "c1.5": {
+   "id": "R.trim"
+  },
+  "c1.6": {
+   "id": "R.jog",
+   "type": "jog",
+   "mode": "2c"
+  },
+  "c1.7": {
+   "id": "R.fader"
+  },
+  "c2.8": {
+   "id": "xf"
+  }
+ }
+}
