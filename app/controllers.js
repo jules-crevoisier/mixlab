@@ -151,7 +151,7 @@ C.renderMaps=()=>{
   for(const[k,v]of ents){
     const box=h('div',{class:'mopts',hidden:C.openKey!==k},C.openKey===k?optsRow(k):null);
     const li=h('li',{'data-key':k},h('span',{},labelOf(v)+' ← '+midiKeyText(k)+(norm(v).hi?' (+'+(keyParts(k).n+32)+')':'')),h('em',{},typeName(v)),
-      h('button',{title:'Options : type, inversion, 14 bits, Shift',class:'opt',onclick:()=>{if(box.hidden){box.innerHTML='';box.append(optsRow(k));}box.hidden=!box.hidden;C.openKey=box.hidden?null:k;}},'⚙'),
+      h('button',{title:'Options : type, inversion, 14 bits, Shift',class:'opt',onclick:()=>{if(box.hidden){box.innerHTML='';box.append(optsRow(k));}box.hidden=!box.hidden;C.openKey=box.hidden?null:k;},'aria-label':'Options'},icon('gear')),
       h('button',{title:'Supprimer',onclick:()=>{delete midi.map[k];save();C.renderMaps();}},'×'),box);
     ul.append(li);
   }
@@ -232,7 +232,7 @@ const DECK_STEPS=[['play','Play','btn','Appuie puis relâche le bouton Play.'],[
   ['low','EQ graves','abs','Tourne le potard des graves d’un bout à l’autre.'],['filter','Filtre','abs','Tourne le filtre d’un bout à l’autre.'],['fader','Fader de voie','abs','Monte et descends le fader de voie.'],...[1,2,3,4,5,6,7,8].map(PAD)];
 const STEPS=[...DECK_STEPS.map(s=>({id:'L.'+s[0],label:s[1]+' A',deck:'A',kind:s[2],hint:s[3]})),
   {id:'xf',label:'Crossfader',kind:'abs',hint:'Fais glisser le crossfader d’un bout à l’autre.'},
-  {id:'shift',label:'Shift',kind:'shift',hint:'Appuie sur Shift. Plus tard, tu pourras donner une 2e fonction à chaque bouton (⚙ dans la liste).'},
+  {id:'shift',label:'Shift',kind:'shift',hint:'Appuie sur Shift. Plus tard, tu pourras donner une 2e fonction à chaque bouton (bouton Options de la liste).'},
   ...DECK_STEPS.map(s=>({id:'R.'+s[0],label:s[1]+' B',deck:'B',kind:s[2],hint:s[3]}))];
 C.STEPS=STEPS;
 function relMode(vs){

@@ -188,14 +188,14 @@ window.Parcours=(()=>{
       {t:'Un DJ enchaîne des morceaux sans silence',why:'Ton travail : passer d’un morceau à l’autre sans que la piste de danse s’arrête. Pour ça, tu as deux outils : des {platines} et un {mixer}.',next:true},
       {t:'Voici la platine A',why:'Une {platine} lit un morceau. Le disque tourne pendant la lecture. En haut : le titre et le temps restant. Au centre : les boutons de lecture.',next:true,target:'#p-deckA'},
       {t:'Voici le mixer',why:'Le {mixer} mélange les platines. Chaque platine a sa voie, avec son {fader} de volume. Le MASTER règle le volume de la salle.',next:true,target:'#p-mixer'},
-      {t:'Lance la musique : appuie sur ▶ de la platine A',why:'Le bouton ▶ lance et arrête la lecture. Tu peux aussi utiliser la touche Q du clavier.',check:()=>A().playing,target:'A.play'},
+      {t:'Lance la musique : appuie sur Play de la platine A',why:'Le bouton Play lance et arrête la lecture. Tu peux aussi utiliser la touche Q du clavier.',check:()=>A().playing,target:'A.play'},
       {t:'Baisse le fader de A tout en bas',why:'Le {fader} règle ce que le public entend de cette platine. En bas, la platine joue toujours, mais la salle ne l’entend plus.',check:()=>A().p.fader<.05,target:'A.fader'},
       {t:'Remonte le fader de A tout en haut',why:'Voilà : le son revient. Le fader, c’est le geste que tu feras le plus souvent.',check:()=>A().p.fader>.8,target:'A.fader'},
       {t:'Tourne le potard MASTER',why:'Le {master} règle le volume final, celui des enceintes. Garde-le vers 80 % : tu auras de la marge.',enter:st=>{st.m0=S.masterVol;},check:st=>Math.abs(S.masterVol-st.m0)>.05,target:'master'},
      ])},
     {title:'Lire un morceau',sub:'Play, pause, cue. Charger un morceau.',badge:'Aux commandes',mins:6,
      steps:()=>seg(()=>{if(!A().track)A().load(demo('Néons',0));},[
-      {t:'Mets la platine A en pause',why:'Le même bouton ▶ met en pause. La platine garde sa place dans le morceau.',check:st=>{if(A().playing)st.seen=true;return st.seen&&!A().playing;},target:'A.play',hint:()=>A().playing?'':'Lance d’abord A avec ▶.'},
+      {t:'Mets la platine A en pause',why:'Le même bouton Play met en pause. La platine garde sa place dans le morceau.',check:st=>{if(A().playing)st.seen=true;return st.seen&&!A().playing;},target:'A.play',hint:()=>A().playing?'':'Lance d’abord A avec Play.'},
       {t:'Relance la lecture',why:'La lecture reprend exactement là où elle s’était arrêtée.',check:()=>A().playing,target:'A.play'},
       {t:'Appuie sur CUE pendant la lecture',why:'Le {cue} est ton point de départ. En lecture, CUE ramène la platine à ce point et l’arrête. Pratique pour recommencer proprement.',check:()=>!A().playing&&A().track&&near(A().position(),A().track.cue,.05),target:'A.cue'},
       {t:'Pose un nouveau point de cue',why:'Clique dans la vue d’ensemble (la bande sous le titre) pour avancer dans le morceau. Puis, à l’arrêt, appuie sur CUE : c’est ton nouveau départ.',enter:st=>{st.c0=A().track&&A().track.cue;},check:st=>A().track&&!near(A().track.cue,st.c0,.05),target:'A.cue',
@@ -238,9 +238,9 @@ window.Parcours=(()=>{
     {title:'La structure d’un morceau',sub:'Intro, couplet, break, drop, outro.',badge:'Radar',mins:8,
      steps:()=>seg(()=>{const t=demo('Halogène',2);if(A().playing)A().pause();A().load(t);A().ui.fader.set(.9);},[
       {t:'Un morceau se lit en blocs',why:'{Intro}, {couplet}, {break}, {montée}, {drop}, {outro}. Chaque bloc dure une ou plusieurs phrases. Dans la vue d’ensemble, on voit la forme : le break est le creux.',next:true,target:'#p-deckA .dk-ov'},
-      {t:'À l’oreille : clique « Break ! » quand la grosse caisse s’arrête',why:'Waveforms cachées. La platine part juste avant le {break} de « Halogène ». Lance A et écoute la {grosse caisse}.',w:'mark',mark:'Break !',
+      {t:'À l’oreille : clique « Break » quand la grosse caisse s’arrête',why:'Waveforms cachées. La platine part juste avant le {break} de « Halogène ». Lance A et écoute la {grosse caisse}.',w:'mark',mark:'Break',
        enter:st=>{blind(true);if(A().playing)A().pause();A().seek(A().timeOfBeat(104));},check:st=>st.mark!=null,target:()=>A().playing?'#pc-mark':'A.play',hint:()=>A().playing?'':'Lance A.'},
-      {t:'Clique « Drop ! » quand tout revient',why:'Après le break, le rythme et les {basses} reviennent d’un coup : c’est le {drop}.',w:'mark',mark:'Drop !',check:st=>st.mark!=null,target:'#pc-mark',hint:()=>A().playing?'':'Relance A.'},
+      {t:'Clique « Drop » quand tout revient',why:'Après le break, le rythme et les {basses} reviennent d’un coup : c’est le {drop}.',w:'mark',mark:'Drop',check:st=>st.mark!=null,target:'#pc-mark',hint:()=>A().playing?'':'Relance A.'},
       {t:'Le résultat',why:'Les waveforms reviennent : regarde le creux du break dans la vue d’ensemble.',w:'res',res:'mark',next:true,enter:()=>blind(false)},
       {t:'Va dans l’outro : clique dans le dernier huitième de la vue d’ensemble',why:'L’{outro} est faite pour mixer : surtout du rythme, peu de mélodie. C’est là que tu feras entrer le morceau suivant.',check:()=>A().track&&A().position()>=A().timeOfBeat(224)-.2,target:'#p-deckA .dk-ov'},
       {t:'Où mixer ?',why:'Règle simple : le morceau suivant entre sur le 1 d’une phrase, pendant l’outro du morceau qui joue. Les deux blocs rythmiques se superposent sans se gêner.',next:true},
@@ -267,7 +267,7 @@ window.Parcours=(()=>{
       {t:'Ramène-le au centre',why:'Au centre, les deux passent : ce sont les faders de voie qui décident. On travaille comme ça dans ce parcours.',check:()=>Math.abs(S.xf-.5)<.06,target:'xf'},
       {t:'Lance A',why:'A est à 2 phrases de son outro. À partir de maintenant, le coach t’écoute et notera ta {transition}.',check:()=>A().playing,target:'A.play'},
       {t:'Prépare B : SYNC et basses coupées',why:'Tout ce que tu as appris : même tempo, et B entrera sans ses graves.',check:()=>(B().sync||Math.abs(B().bpm-A().bpm)<.05)&&!bassOn(B()),target:()=>B().sync?'B.low':'B.sync'},
-      {t:'Lance B sur le 1 d’une phrase de A',why:'Regarde le compteur de phrase de A. Appuie sur ▶ de B pendant le dernier temps de la mesure 8.',check:()=>B().playing,target:'B.play',hint:()=>A().playing?'A : '+posTxt(A()):''},
+      {t:'Lance B sur le 1 d’une phrase de A',why:'Regarde le compteur de phrase de A. Appuie sur Play de B pendant le dernier temps de la mesure 8.',check:()=>B().playing,target:'B.play',hint:()=>A().playing?'A : '+posTxt(A()):''},
       {t:'Monte le fader de B, doucement',why:'Sur 4 à 8 mesures. Les aigus de B se glissent sous A.',check:()=>B().p.fader>=.8,target:'B.fader'},
       {t:'Échange les basses sur le 1 d’une phrase',why:'LOW de A à gauche, LOW de B au centre, en même temps. Une seule basse à la fois.',check:()=>!bassOn(A())&&bassOn(B()),target:()=>bassOn(A())?'A.low':'B.low',hint:()=>A().playing?'A : '+posTxt(A()):''},
       {t:'Sors A : baisse son fader',why:'B porte le morceau. A sort en douceur.',check:()=>A().p.fader<=.05||!A().playing,target:'A.fader'},
@@ -339,7 +339,7 @@ window.Parcours=(()=>{
       ];
       for(let k=1;k<n;k++)s.push({t:`Transition ${k}/${n-1} : fais entrer « ${tr(k).title} »`,why:'Charge, cale, lance sur le 1, échange les basses, sors l’ancien. Le coach te guide ligne par ligne.',k,
         check:()=>P.run&&P.run.trs.length>=k,hint:()=>guide(tr(k)).h,target:()=>guide(tr(k)).tg});
-      s.push({t:'Arrête l’enregistrement',why:'Appuie de nouveau sur REC. Ton set est fini !',check:()=>!REC.mr,target:'#rec-btn'});
+      s.push({t:'Arrête l’enregistrement',why:'Appuie de nouveau sur Rec pour arrêter l’enregistrement.',check:()=>!REC.mr,target:'#rec-btn'});
       return s;}},
   ];
 
@@ -370,7 +370,7 @@ window.Parcours=(()=>{
   // Le guide de transition du premier set : une seule consigne à la fois.
   function guide(next){
     const ab=[A(),B()],main=ab.filter(d=>d.playing&&audible(d)).sort((a,b)=>b.p.fader-a.p.fader)[0];
-    if(!main)return{h:'Relance la musique : ▶ et fader en haut.',tg:ab.find(d=>d.track)?.id+'.play'};
+    if(!main)return{h:'Relance la musique : Play et fader en haut.',tg:ab.find(d=>d.track)?.id+'.play'};
     const o=main===A()?B():A(),m=main.id,rem=main.track.duration-main.position(),pre=rem<40?`${m} se termine dans ${Math.round(rem)} s. `:'';
     if(o.track!==next)return{h:pre+`Charge « ${next.title} » sur la platine ${o.id} (bouton ${o.id} dans la bibliothèque).`,tg:'#p-lib'};
     if(!o.playing&&!o.sync&&Math.abs(o.bpm-main.bpm)>.05)return{h:pre+`Appuie sur SYNC de ${o.id}.`,tg:o.id+'.sync'};
@@ -417,7 +417,7 @@ window.Parcours=(()=>{
   function mark(){
     const s=P.steps[prog.step];if(!s||s.w!=='mark'||!A().playing)return;
     P.st.mark=A().beatPos();
-    const k=s.mark==='Break !'?'brk':'drop',exp=k==='brk'?128:160;
+    const k=s.mark==='Break'?'brk':'drop',exp=k==='brk'?128:160;
     prog.ear.mark=Object.assign({},prog.ear.mark,{[k]:+(P.st.mark-exp).toFixed(1)});
     const m=prog.ear.mark;if(m.brk!=null&&m.drop!=null&&Math.abs(m.brk)<=2&&Math.abs(m.drop)<=2)badge('Radar à break');save();
   }
@@ -441,7 +441,7 @@ window.Parcours=(()=>{
   }
   function advance(skip){
     const s=P.steps[prog.step];if(!s)return;
-    if(skip)prog.skips++;else if(!s.next&&P.st._f)toast('✓ '+s.t,'ok');
+    if(skip)prog.skips++;else if(!s.next&&P.st._f)toast(s.t,'ok');
     if(s.w==='tap'||s.w==='mark')blind(false);
     prog.step++;
     if(prog.step>=P.steps.length)finishChapter();else enterStep(false);
@@ -504,7 +504,7 @@ window.Parcours=(()=>{
       h('div',{class:'pc-title'},ch.title),h('div',{class:'pc-sub'},ch.sub),
       h('div',{class:'prog'},h('i',{style:`width:${Math.min(prog.step,n)/n*100}%`}))));
     if(done){
-      const box=h('div',{class:'donebox pc-done flash'},h('b',{},'Chapitre réussi !'),h('div',{class:'pc-badges'},h('span',{class:'pc-badge'},'🏅 '+ch.badge)));
+      const box=h('div',{class:'donebox pc-done flash'},h('b',{},'Chapitre validé.'),h('div',{class:'pc-badges'},h('span',{class:'pc-badge'},ch.badge)));
       el.append(box);
       if(ch.final)el.append(summaryCard());
       else if(prog.ch===8&&prog.score.first!=null)box.append(h('p',{},`Ta première transition : ${prog.score.first}/100.`));
@@ -533,7 +533,7 @@ window.Parcours=(()=>{
     if(s.w==='res')return earResult(s.res);
     if(s.w==='wheel')return wheel();
     if(s.w==='set')return setBuilder(s);
-    if(s.w==='setlist')return h('ol',{class:'pc-setl'},setIds().map(id=>{const t=trackOf(id);return h('li',{},h('span',{},t.title),h('i',{class:'pc-en',title:'Énergie'},'⚡'+energy(t)),h('em',{},t.bpm.toFixed(0)+' BPM'));}));
+    if(s.w==='setlist')return h('ol',{class:'pc-setl'},setIds().map(id=>{const t=trackOf(id);return h('li',{},h('span',{},t.title),h('i',{class:'pc-en',title:'Énergie'},icon('energy'),String(energy(t))),h('em',{},t.bpm.toFixed(0)+' BPM'));}));
     if(s.w==='score'){const d=h('div',{class:'pc-score'});P.live=()=>{const r=window.MixCoach&&MixCoach.state.hist[0];if(!r||r===P.mark||d.dataset.k===String(r.at))return;d.dataset.k=String(r.at);d.innerHTML='';d.append(h('span',{class:'sc '+(r.score>=75?'ok':r.score>=50?'warn':'bad')},String(r.score)),h('span',{},` /100 · ${r.from} → ${r.to} · ${r.bars.toFixed(0)} mesures`));};return d;}
     return null;
   }
@@ -562,12 +562,12 @@ window.Parcours=(()=>{
   function setBuilder(s){
     const box=h('div',{class:'pc-set'}),ids=setIds();
     const mv=(i,d)=>{const a=setIds();const j=i+d;if(j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];prog.set=a;save();render();};
-    box.append(h('ol',{class:'pc-setl'},ids.map((id,i)=>{const t=trackOf(id),e=energy(t);return h('li',{},h('span',{},t.title),h('i',{class:'pc-en',style:`--e:${e*10}%`,title:'Énergie '+e+'/10'},'⚡'+e),
+    box.append(h('ol',{class:'pc-setl'},ids.map((id,i)=>{const t=trackOf(id),e=energy(t);return h('li',{},h('span',{},t.title),h('i',{class:'pc-en',style:`--e:${e*10}%`,title:'Énergie '+e+'/10'},icon('energy'),String(e)),
       h('button',{class:'b',type:'button',title:'Monter',onclick:()=>mv(i,-1)},'↑'),h('button',{class:'b',type:'button',title:'Descendre',onclick:()=>mv(i,1)},'↓'),
       h('button',{class:'b',type:'button',title:'Retirer',onclick:()=>{prog.set=setIds().filter(x=>x!==id);save();render();}},'×'));})));
     if(ids.length)box.append(h('div',{class:'pc-curve',title:'Courbe d’énergie'},ids.map(id=>h('i',{style:`height:${energy(trackOf(id))*10}%`}))));
     const rest=LIB.tracks.filter(t=>!ids.includes(t.id));
-    if(rest.length&&ids.length<5)box.append(lbl('Ta bibliothèque'),h('ul',{class:'pc-pick'},rest.map(t=>h('li',{},h('span',{},t.title,h('em',{},` · ${t.bpm.toFixed(0)} BPM · ⚡${energy(t)}`)),h('button',{class:'b',type:'button',title:'Ajouter au set','data-add':t.id,onclick:()=>{prog.set=[...setIds(),t.id].slice(0,5);save();render();}},'+')))));
+    if(rest.length&&ids.length<5)box.append(lbl('Ta bibliothèque'),h('ul',{class:'pc-pick'},rest.map(t=>h('li',{},h('span',{},t.title,h('em',{},` · ${t.bpm.toFixed(0)} BPM · énergie ${energy(t)}`)),h('button',{class:'b',type:'button',title:'Ajouter au set','data-add':t.id,onclick:()=>{prog.set=[...setIds(),t.id].slice(0,5);save();render();}},'+')))));
     if(s.order)box.append(h('button',{class:'go',type:'button',id:'pc-order',onclick:()=>{P.st.ok=true;}},'C’est mon ordre'));
     if(s.save)box.append(h('button',{class:'go',type:'button',id:'pc-save',onclick:()=>{const pl=LIB.playlists[0];if(pl){pl.ids=setIds().slice();renderSide();toast('Set rangé dans « '+pl.name+' »','ok');}}},'Ranger dans « Préparation »'));
     return box;
@@ -595,8 +595,8 @@ window.Parcours=(()=>{
     el.append(h('div',{class:'pc-head'},lbl('Parcours · de zéro à ton premier set'),h('div',{class:'pc-title'},'La carte'),
       h('div',{class:'pc-stats'},h('span',{},h('b',{},`${nDone}/${CH.length}`),' chapitres'),h('span',{},h('b',{},fmtMin(prog.time)),' de pratique'),h('span',{},h('b',{},String(prog.badges.length)),prog.badges.length>1?' badges':' badge'))));
     el.append(h('div',{class:'pc-map'},CH.map((c,i)=>h('button',{class:'pc-tile'+(prog.done[i]?' d':'')+(i===prog.ch?' c':''),type:'button','data-ch':i,onclick:()=>loadChapter(i,i===prog.ch&&!prog.done[i]?prog.step:0)},
-      h('span',{class:'n'},prog.done[i]?'✓':String(i+1)),h('span',{class:'tx'},h('b',{},c.title),h('small',{},c.sub)),h('em',{},prog.chTime[i]?fmtMin(prog.chTime[i]):'~'+c.mins+' min')))));
-    if(prog.badges.length)el.append(lbl('Badges'),h('div',{class:'pc-badges'},prog.badges.map(b=>h('span',{class:'pc-badge'},'🏅 '+b))));
+      h('span',{class:'n'},prog.done[i]?icon('check','Terminé'):String(i+1)),h('span',{class:'tx'},h('b',{},c.title),h('small',{},c.sub)),h('em',{},prog.chTime[i]?fmtMin(prog.chTime[i]):'~'+c.mins+' min')))));
+    if(prog.badges.length)el.append(lbl('Badges'),h('div',{class:'pc-badges'},prog.badges.map(b=>h('span',{class:'pc-badge'},b))));
     el.append(h('div',{class:'pc-foot'},h('button',{class:'go',type:'button',onclick:()=>{P.view='step';render();}},'Reprendre'),
       h('button',{class:'b',type:'button',onclick:()=>{P.view='gloss';render();}},'Glossaire'),
       h('button',{class:'b',type:'button',onclick:reset},'Tout recommencer'),h('button',{class:'b',type:'button',onclick:exit},'Quitter')));
@@ -611,7 +611,7 @@ window.Parcours=(()=>{
   function card(){
     const started=Object.keys(prog.done).length||prog.step||prog.ch;
     return h('div',{class:'lcard pc-card'},h('span',{class:'mod'},'Parcours · 14 chapitres · ~2 h'),h('b',{},'De zéro à ton premier set'),
-      h('p',{},'Tu n’as jamais touché une platine ? L’interface s’ouvre au fur et à mesure, une commande à la fois, jusqu’à ton premier set enregistré.'),
+      h('p',{},'Pour débuter : l’interface s’ouvre commande par commande, jusqu’au premier set enregistré.'),
       h('button',{class:'go',type:'button',onclick:()=>open()},started?`Reprendre · chapitre ${prog.ch+1}`:'Commencer'));
   }
 
@@ -624,13 +624,20 @@ window.Parcours=(()=>{
       const f=FROM[choice];
       if(f){const[name,k]=f,pr=PRESETS[k];layout.preset=k;layout.visible=new Set(pr.show);layout.coach=!!pr.coach;applyLayout();toast(`Disposition « ${pr.name} », la plus proche de ${name}. Le parcours reste dans le bouton Parcours.`,'ok');}
       else toast('Le parcours débutant reste dans le bouton Parcours, en haut.');return;}
-    const opt=(id,t,p,c)=>h('button',{class:'pc-opt',type:'button',id,onclick:()=>welcome(c)},h('b',{},t),h('span',{},p));
-    P.el.wel=h('div',{class:'pc-wel',role:'dialog','aria-label':'Bienvenue'},h('div',{class:'pc-welc'},
-      h('div',{class:'pc-k'},'Bienvenue dans Mixlab'),h('h2',{},'Tu as déjà mixé ?'),
-      h('p',{},'Mixlab est un logiciel DJ complet et gratuit, avec un professeur intégré. Dis-nous d’où tu pars.'),
-      h('div',{class:'pc-opts'},opt('pc-novice','Je n’ai jamais mixé','Un parcours guidé en 14 chapitres, de ta première note à ton premier set. L’interface s’ouvre petit à petit.','novice'),
-        opt('pc-pro','Je sais déjà mixer','L’interface complète tout de suite. Le parcours reste dans le bouton Parcours.','pro')),
-      h('div',{class:'pc-from'},h('span',{},'Je mixe déjà sur'),Object.entries(FROM).map(([k,[n]])=>h('button',{class:'pc-fromb',type:'button',id:'pc-from-'+k,onclick:()=>welcome(k)},n)))));
+    // Premier lancement : une feuille de réglage, comme la première ouverture d'un logiciel de bureau.
+    // Chaque ligne s'applique tout de suite ; Échap revient à « Je sais mixer ».
+    const opt=(id,t,p,c,meta)=>h('button',{class:'pc-opt',type:'button',id,onclick:()=>welcome(c)},
+      h('span',{class:'pc-optt'},h('b',{},t),h('span',{},p)),meta?h('em',{},meta):null,icon('chev-r'));
+    P.el.wel=h('div',{class:'pc-wel',role:'dialog','aria-modal':'true','aria-labelledby':'pc-wel-t'},h('div',{class:'pc-welc'},
+      h('header',{class:'pc-welh'},h('h2',{id:'pc-wel-t'},'Mixlab · premier lancement')),
+      h('div',{class:'pc-welb'},
+        h('p',{},'Choisis l’interface de départ. Tu pourras la changer à tout moment avec les boutons Parcours et Affichage.'),
+        h('div',{class:'pc-welg'},h('div',{class:'pc-k'},'Ton niveau'),
+          h('div',{class:'pc-opts'},opt('pc-novice','Je débute','Parcours guidé : l’interface s’ouvre commande par commande, jusqu’au premier set enregistré.','novice','14 chapitres, 2 h'),
+            opt('pc-pro','Je sais mixer','Interface complète, sans parcours.','pro'))),
+        h('div',{class:'pc-welg'},h('div',{class:'pc-k'},'Disposition proche de ton logiciel habituel'),
+          h('div',{class:'pc-from'},Object.entries(FROM).map(([k,[n]])=>h('button',{class:'pc-fromb',type:'button',id:'pc-from-'+k,onclick:()=>welcome(k)},n))))),
+      h('footer',{class:'pc-welf'},h('span',{},h('kbd',{},'Échap'),' interface complète'),h('span',{},'Audio et contrôleur : barre du haut'))));
     document.body.append(P.el.wel);$('#pc-novice').focus();
   }
 

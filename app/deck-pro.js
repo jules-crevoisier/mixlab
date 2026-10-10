@@ -219,7 +219,7 @@ window.DeckPro=(()=>{
   }
   function pvSeek(f){const t=PV.tr||pvSelected();if(!t)return;const p=clamp(f,0,1)*t.duration;if(PV.on||!PV.tr)pvPlay(t,p);else{PV.tr=t;PV.pos=p;}}
   function buildPreview(){
-    const play=h('button',{class:'tb dp-pvb',type:'button','data-ctl':'preview',title:'Pré-écoute au casque du morceau sélectionné, sans toucher aux platines','aria-label':'Pré-écoute'},'▶ Pré-écoute');
+    const play=h('button',{class:'tb dp-pvb',type:'button','data-ctl':'preview',title:'Pré-écoute au casque du morceau sélectionné, sans toucher aux platines','aria-label':'Pré-écoute'},icon('phones'),'Pré-écoute');
     play.addEventListener('click',pvToggle);
     const cv=h('canvas',{class:'dp-pvc',title:'Clique ou glisse pour te déplacer dans la pré-écoute','aria-label':'Position de la pré-écoute'});
     let drag=false;const at=e=>{const r=cv.getBoundingClientRect();return(e.clientX-r.left)/r.width;};
@@ -232,7 +232,7 @@ window.DeckPro=(()=>{
   }
   function drawPreview(){
     const E=PV.el;if(!E)return;const tr=PV.tr||pvSelected();
-    E.play.textContent=PV.on?'■ Pré-écoute':'▶ Pré-écoute';E.play.classList.toggle('on',PV.on);
+    E.play.replaceChildren(icon(PV.on?'stop':'phones'),'Pré-écoute');E.play.classList.toggle('on',PV.on);
     // la barre de position n'apparaît qu'une fois la pré-écoute lancée (avant, elle ressemblait à un champ vide)
     E.root.classList.toggle('idle',!PV.tr);if(!PV.tr)return;
     E.tm.textContent=tr?fmtTime(pvPos(),false)+' / '+fmtTime(tr.duration,false):'';

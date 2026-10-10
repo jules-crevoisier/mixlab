@@ -127,7 +127,7 @@ window.Academie=(()=>{
       h('div',{class:'prog'},h('i',{style:`width:${s.done/s.n*100}%`}))));
     MODS.forEach((m,mi)=>el.append(h('div',{class:'ac-mod'},lbl(`Module ${mi+1} · ${m.title}`),h('p',{class:'pc-sub'},m.intro),
       h('div',{class:'pc-map'},m.lessons.map((l,li)=>h('button',{class:'pc-tile'+(prog.done[l.id]?' d':'')+(l.id===prog.les?' c':''),type:'button','data-l':l.id,onclick:()=>go('lesson',l.id)},
-        h('span',{class:'n'},prog.done[l.id]?'✓':String(li+1)),
+        h('span',{class:'n'},prog.done[l.id]?icon('check','Terminée'):String(li+1)),
         h('span',{class:'tx'},h('b',{},l.title),h('small',{},[l.quiz&&l.quiz.length&&pl(l.quiz.length,'question'),l.exercise&&'exercice : '+l.exercise.title].filter(Boolean).join(' · ')||'Lecture')),
         h('em',{},'~'+l.mins+' min')))))));
     el.append(h('div',{class:'pc-foot'},prog.les&&h('button',{class:'go',type:'button',onclick:()=>go('lesson',prog.les)},'Reprendre'),
@@ -144,7 +144,7 @@ window.Academie=(()=>{
     if(l.keys&&l.keys.length)el.append(h('div',{class:'ac-keys'},lbl('À retenir'),h('ul',{},l.keys.map(k=>h('li',{},k)))));
     if(l.quiz&&l.quiz.length)el.append(h('div',{class:'ac-quiz'},lbl(l.quiz.length>1?'Quiz · '+l.quiz.length+' questions':'Quiz'),l.quiz.map((q,qi)=>question(l,q,qi))));
     if(l.exercise)el.append(h('div',{class:'ac-ex'+(prog.ex[l.id]?' ok':''),'data-ex':l.exercise.type},
-      h('div',{class:'pc-row'},lbl('Exercice'),prog.ex[l.id]&&h('span',{class:'ac-tag ok'},'✓ Réussi')),
+      h('div',{class:'pc-row'},lbl('Exercice'),prog.ex[l.id]&&h('span',{class:'ac-tag ok'},'Réussi')),
       h('b',{class:'ac-ext'},l.exercise.title),h('p',{class:'pc-sub'},l.exercise.goal),exercise(l)));
     if(done)el.append(h('div',{class:'donebox pc-done',id:'ac-done'},h('b',{},'Leçon terminée'),h('p',{},next?'La suite : « '+next.title+' ».':'Tu as fait le tour de l’Académie. Reviens aux exercices quand tu prépares une date.')));
     else if(!auto(l))el.append(h('div',{class:'pc-btns'},h('button',{class:'go',type:'button',id:'ac-read',onclick:()=>markRead(l)},'J’ai lu, leçon terminée')));
@@ -226,8 +226,8 @@ window.Academie=(()=>{
         svg.append(c);});
       const m=match(s.pts,s.tpl),crit=analyse(s.pts);
       info.innerHTML='';info.append(h('span',{},'Proche de la trame « '+(TPL[s.tpl]||TPL.peak).label+' » : ',h('b',{id:'ac-ematch'},m+'/100')),h('span',{class:'ac-leg'},h('i',{class:'me'}),'ta courbe ',h('i',{class:'tpl'}),'la trame'));
-      list.innerHTML='';crit.forEach(c=>list.append(h('li',{class:c.ok?'ok':'','data-c':c.id},(c.ok?'✓ ':'○ ')+c.t)));
-      if(names){names.innerHTML='';names.append(...s.ids.map((id,i)=>{const t=trackOf(id);return t?h('li',{},h('span',{},t.title),h('i',{class:'pc-en'},'⚡'+s.pts[i]),h('em',{},t.bpm.toFixed(0)+' BPM'),
+      list.innerHTML='';crit.forEach(c=>list.append(h('li',{class:c.ok?'ok':'','data-c':c.id},icon(c.ok?'check':'dot'),c.t)));
+      if(names){names.innerHTML='';names.append(...s.ids.map((id,i)=>{const t=trackOf(id);return t?h('li',{},h('span',{},t.title),h('i',{class:'pc-en',title:'Énergie'},icon('energy'),String(s.pts[i])),h('em',{},t.bpm.toFixed(0)+' BPM'),
         h('button',{class:'b',type:'button',title:'Monter',onclick:()=>mv(i,-1)},'↑'),h('button',{class:'b',type:'button',title:'Descendre',onclick:()=>mv(i,1)},'↓')):'';}));}
     }
     // glisser : le point le plus proche horizontalement suit le pointeur
@@ -286,9 +286,9 @@ window.Academie=(()=>{
     box.append(h('div',{class:'pc-curve ac-pcurve',title:'Énergie cible (clair) et énergie des morceaux placés'},s.slots.map(x=>{const t=trackOf(x.id);return h('span',{class:'ac-bar'},h('i',{class:'tg',style:`height:${x.target*10}%`}),t&&h('i',{class:'me',style:`height:${E(t)*10}%`}));})));
     const fmt=m=>Math.floor(m/60)+':'+String(m%60).padStart(2,'0');
     box.append(h('ol',{class:'pc-setl ac-slots',id:'ac-pslots'},s.slots.map((x,i)=>{const t=trackOf(x.id);
-      return h('li',{class:t?'':'miss','data-slot':i},h('em',{},fmt(i*MIN_PER)),h('i',{class:'pc-en',title:'Énergie cible'},'⚡'+Math.round(x.target)),
-        t?h('span',{},t.title,h('em',{},` · ${t.bpm.toFixed(0)} BPM`+(keyCode(t)?' · '+keyCode(t):'')+` · ⚡${E(t)}`)):h('span',{class:'ac-need'},`À trouver : énergie ${Math.round(x.target)}, ${tpl.bpm[0]}-${tpl.bpm[1]} BPM`),
-        h('button',{class:'b',type:'button',title:'Autre proposition','data-alt':i,onclick:()=>{const c=candidates(s.slots,i,tpl);if(!c.length){toast('Aucun autre morceau de ta bibliothèque ne colle à cette tranche.');return;}const k=c.findIndex(y=>y.t.id===x.id);x.id=c[(k+1)%c.length].t.id;s.saved=null;save();render();}},'↻'),
+      return h('li',{class:t?'':'miss','data-slot':i},h('em',{},fmt(i*MIN_PER)),h('i',{class:'pc-en',title:'Énergie cible'},icon('energy'),String(Math.round(x.target))),
+        t?h('span',{},t.title,h('em',{},` · ${t.bpm.toFixed(0)} BPM`+(keyCode(t)?' · '+keyCode(t):'')+` · énergie ${E(t)}`)):h('span',{class:'ac-need'},`À trouver : énergie ${Math.round(x.target)}, ${tpl.bpm[0]}-${tpl.bpm[1]} BPM`),
+        h('button',{class:'b',type:'button',title:'Autre proposition','data-alt':i,onclick:()=>{const c=candidates(s.slots,i,tpl);if(!c.length){toast('Aucun autre morceau de ta bibliothèque ne colle à cette tranche.');return;}const k=c.findIndex(y=>y.t.id===x.id);x.id=c[(k+1)%c.length].t.id;s.saved=null;save();render();}},'Autre'),
         t&&h('button',{class:'b',type:'button',title:'Vider la tranche',onclick:()=>{x.id=null;s.saved=null;save();render();}},'×'));})));
     const res=Math.round(placed*2.5);
     box.append(h('div',{class:'ac-sum',id:'ac-psum'},
@@ -322,7 +322,7 @@ window.Academie=(()=>{
       box.append(h('div',{class:'ac-qq'},`Morceau ${s.r+1}/${sc.rounds.length} · ${rd.q}`),
         h('div',{class:'ac-ch'},rd.opts.map((o,oi)=>h('button',{class:'ac-c',type:'button','data-o':oi,onclick:()=>{
           s.fill=clamp(s.fill+o.d,0,100);s.picks.push({r:s.r,o:oi,d:o.d,k:o.k,fb:o.fb});s.r++;
-          if(s.r>=sc.rounds.length&&s.fill>=WIN){save();exDone(l,'Piste sauvée !');}
+          if(s.r>=sc.rounds.length&&s.fill>=WIN){save();exDone(l,'Piste sauvée.');}
           save();render();}},o.t))));
     }else{
       const win=s.fill>=WIN;
@@ -371,7 +371,7 @@ window.Academie=(()=>{
     box.append(lbl('Range tes morceaux par moment'),h('p',{class:'ac-note'},'Un tag par morceau. Ensuite, cherche tag:montée dans la bibliothèque, ou fais une crate sur ce tag.'),
       h('ul',{class:'pc-pick ac-tags',id:'ac-ctags'},tracks.map(t=>{const sel=h('select',{class:'sel','data-t':t.id,'aria-label':'Moment de '+t.title},h('option',{value:''},'Moment…'),MOMENTS.map(m=>h('option',{value:m},m)));sel.value=tagOf(t);
         sel.addEventListener('change',()=>{t.tags=(t.tags||[]).filter(x=>!MOMENTS.some(m=>fold(m)===fold(x)));if(sel.value)t.tags.push(sel.value);renderTable();libSave();});
-        return h('li',{},h('span',{},t.title,h('em',{},` · ${t.bpm.toFixed(0)} BPM · ⚡${E(t)}`)),sel);})));
+        return h('li',{},h('span',{},t.title,h('em',{},` · ${t.bpm.toFixed(0)} BPM · énergie ${E(t)}`)),sel);})));
     return box;
   }
 
@@ -398,7 +398,7 @@ window.Academie=(()=>{
   function card(){
     const s=stats();
     return h('div',{class:'lcard pc-card ac-card'},h('span',{class:'mod'},`Académie · ${MODS.length} modules · ${LESSONS.length} leçons`),h('b',{},'Le métier de DJ'),
-      h('p',{},'Construire un set, lire le public, trouver et ranger ta musique, être prêt sur scène. Des leçons courtes, des quiz et des exercices sur ta bibliothèque.'),
+      h('p',{},'Construire un set, lire le public, trouver et ranger ta musique. Leçons courtes, quiz, exercices sur ta bibliothèque.'),
       h('button',{class:'go',type:'button',id:'ac-open',onclick:()=>open()},s.done?`Reprendre · ${s.done}/${s.n}`:'Commencer'));
   }
 

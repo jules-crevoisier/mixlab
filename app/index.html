@@ -271,24 +271,24 @@ body.dragging .deck,body.dragging #p-lib{outline:1px dashed var(--coach);outline
 .lr .v{font:500 11px var(--num);font-variant-numeric:tabular-nums;min-width:0}
 .phase{position:relative;height:14px;border-radius:2px;background:#07080a;overflow:hidden}
 .phase::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--dim)}
-.phase .okz{position:absolute;left:40%;width:20%;top:0;bottom:0;background:rgba(63,214,121,.12)}
+.phase .okz{position:absolute;left:40%;width:20%;top:0;bottom:0;background:color-mix(in srgb,var(--state-ok) 12%,transparent)}
 .phase .nd{position:absolute;top:2px;bottom:2px;width:4px;margin-left:-2px;border-radius:1px;background:var(--dim);left:50%}
 .phr{display:flex;gap:6px;align-items:center}
 .bars{display:flex;gap:2px}.bars i{width:11px;height:7px;border-radius:1px;background:#262a32}.bars i.on{background:var(--dc)}.bars i.cur{background:var(--white)}
 .beats{display:flex;gap:2px}.beats i{width:5px;height:5px;border-radius:50%;background:#262a32}.beats i.on{background:var(--white)}
-.alert{font-size:13px;padding:5px 7px;border-radius:3px;background:rgba(255,77,94,.12);color:#ff8792;line-height:1.35}
-.alert.warn{background:rgba(245,184,61,.12);color:var(--warn)}
+.alert{font-size:13px;padding:5px 7px;border-radius:3px;background:color-mix(in srgb,var(--state-bad) 12%,transparent);color:#ff8792;line-height:1.35}
+.alert.warn{background:color-mix(in srgb,var(--state-warn) 12%,transparent);color:var(--warn)}
 .lcard{border:1px solid var(--ln);border-radius:4px;padding:9px;display:grid;gap:4px;background:var(--s1)}
 .lcard .mod{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--coach);font-weight:600}
 .lcard b{font-size:13px;color:var(--white)}
 .lcard p{margin:0;color:var(--mu);font:400 13px/1.4 var(--ui)}
-.go{justify-self:start;margin-top:3px;background:var(--coach);color:#120d1f;border:0;border-radius:3px;padding:5px 10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:11px;cursor:pointer}
+.go{justify-self:start;margin-top:3px;background:var(--coach);color:var(--surface-0);border:0;border-radius:3px;padding:5px 10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:11px;cursor:pointer}
 .soon{margin:0;padding-left:16px;color:var(--dim);font:400 13px/1.5 var(--ui)}
 .steps{list-style:none;padding:0;margin:0;display:grid;gap:4px;counter-reset:s}
 .steps li{display:grid;grid-template-columns:18px 1fr;gap:6px;font-size:13px;color:var(--dim);counter-increment:s;align-items:start}
 .steps li::before{content:counter(s);font:500 11px var(--num);width:16px;height:16px;border-radius:50%;border:1px solid var(--ln2);display:grid;place-items:center}
 .steps li.done{color:var(--mu)}
-.steps li.done::before{content:"✓";background:var(--ok);color:#05070a;border-color:var(--ok)}
+.steps li.done::before{content:"";background:var(--ok);color:#05070a;border-color:var(--ok)}
 .steps li.cur{color:var(--white);font-weight:600}
 .steps li.cur::before{border-color:var(--coach);color:var(--coach)}
 .now{border-left:2px solid var(--coach);padding:8px 10px;background:var(--s1);border-radius:0 4px 4px 0;display:grid;gap:5px}
@@ -321,12 +321,12 @@ kbd{font:500 11px var(--num);border:1px solid var(--ln2);border-bottom-width:2px
 
 /* ---------- MIDI Learn : un calque sur chaque commande mappable ---------- */
 .learn [data-ctl]{position:relative}
-.learn [data-ctl]::after{content:"";position:absolute;inset:-2px;border:1px dashed var(--coach);border-radius:4px;background:rgba(167,139,250,.08);cursor:crosshair;z-index:5}
-.learn [data-ctl].mapped::after{border-style:solid;background:rgba(167,139,250,.2)}
-.learn [data-ctl].sel::after{border:2px solid var(--coach);background:rgba(167,139,250,.35);animation:pulse 1s infinite}
-@keyframes pulse{50%{background:rgba(167,139,250,.08)}}
-.learnbar{position:fixed;left:50%;top:44px;transform:translateX(-50%);z-index:55;background:var(--coach);color:#120d1f;padding:6px 12px;border-radius:4px;font-weight:600;font-size:13px;display:flex;gap:10px;align-items:center}
-.learnbar button{background:#120d1f;color:var(--white);border:0;border-radius:3px;padding:3px 8px;cursor:pointer;font-weight:600}
+.learn [data-ctl]::after{content:"";position:absolute;inset:-2px;border:1px dashed var(--coach);border-radius:4px;background:color-mix(in srgb,var(--coach) 8%,transparent);cursor:crosshair;z-index:5}
+.learn [data-ctl].mapped::after{border-style:solid;background:color-mix(in srgb,var(--coach) 20%,transparent)}
+.learn [data-ctl].sel::after{border:2px solid var(--coach);background:color-mix(in srgb,var(--coach) 35%,transparent);animation:pulse 1s infinite}
+@keyframes pulse{50%{background:color-mix(in srgb,var(--coach) 8%,transparent)}}
+.learnbar{position:fixed;left:50%;top:44px;transform:translateX(-50%);z-index:55;background:var(--coach);color:var(--surface-0);padding:6px 12px;border-radius:4px;font-weight:600;font-size:13px;display:flex;gap:10px;align-items:center}
+.learnbar button{background:var(--surface-0);color:var(--white);border:0;border-radius:3px;padding:3px 8px;cursor:pointer;font-weight:600}
 
 #loading{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg);z-index:80;color:var(--mu);font-size:13px;letter-spacing:.14em;text-transform:uppercase}
 .toasts{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:grid;gap:4px;z-index:70;pointer-events:none;width:min(92vw,440px)}
@@ -343,8 +343,8 @@ kbd{font:500 11px var(--num);border:1px solid var(--ln2);border-bottom-width:2px
 .mopt .sel{height:22px;font-size:11px;max-width:170px}
 .mopt label{display:inline-flex;gap:3px;align-items:center;color:var(--tx);font:500 11px var(--ui);white-space:nowrap}
 .learnbar{flex-wrap:wrap;max-width:min(96vw,900px)}
-.learnbar .mopts{display:flex;gap:8px;align-items:center;padding:0;flex-basis:auto;color:#120d1f}
-.learnbar .mopt label{color:#120d1f}.learnbar .sel{background:#120d1f;color:var(--white);border-color:#120d1f}
+.learnbar .mopts{display:flex;gap:8px;align-items:center;padding:0;flex-basis:auto;color:var(--surface-0)}
+.learnbar .mopt label{color:var(--surface-0)}.learnbar .sel{background:var(--surface-0);color:var(--white);border-color:var(--surface-0)}
 .mlib .r,.mgrid .r.fixed{flex-wrap:wrap;gap:4px}
 .keyl kbd{min-width:22px;text-align:center;color:var(--white)}.keyl li{gap:8px}
 @media (min-width:760px){.mgrid>.mact{grid-column:span 2}}
@@ -355,7 +355,7 @@ kbd{font:500 11px var(--num);border:1px solid var(--ln2);border-bottom-width:2px
 .libl li.on{border-color:var(--coach)}
 .libl .ln{display:grid;gap:1px;min-width:0}.libl .ln b{color:var(--white);font-size:13px}.libl .ln span{color:var(--mu);font-size:11px}
 #clock-on[aria-pressed="true"]{color:var(--ok);border-color:var(--ok)}
-.b.go{border-color:var(--coach);color:var(--white);background:rgba(167,139,250,.16)}
+.b.go{border-color:var(--coach);color:var(--white);background:color-mix(in srgb,var(--coach) 16%,transparent)}
 .mbox.wz{width:min(560px,100%)}
 .mbox.wz .prog{margin:0 0 14px}
 .wz-step{display:grid;gap:3px;margin-bottom:8px}.wz-step small{color:var(--mu);font:600 11px var(--ui);letter-spacing:.12em;text-transform:uppercase}
@@ -398,22 +398,24 @@ kbd{font:500 11px var(--num);border:1px solid var(--ln2);border-bottom-width:2px
 :root{
   /* Jetons sémantiques : la seule palette de l'appli (docs/design/STYLE.md).
      app.js les relit pour le dessin (readTokens) : aucune couleur en dur dans les canvas. */
-  /* surfaces : 0 fond, 1 panneau, 2 commande au repos, 3 survol et sélection, 4 relief */
-  --surface-0:#08090b;--surface-1:#111317;--surface-2:#191c21;--surface-3:#22262d;--surface-4:#2d323a;
-  --line-1:#1b1e24;--line-2:#2a2e36;
-  /* textes : fort (vital et titres), moyen (corps), faible (libellés, réglages) */
-  --text-hi:#f3f5f8;--text-mid:#c3c8d0;--text-lo:#8e95a1;
+  /* surfaces : gris neutres de façade mate (ni bleutés ni chauds).
+     0 fond et joints entre modules, 1 façade, 2 commande au repos, 3 survol et sélection, 4 relief */
+  --surface-0:#0b0b0c;--surface-1:#161617;--surface-2:#1f1f21;--surface-3:#29292c;--surface-4:#363639;
+  --line-1:#232325;--line-2:#38383c;
+  /* textes : sérigraphie blanc cassé (vital et titres), moyen (corps), faible (légendes, réglages) */
+  --text-hi:#efeee9;--text-mid:#c3c2bc;--text-lo:#908f89;
   /* identité des platines : pastille, liseré, tête de lecture et états actifs, rien d'autre */
-  --deck-a:#3aa8ff;--deck-b:#ff7547;--deck-c:#ef5fa7;--deck-d:#2cc4b2;
-  /* états : calé ou compatible, attention ou cue, erreur ou fin ; le violet est au coach seul */
-  --state-ok:#46d483;--state-warn:#f2b441;--state-bad:#ff4f5e;
-  --cue:#f2b441;--coach:#a78bfa;--live:#ffffff;--accent:#dfe5ee;
-  /* waveforms : graves bleu profond, médiums ambre, aigus presque blancs */
-  --wave-low:#2b5cff;--wave-mid:#f0a54a;--wave-high:#e8ecf2;--wave-bg:#060709;
-  /* échelle typographique (rien sous 11 px), grille de 8 px, rayons */
+  --deck-a:#5e9fd6;--deck-b:#e2874f;--deck-c:#4dbcb2;--deck-d:#d4789e;
+  /* états : un vert (calé, compatible), un ambre (attention, cue), un rouge (erreur, fin) */
+  --state-ok:#63c46f;--state-warn:#e9ad3d;--state-bad:#e5484d;
+  /* coach : vert anis de voyant « learn », réservé au coach, au parcours et à l'académie */
+  --cue:#e9ad3d;--coach:#c5d64b;--live:#ffffff;--accent:#efeee9;
+  /* waveforms : graves bleu acier, médiums ambre, aigus blanc cassé */
+  --wave-low:#3d6dd6;--wave-mid:#de9746;--wave-high:#ebeae4;--wave-bg:#08080a;
+  /* échelle typographique (rien sous 11 px), grille de 4 px, rayons d'usinage (2 à 4 px) */
   --fs-1:11px;--fs-2:13px;--fs-3:16px;--fs-4:24px;--fs-5:32px;
   --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;
-  --r-1:4px;--r-2:6px;--r-3:8px;
+  --r-1:2px;--r-2:3px;--r-3:4px;
   --ui:Inter,"Segoe UI",system-ui,sans-serif;
   --num:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
   /* alias historiques (anciens noms encore utilisés par les modules) */
@@ -623,7 +625,7 @@ pre.tl{margin:0;background:#0a0b0e;border:1px solid var(--ln);border-radius:6px;
 #coach-direct .sel{max-width:130px}
 .cl-list,.cl-hist{display:grid;gap:5px}
 .cl-ok{color:var(--mu);font-size:11px}
-.alert.tip{background:rgba(167,139,250,.12);color:var(--tx)}
+.alert.tip{background:color-mix(in srgb,var(--coach) 12%,transparent);color:var(--tx)}
 .alert b{color:var(--white)}
 .trcard{border:1px solid var(--ln);border-radius:4px;padding:5px 7px;background:#0a0b0e;font-size:11px}
 .trcard summary{cursor:pointer;color:var(--tx)}
@@ -697,7 +699,7 @@ pre.tl{margin:0;background:#0a0b0e;border:1px solid var(--ln);border-radius:6px;
 .pc-tapb{flex:1;height:64px;border-radius:12px;border:1px solid color-mix(in srgb,var(--coach) 60%,transparent);background:color-mix(in srgb,var(--coach) 14%,#15171c);color:var(--white);font:700 16px var(--ui);letter-spacing:.06em;cursor:pointer;display:grid;place-content:center;gap:2px;touch-action:manipulation;user-select:none}
 .pc-tapb small{font:500 11px var(--ui);color:var(--mu);letter-spacing:.04em}
 .pc-tapb:active,.pc-tapb.hit{animation:pcHit .18s ease-out}
-@keyframes pcHit{from{background:var(--coach);color:#120d1f}}
+@keyframes pcHit{from{background:var(--coach);color:var(--surface-0)}}
 .pc-ear b{font:700 16px var(--num);color:var(--white);min-width:44px;text-align:center}
 .pc-res ul,.pc-ul{margin:6px 0 0;padding-left:16px;display:grid;gap:3px;font:400 13px/1.45 var(--ui)}
 .pc-ul.g li{color:var(--ok)}
@@ -836,11 +838,11 @@ body.parcours #p-coach{width:360px}
 .pc-hide{display:none!important}
 .pnl.pc-lockp{pointer-events:none}
 .pnl.pc-lockp>*{opacity:.1;filter:grayscale(1)}
-.pnl.pc-lockp::after{content:"🔒  " attr(data-pc-lock);position:absolute;inset:0;display:grid;place-items:center;font:600 11px var(--ui);letter-spacing:.16em;text-transform:uppercase;color:var(--mu);border-radius:inherit;background:repeating-linear-gradient(135deg,transparent 0 10px,rgba(255,255,255,.012) 10px 20px)}
+.pnl.pc-lockp::after{content:attr(data-pc-lock);position:absolute;inset:0;display:grid;place-items:center;font:600 11px var(--ui);letter-spacing:.16em;text-transform:uppercase;color:var(--mu);border-radius:inherit;background:repeating-linear-gradient(135deg,transparent 0 10px,rgba(255,255,255,.012) 10px 20px)}
 .pc-target{z-index:3}
 /* exercices à l'oreille : waveforms et BPM cachés */
 body.pc-blind .lane canvas,body.pc-blind .dk-ov canvas,body.pc-blind .dk-wave canvas,body.pc-blind .dk-stat:last-child b,body.pc-blind #master-bpm,body.pc-blind #coach-live,body.pc-blind .dk-stat.t b{visibility:hidden}
-body.pc-blind .lane::after,body.pc-blind .dk-ov::after{content:"À l’oreille";position:absolute;inset:0;display:grid;place-items:center;font:600 11px var(--ui);letter-spacing:.2em;text-transform:uppercase;color:var(--coach);background:repeating-linear-gradient(90deg,transparent 0 14px,rgba(167,139,250,.05) 14px 15px)}
+body.pc-blind .lane::after,body.pc-blind .dk-ov::after{content:"À l’oreille";position:absolute;inset:0;display:grid;place-items:center;font:600 11px var(--ui);letter-spacing:.2em;text-transform:uppercase;color:var(--coach);background:repeating-linear-gradient(90deg,transparent 0 14px,color-mix(in srgb,var(--coach) 5%,transparent) 14px 15px)}
 /* premier lancement */
 .pc-wel{position:fixed;inset:0;z-index:78;display:grid;place-items:center;padding:16px;background:rgba(5,6,8,.72);backdrop-filter:blur(5px)}
 .pc-welc{width:min(560px,100%);background:linear-gradient(170deg,#191b22,#121418);border:1px solid var(--ln2);border-radius:14px;padding:22px 22px 20px;box-shadow:0 30px 80px rgba(0,0,0,.7);display:grid;gap:10px}
@@ -1543,8 +1545,8 @@ select.sel:hover{background:var(--surface-3);color:var(--text-hi)}
 }
 
 /* ---------- mode scène : surfaces plus noires, contraste renforcé, chiffres en 32 px ---------- */
-html.stage{--surface-0:#000;--surface-1:#0a0b0d;--surface-2:#14161a;--surface-3:#1f2228;--surface-4:#2c3038;--line-1:#2a2e36;--line-2:#3c424d;
-  --text-hi:#fff;--text-mid:#e6e9ee;--text-lo:#c1c7d0;--wave-bg:#000}
+html.stage{--surface-0:#000;--surface-1:#0b0b0c;--surface-2:#151516;--surface-3:#202022;--surface-4:#2e2e31;--line-1:#2b2b2e;--line-2:#424246;
+  --text-hi:#fff;--text-mid:#e8e7e2;--text-lo:#c6c5bf;--wave-bg:#000}
 html.stage .dk-stat b,html.stage .dk-stat b.time{font-size:var(--fs-5)}
 html.stage .dk-stat b.key{font-size:var(--fs-3)}
 html.stage .sz-compact .dk-stat b,html.stage .sz-compact .dk-stat b.time{font-size:var(--fs-5)}
@@ -1576,13 +1578,259 @@ details:not([open])>:not(summary){display:none!important}
 #p-wave:hover>.zoomb,.dk-wave:hover .zoomb,.zoomb:focus-within{visibility:visible;opacity:1}
 /* un seul bouton pour replier la rangée d'effets, sur la dernière unité */
 #p-fx .fxu:not(:last-of-type) .fxfoldb{display:none}
+
+/* =====================================================================
+   Thème v5 · « console » (docs/design/STYLE.md, audit : docs/design/AUDIT-STYLE-IA.md).
+   Une façade de matériel de cabine, pas un tableau de bord web :
+   · modules mats posés côte à côte, séparés par un joint noir, arêtes vives (2 à 4 px) ;
+   · commandes en caoutchouc (léger relief, ombre portée d'un pixel), allumées par rétroéclairage,
+     jamais par un halo ;
+   · potards usinés à graduation, faders à capuchon strié et rail creusé, VU à diodes ;
+   · légendes sérigraphiées en JetBrains Mono, casse normale, sans espacement ; Inter pour lire ;
+   · gris neutres ; couleur de platine pour l'identité, un vert, un ambre, un rouge ; le coach
+     en vert anis, seul.
+   ===================================================================== */
+body{font:500 var(--fs-1)/1.35 var(--ui);font-feature-settings:"cv05","cv08";background:var(--surface-0)}
+:focus-visible{outline:2px solid var(--text-hi);outline-offset:1px}
+/* légendes : sérigraphie en chasse fixe, casse normale */
+.lbl,.dk-stat .lbl,.mclock span,.side .sec,.mst>.nm,.mxc .mst>.nm,.pc-k,.lcard .mod,.ctx-t,.lpe .f>span,.wz-step small,.mgrid h3,.am-tag,.pp-bpm span,#ndecks::before{
+  font:500 var(--fs-1)/1.25 var(--num);letter-spacing:0;text-transform:none;color:var(--text-lo)}
+.pc-k.ok{color:var(--state-ok)}.pc-k.warn{color:var(--state-warn)}
+/* titres de panneau : Inter, casse normale */
+#p-coach h2,.mbox h2,.am-panel h2,.lpe-h b,.pp-h b{font:600 var(--fs-2)/1.2 var(--ui);letter-spacing:0;text-transform:none;color:var(--text-hi)}
+#loading{font:500 var(--fs-2) var(--num);letter-spacing:0;text-transform:none}
+
+/* ---------- barre du haut : un bandeau de façade ---------- */
+#top{background:var(--surface-1);border-bottom:1px solid #000;box-shadow:inset 0 -1px 0 var(--line-1);min-height:42px;gap:6px}
+.brand{font:700 var(--fs-2)/1 var(--ui);letter-spacing:-.01em;color:var(--text-hi);text-transform:none;padding:0 10px 0 4px}
+.seg{background:var(--surface-0);border-radius:var(--r-2);padding:2px;gap:2px;box-shadow:inset 0 1px 2px rgba(0,0,0,.7)}
+.seg button,#top .seg button{border-radius:var(--r-1);font:500 var(--fs-1) var(--ui);color:var(--text-lo);padding:5px 9px}
+.seg button[aria-pressed="true"]{background:linear-gradient(#343437,#2a2a2d);color:var(--text-hi);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 1px 0 #000}
+.tb,#top .tb{border-radius:var(--r-2);font:500 var(--fs-1) var(--ui);padding:6px 9px}
+.tb[aria-pressed="true"]{background:var(--surface-3);color:var(--text-hi);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+/* voyants : petites diodes carrées, sans halo */
+.tb .dot,.coach-hud .dot{width:6px;height:6px;border-radius:1px;background:var(--surface-4);box-shadow:none;animation:none}
+.tb .dot.on{background:var(--state-ok);box-shadow:none}
+#coachlive-dot.on{background:var(--coach);box-shadow:none}
+.tb.rec i{width:7px;height:7px;border-radius:1px}
+.tb.coach[aria-pressed="true"],.tb.pcb[aria-pressed="true"]{color:var(--coach);background:color-mix(in srgb,var(--coach) 10%,var(--surface-2))}
+.mclock{gap:6px}
+.mclock b{font:600 var(--fs-3) var(--num)}
+.ic{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:square;stroke-linejoin:miter;display:block}
+.b .ic,.tb .ic,button .ic{fill:none}
+.ic .f{fill:currentColor;stroke:none}
+.tb .ic,#stage-btn svg{width:16px;height:16px}
+details.menu .pop,details.tbmore .pop,.mxpop,.ctx,.popx,.lpe,.pc-pop{border-radius:var(--r-3);border:1px solid var(--line-2);background:var(--surface-2);box-shadow:0 12px 32px rgba(0,0,0,.6)}
+
+/* ---------- modules : façades mates séparées par un joint ---------- */
+#app{gap:3px;padding:3px;background:#000}
+.pnl{background:var(--surface-1);border:0;border-radius:var(--r-2);box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+.split::before{height:2px;width:36px;margin-left:-18px;border-radius:0;background:var(--line-2)}
+
+/* ---------- boutons : caoutchouc ; allumé = rétroéclairé ---------- */
+.b{border-radius:var(--r-2);background:linear-gradient(#242426,#1d1d1f);color:var(--text-mid);font:500 var(--fs-1) var(--ui);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 0 rgba(0,0,0,.7)}
+.b:hover{background:linear-gradient(#2b2b2e,#242426);color:var(--text-hi)}
+.b:active{background:var(--surface-2);box-shadow:inset 0 1px 2px rgba(0,0,0,.6)}
+.b.on{background:color-mix(in srgb,var(--dc,var(--text-hi)) 20%,var(--surface-2));color:color-mix(in srgb,var(--dc,var(--text-hi)) 80%,#fff);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--dc,var(--text-hi)) 55%,transparent),0 1px 0 rgba(0,0,0,.7)}
+.b.pri{background:var(--text-hi);color:var(--surface-0);box-shadow:0 1px 0 #000}
+.b.go{background:color-mix(in srgb,var(--coach) 16%,var(--surface-2));color:var(--text-hi);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--coach) 45%,transparent)}
+select.sel{border-radius:var(--r-2);background-color:var(--surface-2)}
+.in,.inp,.libbar input[type=search]{border-radius:var(--r-2);background:var(--surface-0);border:1px solid var(--line-2);box-shadow:inset 0 1px 2px rgba(0,0,0,.5)}
+/* transport : deux grosses touches ; Play rétroéclairé à la couleur de la platine, sans halo */
+.b.big{height:40px;border-radius:var(--r-3);font:600 var(--fs-2) var(--ui);letter-spacing:0}
+.b.cue,.b.play{background:linear-gradient(#2c2c2f,#232326);color:var(--text-hi);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 1px 0 #000}
+.b.cue:hover,.b.play:hover{background:linear-gradient(#333336,#2a2a2d)}
+.b.cue.on{background:linear-gradient(#2c2c2f,#232326);color:var(--cue);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--cue) 70%,transparent),0 1px 0 #000}
+.b.cue.held,.b.cue:active{background:var(--cue);color:var(--surface-0);box-shadow:0 1px 0 #000}
+.b.play.on{background:var(--dc);color:var(--surface-0);box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 1px 0 #000}
+.b .ic{width:14px;height:14px}
+/* niveau 3 : réglages, sans relief au repos */
+.dk-xtra .b,.dk-grid .b,.dk-pro .b,.tabs .b,.zoomb .b,.dk-protg,.fxu .fxmode,.fxu .fxfoldb,.xf select,.dk-pitch select.sel,.mxset>summary{box-shadow:none;background:transparent}
+.tabs .b[aria-pressed="true"],.dk-protg[aria-expanded="true"]{background:var(--surface-3);color:var(--text-hi);box-shadow:inset 0 -2px 0 var(--text-lo)}
+
+/* ---------- potards usinés ---------- */
+.kn .tk{stroke:var(--text-lo);stroke-width:1;opacity:.85}
+.kn .tk.c{opacity:1;stroke-width:1.4}
+.kn .tr{stroke:#000;stroke-width:2}
+.kn .vl{stroke-width:2;stroke-linecap:butt}
+.kn .cap{fill:url(#capg);stroke:#000;stroke-width:.8}
+.kn .knurl{fill:none;stroke:rgba(0,0,0,.55);stroke-width:1.2;stroke-dasharray:.8 .9}
+.kn .face{fill:url(#faceg)}
+.kn .ptr{stroke:var(--text-hi);stroke-width:1.8;stroke-linecap:butt}
+.kn.neu .ptr{stroke:var(--text-mid)}
+.kn.killed .ptr{stroke:var(--text-lo)}
+.kn span,.kn .kl{font:500 var(--fs-1)/14px var(--num);color:var(--text-lo)}
+.kn .kl.on{color:#fff;background:var(--state-bad)}
+
+/* ---------- faders : rail creusé, capuchon strié avec trait blanc ---------- */
+.fd::-webkit-slider-runnable-track{background:#000;border:0;border-radius:1px;box-shadow:inset 0 1px 2px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.04)}
+.fd::-webkit-slider-thumb{border:1px solid #000;border-radius:var(--r-1);
+  background:linear-gradient(transparent calc(50% - 1px),var(--text-hi) calc(50% - 1px),var(--text-hi) calc(50% + 1px),transparent calc(50% + 1px)),repeating-linear-gradient(#36363a 0 1px,#29292c 1px 3px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 2px 3px rgba(0,0,0,.7)}
+.fd.v::-webkit-slider-thumb{width:30px;height:18px;margin-left:-13px}
+.fd.h::-webkit-slider-thumb{width:18px;height:28px;margin-top:-12px;
+  background:linear-gradient(90deg,transparent calc(50% - 1px),var(--text-hi) calc(50% - 1px),var(--text-hi) calc(50% + 1px),transparent calc(50% + 1px)),repeating-linear-gradient(90deg,#36363a 0 1px,#29292c 1px 3px)}
+.fd.v.pitch::-webkit-slider-thumb{background:linear-gradient(transparent calc(50% - 1px),var(--text-hi) calc(50% - 1px),var(--text-hi) calc(50% + 1px),transparent calc(50% + 1px)),repeating-linear-gradient(#36363a 0 1px,#29292c 1px 3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 2px 3px rgba(0,0,0,.7)}
+.fd::-moz-range-thumb{background:#2e2e31;border:1px solid #000;border-radius:var(--r-1)}
+/* graduations sérigraphiées : 0 dB en haut (plus long), centre du pitch marqué */
+.fdw::before{background:linear-gradient(var(--text-lo),var(--text-lo)) 0 0/100% 1px no-repeat,
+  repeating-linear-gradient(color-mix(in srgb,var(--text-lo) 55%,transparent) 0 1px,transparent 1px 12.5%) 0 0/6px 100% no-repeat,
+  repeating-linear-gradient(color-mix(in srgb,var(--text-lo) 55%,transparent) 0 1px,transparent 1px 12.5%) 100% 0/6px 100% no-repeat}
+.dk-pitch>[data-ctl]::before{background:linear-gradient(var(--text-mid),var(--text-mid)) 0 50%/100% 1px no-repeat,
+  repeating-linear-gradient(color-mix(in srgb,var(--text-lo) 55%,transparent) 0 1px,transparent 1px 10%) 0 0/5px 100% no-repeat,
+  repeating-linear-gradient(color-mix(in srgb,var(--text-lo) 55%,transparent) 0 1px,transparent 1px 10%) 100% 0/5px 100% no-repeat}
+.xf [data-ctl=xf]::after{background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--text-lo) 55%,transparent) 0 1px,transparent 1px 10%)}
+.vu{border-radius:1px}
+
+/* ---------- waveforms ---------- */
+#p-wave{background:var(--surface-1)}
+.lane,.dk-ov,.dk-wave{border-radius:var(--r-1);box-shadow:inset 0 1px 2px rgba(0,0,0,.8)}
+.dk-ov .ovh::before,.dk-ov .ovh.end::before{box-shadow:0 0 0 1px rgba(0,0,0,.8)}
+.bb{border-radius:var(--r-1)}
+.bb .beats i{border-radius:1px}
+
+/* ---------- platines ---------- */
+.deck.isMaster{box-shadow:inset 0 2px 0 var(--dc),inset 0 0 0 1px color-mix(in srgb,var(--dc) 30%,transparent)}
+.dk-id{width:24px;height:24px;border-radius:var(--r-1);font:700 var(--fs-2) var(--num)}
+.dk-stat b.key,.kchip{border-radius:var(--r-1)}
+/* tonalité : badge neutre ; vert plein seulement quand elle est compatible avec la platine maître */
+.kchip,.dk-stat b.key{--kc:var(--text-lo)!important}
+.lt td.okk .kchip,.dk-stat b.key.ok{--kc:var(--state-ok)!important}
+/* pads : caoutchouc éteint ; posé = rétroéclairé à 22 % avec un filet de couleur ; appuyé = plein */
+.pad,.deck .pad{border:0;border-radius:var(--r-2);background:linear-gradient(#232326,#1c1c1e);color:var(--text-lo);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 0 #000}
+.pad:hover{background:linear-gradient(#2a2a2d,#222224);color:var(--text-hi)}
+.deck .pad.set{border:0;background:color-mix(in srgb,var(--hc) 22%,var(--surface-2));color:var(--text-hi);box-shadow:inset 0 -2px 0 var(--hc),0 1px 0 #000}
+.deck .pad.lit{border:0;background:var(--hc);color:var(--surface-0);box-shadow:0 1px 0 #000}
+/* modes de pads : à la couleur de la platine, pas d'arc-en-ciel */
+.pad.m-roll,.pad.m-jump,.pad.m-smp,.pad.m-slice,.pad.m-sloop,.pad.m-pitch{--hc:var(--dc);border:0;background:linear-gradient(#232326,#1c1c1e);color:var(--text-mid);box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--dc) 35%,transparent),0 1px 0 #000}
+.pad.m-sloop:not(.set){border:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 0 #000}
+
+/* ---------- mixer ---------- */
+.ch>.nm,.mxc .ch>.nm{font:700 var(--fs-2) var(--num)}
+.mst>.nm,.mxc .mst>.nm{box-shadow:inset 0 -2px 0 var(--line-2)}
+.limt{font:500 var(--fs-1) var(--num)}
+
+/* ---------- effets ---------- */
+.fxu{border-radius:var(--r-2);box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+.fxu .tag{font:700 var(--fs-2) var(--num);letter-spacing:0}
+.fxu .asg button{border-radius:var(--r-1);font:600 var(--fs-1) var(--num)}
+.fxu .fxon.on{box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 1px 0 #000}
+.fxu .bseg{border-radius:var(--r-2);box-shadow:inset 0 1px 2px rgba(0,0,0,.6)}
+
+/* ---------- bibliothèque ---------- */
+.side{background:var(--surface-1)}
+.side button.it .ic{width:13px;height:13px;color:var(--text-lo)}
+.lt th{font:500 var(--fs-1) var(--num);letter-spacing:0}
+/* note : cinq repères carrés, pas d'étoiles */
+.lt td.stars{letter-spacing:0;white-space:nowrap}
+.lt td.stars span{display:inline-block;width:7px;height:7px;margin-right:4px;border-radius:1px;background:var(--surface-4);vertical-align:middle}
+.lt td.stars span.on{background:var(--state-warn)}
+.lt td.stars span:hover,.lt td.stars span:hover~span{background:var(--text-lo)}
+.lt td.stars:hover span.on{background:color-mix(in srgb,var(--state-warn) 80%,#fff)}
+.srow{gap:6px}
+.srow .st{width:16px;height:16px;padding:0;border-radius:var(--r-1);background:var(--surface-4)}
+.srow .st.on{background:var(--state-warn)}
+.tagchip,.pc-badge,.ac-tag{border-radius:var(--r-1)}
+.pc-badge{background:var(--surface-3);border:0;color:var(--text-hi);padding:3px 7px;font:500 var(--fs-1) var(--ui)}
+.lt td.nrg i{border-radius:0}
+
+/* ---------- coach, parcours, académie : des sections séparées par un filet, pas des cartes ---------- */
+#p-coach{background:var(--surface-1);border-left:1px solid #000;padding:12px 16px}
+#p-coach h2{padding-bottom:10px;border-bottom:1px solid var(--line-1)}
+.live,.lcard{background:transparent;border:0;border-radius:0;border-bottom:1px solid var(--line-1);padding:0 0 12px}
+.lcard p{color:var(--text-lo)}
+.go{background:var(--coach);color:#14160a;border-radius:var(--r-2);font:600 var(--fs-2) var(--ui);padding:6px 12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 1px 0 #000}
+.go:hover{background:color-mix(in srgb,var(--coach) 88%,#fff)}
+.pc-card{background:transparent}
+.alert{border-radius:var(--r-1);border-left:2px solid var(--state-bad);color:var(--text-mid)}
+.alert.warn{border-left-color:var(--state-warn);color:var(--text-mid)}
+.alert.tip{border-left-color:var(--coach)}
+.now,.donebox,.ac-keys{border-radius:0 var(--r-2) var(--r-2) 0}
+.now{border-left-color:var(--coach)}
+.now .hx{color:var(--text-mid)}
+.prog{border-radius:0}.prog i{background:var(--coach)}
+.phase{border-radius:var(--r-1)}
+.bars i,.beats i{border-radius:1px}
+/* avancement : une rangée de diodes, pas de pastilles */
+.pc-dots{gap:2px}.pc-dots i{width:8px;height:4px;border-radius:0;background:var(--surface-4)}
+.pc-dots i.d{background:var(--text-lo)}.pc-dots i.c{background:var(--coach);box-shadow:none}
+.steps li::before{border-radius:var(--r-1);font:500 var(--fs-1) var(--num)}
+.steps li.done::before{content:"";background:var(--state-ok)}
+.steps li.cur::before{border-color:var(--coach);color:var(--text-hi);background:color-mix(in srgb,var(--coach) 18%,transparent)}
+/* listes de chapitres et de leçons : des lignes, pas des tuiles */
+.pc-map{gap:0;border-top:1px solid var(--line-1)}
+.pc-tile{border:0;border-bottom:1px solid var(--line-1);border-radius:0;background:transparent;padding:7px 4px}
+.pc-tile:hover{background:var(--surface-2)}
+.pc-tile .n{border-radius:var(--r-1);border:1px solid var(--line-2);font:500 var(--fs-1) var(--num);width:20px;height:20px}
+.pc-tile .n .ic{width:12px;height:12px;stroke-width:2}
+.pc-tile.d .n{background:transparent;border-color:color-mix(in srgb,var(--state-ok) 60%,transparent);color:var(--state-ok)}
+.pc-tile.c{box-shadow:inset 2px 0 0 var(--coach)}.pc-tile.c .n{border-color:var(--coach);color:var(--text-hi)}
+.pc-title{font:600 var(--fs-3)/1.25 var(--ui);letter-spacing:0}
+.pc-sum,.ac-ex{background:var(--surface-2);border:0;border-radius:var(--r-2)}
+.pc-tapb{border-radius:var(--r-3);background:linear-gradient(#2c2c2f,#232326);border:0;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--coach) 50%,transparent),0 1px 0 #000;font:600 var(--fs-3) var(--ui);letter-spacing:0}
+.pc-en{display:inline-flex;align-items:center;gap:3px}.pc-en .ic{width:11px;height:11px}
+.pc-setl li,.pc-curve,.ac-curve,.ac-q,.ac-c,.ac-fb,.ac-floor,.trcard,.am-box,.am-q li,.am-sug li,.mlist,pre.tl,.libl li,.pp-list li{border-radius:var(--r-2)}
+.ac-crit li{display:flex;gap:6px;align-items:center}.ac-crit li .ic{width:12px;height:12px}
+.ac-floor{background:var(--surface-0)}
+.ac-floor i{border-radius:1px}
+.pc-gl{border-bottom-color:color-mix(in srgb,var(--text-lo) 70%,transparent)}
+.pc-gl:hover,.pc-gl:focus-visible{color:var(--text-hi)}
+.pc-pop{border-top:2px solid var(--coach)}
+/* commandes verrouillées par le parcours : hachures discrètes, légende en clair */
+.pnl.pc-lockp::after{content:attr(data-pc-lock);font:500 var(--fs-1) var(--num);letter-spacing:0;text-transform:none;color:var(--text-lo);background:repeating-linear-gradient(135deg,transparent 0 7px,rgba(255,255,255,.02) 7px 8px)}
+body.pc-blind .lane::after,body.pc-blind .dk-ov::after{font:500 var(--fs-1) var(--num);letter-spacing:0;text-transform:none;color:var(--text-mid);background:repeating-linear-gradient(90deg,transparent 0 14px,rgba(255,255,255,.03) 14px 15px)}
+.coach-target{border-radius:var(--r-2)}
+
+/* ---------- premier lancement : une feuille de réglage, pas une page d'accueil ---------- */
+.pc-wel{background:rgba(0,0,0,.6);backdrop-filter:none;place-items:start center;padding-top:14vh}
+.pc-welc{width:min(580px,100%);background:var(--surface-1);border:1px solid var(--line-2);border-radius:var(--r-3);padding:0;gap:0;box-shadow:0 24px 60px rgba(0,0,0,.7);overflow:hidden}
+.pc-welh{display:flex;align-items:center;height:34px;padding:0 14px;background:var(--surface-2);border-bottom:1px solid #000}
+.pc-welc .pc-welh h2{margin:0;font:600 var(--fs-2)/1 var(--ui);letter-spacing:0;color:var(--text-hi)}
+.pc-welb{display:grid;gap:16px;padding:14px 14px 16px}
+.pc-welc .pc-welb>p{margin:0;font:400 var(--fs-2)/1.5 var(--ui);color:var(--text-mid)}
+.pc-welg{display:grid;gap:6px}
+.pc-opts{display:grid;grid-template-columns:minmax(0,1fr);gap:0;margin:0;border:1px solid var(--line-2);border-radius:var(--r-2);overflow:hidden}
+.pc-opt{display:grid;grid-template-columns:minmax(0,1fr) auto 16px;align-items:center;gap:12px;padding:10px 12px;border:0;border-radius:0;background:var(--surface-1);color:var(--text-mid);text-align:left;transition:none}
+.pc-opt+.pc-opt{border-top:1px solid var(--line-2)}
+.pc-opt .pc-optt{display:grid;gap:2px}
+.pc-opt b,#pc-novice b{font:600 var(--fs-2)/1.3 var(--ui);color:var(--text-hi)}
+.pc-opt .pc-optt span{font:400 var(--fs-2)/1.4 var(--ui);color:var(--text-lo)}
+.pc-opt em{font:500 var(--fs-1) var(--num);font-style:normal;color:var(--text-lo);white-space:nowrap}
+.pc-opt .ic{color:var(--text-lo)}
+#pc-novice{background:var(--surface-1);border:0;box-shadow:inset 3px 0 0 var(--coach)}
+.pc-opt:hover,.pc-opt:focus-visible,#pc-novice:hover,#pc-novice:focus-visible{background:var(--surface-2);outline:0}
+.pc-opt:focus-visible .ic,.pc-opt:hover .ic{color:var(--text-hi)}
+.pc-from{display:flex;gap:4px;flex-wrap:wrap;padding:0;border:0;border-radius:0}
+.pc-fromb{height:28px;padding:0 12px;border:0;border-radius:var(--r-2);background:linear-gradient(#242426,#1d1d1f);color:var(--text-mid);font:500 var(--fs-2) var(--ui);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 0 #000}
+.pc-fromb:hover,.pc-fromb:focus-visible{color:var(--text-hi);background:linear-gradient(#2b2b2e,#242426);border:0}
+.pc-welf{display:flex;justify-content:space-between;gap:12px;padding:8px 14px;border-top:1px solid var(--line-1);font:500 var(--fs-1) var(--num);color:var(--text-lo)}
+.pc-welf kbd{margin-right:4px}
+
+/* ---------- fenêtres, menus, bulles ---------- */
+.modal{background:rgba(0,0,0,.6)}
+.mbox{border-radius:var(--r-3);background:var(--surface-1);border:1px solid var(--line-2);box-shadow:0 24px 60px rgba(0,0,0,.7)}
+.mbox>h2{margin:-14px -16px 14px;padding:8px 16px;min-height:36px;align-items:center;background:var(--surface-2);border-bottom:1px solid #000}
+kbd{border-radius:var(--r-1);font:500 var(--fs-1) var(--num)}
+.toast{border-radius:var(--r-2);box-shadow:inset 3px 0 0 var(--text-lo),0 10px 30px rgba(0,0,0,.6)}
+.toast.ok{box-shadow:inset 3px 0 0 var(--state-ok),0 10px 30px rgba(0,0,0,.6)}
+.coach-hud{background:var(--surface-2);backdrop-filter:none;border-radius:var(--r-2);border:1px solid var(--line-2);border-left:3px solid var(--coach)}
+.coach-hud.bad{border-left-color:var(--state-bad)}.coach-hud.warn{border-left-color:var(--state-warn)}
+.coach-hud .dot{display:none}
+.am-panel{border-radius:var(--r-3)}
+.am-box{border-left-width:2px}
+.learnbar{border-radius:var(--r-2)}
+.learnbar,.learnbar .mopts,.learnbar .mopt label{color:#14160a}
+details.menu input[type=checkbox],.am-fill input,.ac-row input{accent-color:var(--text-hi)}
+/* dans la liste des cours, « Commencer » reste secondaire : une seule touche pleine à la fois (l'étape en cours) */
+.lcard .go{background:linear-gradient(#242426,#1d1d1f);color:var(--coach);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--coach) 40%,transparent),0 1px 0 #000}
+.lcard .go:hover{background:linear-gradient(#2b2b2e,#242426);color:color-mix(in srgb,var(--coach) 80%,#fff)}
 </style>
 
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><radialGradient id="capg" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#4a505c"/><stop offset="1" stop-color="#16181d"/></radialGradient></defs></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="capg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4b4b4f"/><stop offset="1" stop-color="#1c1c1e"/></linearGradient><radialGradient id="faceg" cx="50%" cy="38%" r="65%"><stop offset="0" stop-color="#3b3b3e"/><stop offset="1" stop-color="#2a2a2d"/></radialGradient></defs></svg>
 
 <div id="root">
   <header id="top">
-    <div class="brand">MIXLAB</div>
+    <div class="brand">Mixlab</div>
     <div class="seg" id="presets" role="group" aria-label="Disposition"></div>
     <div class="seg" id="ndecks" role="group" aria-label="Nombre de platines"><button data-n="2">2 platines</button><button data-n="4">4 platines</button></div>
     <details class="menu"><summary class="tb" title="Panneaux, zoom, taille des platines, mode scène">Affichage</summary><div class="pop" id="panels-pop"></div></details>
@@ -1661,6 +1909,7 @@ details:not([open])>:not(summary){display:none!important}
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
 <script src="tauri-bridge.js"></script>
+<script src="icons.js"></script>
 <script src="engine.js"></script>
 <script src="desktop.js"></script>
 <script src="app.js"></script>
