@@ -109,7 +109,7 @@ window.Coach=(()=>{
     render();const now=$('#coach-now');if(now&&!skip)now.classList.add('flash');
   }
   function tick(dt){
-    if($('#p-coach').hidden)return;
+    if($('#p-coach').hidden||!live.nd)return;
     const a=A(),b=B();
     if(a.track&&b.track){const df=b.bpm-a.bpm;live.tempo.textContent=`A ${a.bpm.toFixed(2)} · B ${b.bpm.toFixed(2)} · écart ${df>=0?'+':''}${df.toFixed(2)}`;live.tempo.style.color=Math.abs(df)<.05?'var(--ok)':'';}
     const ms=phaseMs();

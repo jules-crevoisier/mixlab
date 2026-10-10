@@ -76,10 +76,10 @@ window.MixCoach=(()=>{
       if(x.inc||!x.main||x.main.loop.on)return null;const r=remaining(x.main);if(r>30)return null;
       const next=decks.find(d=>d!==x.main&&d.active&&d.track&&!d.playing);
       if(!next)return{msg:`${x.main.id} se termine dans ${r.toFixed(0)} s`,why:'Charge le morceau suivant sur une autre platine, maintenant.',target:null,sev:r<12?'bad':'warn'};
-      return{msg:`${x.main.id} se termine dans ${r.toFixed(0)} s`,why:`Lance ${next.id} sur le prochain début de phrase (compteur P), fader encore bas.`,target:next.id+'.play',sev:r<12?'bad':'warn'};}},
+      return{msg:`${x.main.id} se termine dans ${r.toFixed(0)} s`,why:`Lance ${next.id} sur le prochain début de phrase (compteur P)${next.p.fader<.3?', fader encore bas, puis monte-le':''}.`,target:next.id+'.play',sev:r<12?'bad':'warn'};}},
     {id:'silence',sev:'bad',after:.8,test(x){
       if(x.aud.length||now()-C.lastAud>20)return null;
-      const next=decks.find(d=>d.active&&d.track);
+      const ready=d=>d.active&&d.track&&d.position()<d.track.duration-5,next=decks.find(d=>ready(d)&&!d.playing)||decks.find(ready);
       return{msg:'Silence sur la piste de danse',why:next?`Relance du son tout de suite : PLAY sur ${next.id} et fader en haut.`:'Charge un morceau et lance-le.',target:next?next.id+'.play':null};}},
     {id:'filter',sev:'tip',after:15,test(x){
       if(x.inc||!x.main||Math.abs(x.main.p.filter-.5)<.1)return null;

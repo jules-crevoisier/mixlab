@@ -430,7 +430,7 @@ select.sel{background:#181b20;border:1px solid #262a31;border-radius:6px;height:
 .go{border-radius:6px;padding:6px 12px}
 
 /* ---------- coach en direct ---------- */
-.coach-hud{position:fixed;left:50%;top:54px;transform:translateX(-50%);z-index:40;display:flex;align-items:center;gap:10px;max-width:min(560px,calc(100vw - 32px));padding:8px 10px 8px 12px;border-radius:8px;background:rgba(14,16,20,.94);border:1px solid var(--ln);border-left:4px solid var(--coach);box-shadow:0 8px 28px rgba(0,0,0,.45);backdrop-filter:blur(6px);font:12px/1.35 var(--ui);color:var(--tx);pointer-events:auto}
+.coach-hud{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:40;display:flex;align-items:center;gap:10px;max-width:min(560px,calc(100vw - 32px));padding:8px 10px 8px 12px;border-radius:8px;background:rgba(14,16,20,.94);border:1px solid var(--ln);border-left:4px solid var(--coach);box-shadow:0 8px 28px rgba(0,0,0,.45);backdrop-filter:blur(6px);font:12px/1.35 var(--ui);color:var(--tx);pointer-events:auto}
 .coach-hud[hidden]{display:none}
 .coach-hud.bad{border-left-color:var(--bad)}.coach-hud.warn{border-left-color:var(--warn)}.coach-hud.tip{border-left-color:var(--coach)}
 .coach-hud .dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--coach);animation:coachPulse 1s ease-in-out infinite}
@@ -451,7 +451,7 @@ select.sel{background:#181b20;border:1px solid #262a31;border-radius:6px;height:
 .trcard .sc{display:inline-block;min-width:26px;text-align:center;border-radius:3px;font:700 11px var(--num);color:#05070a;padding:1px 3px}
 .trcard .sc.ok{background:var(--ok)}.trcard .sc.warn{background:var(--warn)}.trcard .sc.bad{background:var(--bad)}
 .trcard ul{margin:5px 0 0;padding-left:16px;display:grid;gap:3px}.trcard li.g{color:var(--ok)}.trcard li.t{color:var(--tx)}
-@media (max-width:700px){.coach-hud{top:auto;bottom:12px}}
+
 /* ---------- auto-mix, suggestions, énergie ---------- */
 .am-panel{position:fixed;right:10px;top:46px;z-index:45;width:min(350px,calc(100vw - 20px));max-height:calc(100vh - 60px);overflow:auto;background:#0f1115;border:1px solid var(--ln2);border-radius:9px;box-shadow:0 18px 50px rgba(0,0,0,.6);padding:10px 12px;display:grid;gap:8px;font:12px/1.35 var(--ui);color:var(--tx)}
 .am-panel[hidden]{display:none}
