@@ -1,9 +1,16 @@
 <meta charset="utf-8">
 <title>Mixlab</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
 <style>
+/* Polices embarquées (licence SIL OFL 1.1, voir fonts/) : l'appli marche hors ligne, en club sans wifi. */
+@font-face{font-family:Inter;font-style:normal;font-weight:400;font-display:swap;src:url(fonts/inter-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:Inter;font-style:normal;font-weight:500;font-display:swap;src:url(fonts/inter-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:Inter;font-style:normal;font-weight:600;font-display:swap;src:url(fonts/inter-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:Inter;font-style:normal;font-weight:700;font-display:swap;src:url(fonts/inter-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:Inter;font-style:normal;font-weight:800;font-display:swap;src:url(fonts/inter-latin-800-normal.woff2) format('woff2')}
+@font-face{font-family:"JetBrains Mono";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/jetbrains-mono-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:"JetBrains Mono";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/jetbrains-mono-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:"JetBrains Mono";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/jetbrains-mono-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:"JetBrains Mono";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/jetbrains-mono-latin-700-normal.woff2) format('woff2')}
 /* Mixlab · écran plein, panneaux denses sur fond quasi noir, comme en cabine.
    La grille des panneaux est recomposée en JS selon la disposition choisie. */
 :root{
@@ -25,7 +32,7 @@ button,select,input,textarea{font:inherit;color:inherit}
 #root{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr)}
 
 /* ---------- barre supérieure ---------- */
-#top{display:flex;align-items:center;gap:6px;padding:4px 8px;padding-top:calc(4px + env(safe-area-inset-top,0px));background:#0c0d10;border-bottom:1px solid var(--ln);min-height:34px;flex-wrap:wrap}
+#top{display:flex;align-items:center;gap:6px;padding:4px 8px;padding-top:calc(4px + env(safe-area-inset-top,0px));background:#0c0d10;border-bottom:1px solid var(--ln);min-height:34px;flex-wrap:nowrap;min-width:0}
 .brand{font:700 14px var(--ui);letter-spacing:.32em;color:var(--white);padding-right:10px;margin-right:2px;border-right:1px solid var(--ln);line-height:1}
 .brand small{display:block;font:500 8px var(--ui);letter-spacing:.2em;color:var(--dim);margin-top:2px}
 .seg{display:flex;background:var(--s1);border:1px solid var(--ln);border-radius:3px;overflow:hidden}
@@ -55,7 +62,7 @@ details.menu label{display:flex;gap:7px;align-items:center;padding:3px 0;cursor:
 
 /* ---------- scène et panneaux ---------- */
 #stage{display:flex;min-height:0}
-#app{flex:1;min-width:0;display:grid;gap:4px;padding:4px;min-height:0;overflow:auto;align-content:stretch}
+#app{flex:1;min-width:0;display:grid;gap:4px;padding:4px;min-height:0;overflow:hidden;align-content:stretch}
 .pnl{background:var(--s1);border:1px solid var(--ln);border-radius:4px;min-width:0;min-height:0;position:relative}
 .lbl{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-weight:600}
 
@@ -132,7 +139,7 @@ select.sel{background:var(--s2);border:1px solid var(--ln2);border-radius:3px;he
 .zoomb .b{height:18px;min-width:18px;padding:0 4px;opacity:.8}
 
 /* ---------- platines ---------- */
-.deck{padding:6px;display:grid;gap:6px;align-content:start;--dc:var(--A);min-height:auto}
+.deck{padding:6px;display:grid;gap:6px;align-content:start;--dc:var(--A);min-height:auto;overflow:hidden}
 #p-fx,#p-wave,#p-mixer{min-height:auto}
 .deck[data-deck="B"]{--dc:var(--B)}.deck[data-deck="C"]{--dc:var(--C)}.deck[data-deck="D"]{--dc:var(--D)}
 .deck{container-type:inline-size}
@@ -157,21 +164,21 @@ select.sel{background:var(--s2);border:1px solid var(--ln2);border-radius:3px;he
 .dk-stat b.time.end{color:var(--bad)}
 .dk-ov{position:relative;height:30px;background:#050608;border-radius:2px;cursor:pointer}
 .dk-ov canvas,.dk-wave canvas{width:100%;height:100%;display:block}
-.dk-wave{height:76px;background:#050608;border-radius:2px;display:none;touch-action:none;cursor:grab}
+.dk-wave{height:var(--dkw);background:#050608;border-radius:2px;display:none;touch-action:none;cursor:grab}
 .deck-waves .dk-wave{display:block}
 .dk-mid{display:grid;grid-template-columns:auto minmax(0,1fr) 54px;grid-template-areas:"plat ctr pitch";gap:8px;align-items:stretch}
 .deck.right .dk-mid{grid-template-columns:54px minmax(0,1fr) auto;grid-template-areas:"pitch ctr plat"}
 .dk-plat{grid-area:plat;width:var(--jog);height:var(--jog);touch-action:none;cursor:grab;align-self:center}
 .dk-plat canvas{width:100%;height:100%;display:block}
 .no-jog .dk-plat{display:none}
-.no-jog .dk-mid,.compact .dk-mid{grid-template-columns:minmax(0,1fr) 54px;grid-template-areas:"ctr pitch"}
-.no-jog .deck.right .dk-mid,.compact .deck.right .dk-mid{grid-template-columns:54px minmax(0,1fr);grid-template-areas:"pitch ctr"}
+.no-jog .dk-mid,.deck.sz-compact .dk-mid{grid-template-columns:minmax(0,1fr) 54px;grid-template-areas:"ctr pitch"}
+.no-jog .deck.right .dk-mid,.deck.sz-compact.right .dk-mid{grid-template-columns:54px minmax(0,1fr);grid-template-areas:"pitch ctr"}
 .dk-ctr{grid-area:ctr;display:grid;gap:4px;align-content:end;min-width:0}
 .r{display:flex;gap:3px;align-items:center;min-width:0}
 .r>.b{flex:1}
 .r.fixed>.b{flex:none}
 .keyd{font:600 11px var(--num);min-width:34px;text-align:center;color:var(--white)}
-.dk-pitch{grid-area:pitch;display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;justify-items:center;gap:4px;height:max(var(--jog),176px)}
+.dk-pitch{grid-area:pitch;display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;justify-items:center;gap:4px;height:max(var(--jog),150px)}
 .dk-pitch>[data-ctl]{min-height:0;height:100%}
 .pv{font:500 10.5px var(--num);color:var(--white);font-variant-numeric:tabular-nums}
 .fd{appearance:none;-webkit-appearance:none;background:transparent;margin:0;cursor:pointer}
@@ -200,12 +207,11 @@ select.sel{background:var(--s2);border:1px solid var(--ln2);border-radius:3px;he
 .pad.m-roll,.pad.m-jump,.pad.m-smp,.pad.m-slice,.pad.m-sloop,.pad.m-pitch{color:color-mix(in srgb,var(--hc) 80%,#fff);border-color:color-mix(in srgb,var(--hc) 35%,#2a2e37)}
 .dk-loop .sz{font:600 11px var(--num);min-width:30px;text-align:center;color:var(--white)}
 .dk-loop .b.loopon{--dc:var(--ok)}
-.compact .dk-plat{display:none}
-.compact .pads{grid-template-columns:repeat(8,minmax(0,1fr))}
-.compact .pad{height:24px}
-.compact .dk-pitch{height:132px}
-.compact .dk-grid{display:none}
-.compact .dk-wave{height:54px}
+.sz-compact .dk-plat,.sz-mini .dk-plat{display:none}
+.sz-compact .pads{grid-template-columns:repeat(8,minmax(0,1fr))}
+.sz-compact .pad{height:24px}
+.sz-compact .dk-grid{display:none}
+.sz-compact .dk-wave{height:calc(var(--dkw) * .75)}
 
 /* ---------- mixer ---------- */
 #p-mixer{padding:6px 6px 4px;display:grid;gap:4px;align-content:start}
@@ -218,7 +224,7 @@ select.sel{background:var(--s2);border:1px solid var(--ln2);border-radius:3px;he
 .ch .kill.on{background:var(--bad);border-color:var(--bad)}
 .ch .cueb{width:44px;height:20px}
 .ch .cueb.on{--dc:var(--warn)}
-.fdr{display:flex;gap:4px;height:120px;align-items:stretch}
+.fdr{display:flex;gap:4px;height:var(--fdr,120px);align-items:stretch}
 .fdr>[data-ctl]{height:100%}
 .vu{width:8px;height:100%;display:block;border-radius:1px;background:#050608}
 .xfa{display:flex}
@@ -226,7 +232,7 @@ select.sel{background:var(--s2);border:1px solid var(--ln2);border-radius:3px;he
 .xfa button[aria-pressed="true"]{color:var(--white);background:#2a2e37}
 .mst{width:70px;display:grid;justify-items:center;gap:4px;padding:2px 0;border-left:1px solid var(--ln);border-right:1px solid var(--ln);margin:0 2px}
 .mst .nm{font:700 10px var(--ui);letter-spacing:.14em;color:var(--white)}
-.mvu{display:flex;gap:2px;height:120px}
+.mvu{display:flex;gap:2px;height:var(--fdr,120px)}
 .vu.lim{width:5px;background:#050608}
 .limt{font:700 10px var(--ui);letter-spacing:.08em;color:#4a505b;margin-top:-2px}.limt.on{color:var(--warn)}
 .mst .mxs{width:66px;padding:0 2px}
@@ -398,7 +404,7 @@ kbd{font:500 10px var(--num);border:1px solid var(--ln2);border-bottom-width:2px
    ===================================================================== */
 :root{
   --bg:#0a0b0d;--s1:#131519;--s2:#181b20;--s3:#21252c;--ln:#1d2026;--ln2:#2a2e36;
-  --tx:#d9dde3;--mu:#8d94a0;--dim:#5d636e;--white:#f5f7fa;
+  --tx:#d9dde3;--mu:#a3aab5;--dim:#8a919c;--white:#f5f7fa;
   --A:#2ec5e8;--B:#ff8f3a;--C:#ff5fa2;--D:#3fd68f;
   --cue:#f5b83d;--coach:#a78bfa;
   --ui:Inter,"Segoe UI",system-ui,sans-serif;
@@ -478,10 +484,10 @@ select.sel{background:#181b20;border:1px solid #262a31;border-radius:6px;height:
 }
 .tabs .b[aria-pressed="true"]{color:var(--white);background:var(--s3);border-color:var(--ln2)}
 .pads{gap:5px}
-.pad{height:38px;border-radius:7px;background:#16191e;border-color:#2a2f37;color:#a3aab5;font:600 11px var(--num);overflow:hidden}
+.pad{height:34px;border-radius:7px;background:#16191e;border-color:#2a2f37;color:#a3aab5;font:600 11px var(--num);overflow:hidden}
 .pad.set{background:color-mix(in srgb,var(--hc) 72%,#000);border-color:color-mix(in srgb,var(--hc) 90%,#fff);color:#0a0b0d;box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
 .pad.lit{background:var(--hc);box-shadow:0 0 16px color-mix(in srgb,var(--hc) 55%,transparent)}
-.compact .pad{height:28px}
+.sz-compact .pad{height:28px}
 .dk-loop .sz{font:700 12px var(--num)}
 
 /* mixer */
@@ -841,6 +847,217 @@ body.pc-blind .lane::after,body.pc-blind .dk-ov::after{content:"À l’oreille";
 @media (max-width:1640px){.clock,.mclock span,.brand small{display:none}#top .seg button,#top .tb{padding:4px 7px}#top{gap:6px}}
 @media (max-width:1100px){body.parcours #p-coach{width:auto}}
 @media (prefers-reduced-motion:reduce){.pc-tapb.hit,.pc-tapb:active{animation:none}}
+/* =====================================================================
+   Interface live : portable de 13 à 15", cabine sombre.
+   Zoom global, rien ne défile, séparateurs, tailles de platine (mini,
+   compacte, complète), bibliothèque plein écran, mode scène, presets.
+   ===================================================================== */
+#root,.modal,.toasts,.coach-hud,.am-panel:not(.docked),.learnbar{zoom:var(--uiz,1)}
+#top>*{flex:none}
+#top>.spacer{flex:1 1 0;min-width:0}
+#top>.note{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tb.ico{padding:3px 8px;font-size:14px;letter-spacing:0;line-height:1}
+#ndecks::before{content:"Platines";display:none;align-self:center;padding:0 6px 0 7px;font:600 9.5px var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+#top{overflow:hidden}
+@media (max-width:1800px){
+  #top{gap:5px;padding-left:8px;padding-right:8px}
+  .brand{letter-spacing:.2em;font-size:12px;padding-right:8px}
+  .seg button{padding:4px 7px;letter-spacing:.04em}
+  .tb{padding:5px 7px;letter-spacing:.04em}
+  #ndecks .w{display:none}
+  #ndecks::before{display:block}
+}
+@media (max-width:1500px){#stage-btn{display:none}}
+@media (max-width:1380px){
+  #ndecks::before{display:none}
+  #ndecks button{padding:4px 9px}
+  .tb{padding:5px 6px}.seg button{padding:4px 6px}
+  .brand{letter-spacing:.14em}
+}
+details.menu .pop.vmenu{min-width:260px;gap:3px;padding:8px 10px 10px}
+.vmenu>.lbl{margin-top:7px}
+.vmenu .zv{min-width:60px;font-family:var(--num)}
+.vmenu .vm-acts{flex-wrap:wrap;margin-top:6px}
+.vmenu>.b{margin-top:4px;justify-self:start}
+
+/* contraste : libellés plus clairs et un peu plus grands (≥ 4,5:1) */
+.lbl{font-size:9.5px}
+.kn span{font-size:9.5px;color:var(--dim)}
+.dk-stat .lbl{font-size:9px}
+.lt th{font-size:10px;color:var(--dim)}
+.tabs .b{font-size:10px}
+.xfa button{font-size:9px;color:var(--mu)}
+.mclock span{color:var(--dim)}
+
+/* pendant le calcul de la répartition, le contenu de la bibliothèque n'est pas remis en page */
+#app.fitting>#p-lib,#app.fitting>#p-side,#app.fitting>#p-prep{content-visibility:hidden}
+/* séparateurs à glisser */
+.split{position:relative;z-index:3;margin:-6px 0;cursor:row-resize;touch-action:none;border-radius:4px;outline-offset:-2px}
+.split::before{content:"";position:absolute;left:50%;top:50%;width:46px;height:3px;margin:-1.5px 0 0 -23px;border-radius:2px;background:var(--ln2);transition:width .12s,background .12s}
+.split:hover::before,.split.drag::before,.split:focus-visible::before{background:var(--coach);width:96px;margin-left:-48px}
+body:has(.split.drag){cursor:row-resize;user-select:none}
+
+/* en-tête de platine : clic = taille ; titre jamais réduit à une lettre */
+.dk-head.clk{cursor:pointer;border-radius:6px}
+.dk-head.clk:hover .dk-id{box-shadow:0 0 0 2px color-mix(in srgb,var(--dc) 45%,transparent)}
+.dk-id{flex:none}
+.dk-head>div:nth-child(2){min-width:0}
+@container (max-width:380px){
+  .dk-head{grid-template-columns:26px repeat(3,minmax(0,1fr));row-gap:4px;column-gap:8px}
+  .dk-head>div:nth-child(2){grid-column:2/-1}
+  .dk-head .dk-stat{grid-row:2;justify-items:start}
+  .dk-head .dk-stat.t{grid-column:2}.dk-head .dk-stat.k{grid-column:3}.dk-head .dk-stat:last-child{grid-column:4;justify-items:end}
+}
+@container (max-width:430px){
+  .dk-loop>.lbl,.dk-loop>[data-ctl$=".jumpback"],.dk-loop>[data-ctl$=".jumpback"]~*{display:none}
+}
+@container (max-width:300px){
+  .dk-head{grid-template-columns:22px auto auto minmax(0,1fr);column-gap:7px}
+  .deck .dk-head .dk-stat b{font-size:17px}.deck .dk-head .dk-stat b.key,.deck .dk-head .dk-stat b.time{font-size:13px}
+  html.stage .deck .dk-head .dk-stat b{font-size:20px}html.stage .deck .dk-head .dk-stat b.key,html.stage .deck .dk-head .dk-stat b.time{font-size:15px}
+}
+.dk-wave{position:relative}
+/* les canvas ne dictent jamais la hauteur de leur boîte (sinon elle grandit à chaque redimensionnement) */
+.lane canvas,.dk-ov canvas,.dk-wave canvas{position:absolute;left:0;top:0;width:100%;height:100%}
+.dk-wave .zoomb{opacity:0;transition:opacity .12s}.dk-wave:hover .zoomb{opacity:1}
+
+/* platine complète : un peu plus serrée */
+.deck{padding:8px 10px;gap:7px}
+/* platine compacte : sans jog ni grille ; pitch sur toute la hauteur, à côté des
+   commandes, des pads (une ligne) et des boucles */
+.deck.sz-compact{grid-template-columns:minmax(0,1fr) 54px;grid-template-areas:"head head" "ov ov" "ctr pitch" "pads pitch" "loop pitch"}
+.deck.sz-compact.right{grid-template-columns:54px minmax(0,1fr);grid-template-areas:"head head" "ov ov" "pitch ctr" "pitch pads" "pitch loop"}
+.deck-waves .deck.sz-compact,.prep-mode .deck.big.sz-compact{grid-template-areas:"head head" "ov ov" "dw dw" "ctr pitch" "pads pitch" "loop pitch"}
+.deck-waves .deck.sz-compact.right{grid-template-areas:"head head" "ov ov" "dw dw" "pitch ctr" "pitch pads" "pitch loop"}
+.sz-compact .dk-mid{display:contents}
+.sz-compact>.dk-head{grid-area:head}.sz-compact>.dk-ov{grid-area:ov}.sz-compact>.dk-wave{grid-area:dw}.sz-compact .dk-ctr{grid-area:ctr}
+.sz-compact>.dk-pads{grid-area:pads}.sz-compact>.dk-loop{grid-area:loop}
+.deck.sz-compact .dk-pitch{grid-area:pitch;height:auto;min-height:0}
+.dk-pitch>[data-ctl]{contain:size;height:auto!important;min-height:40px}
+.sz-compact .dk-ctr{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;align-content:start}
+.sz-compact .dk-ctr>.r{display:contents}
+.sz-compact .dk-ctr>.r>*{grid-column:span 2}
+.sz-compact .dk-ctr>.r:has([data-ctl$=".slip"]),.sz-compact .dk-ctr>.r:has([data-ctl$=".keylock"])>:not([data-ctl]){display:none}
+.sz-compact .dk-ctr .b.big{grid-column:span 3;height:40px}
+.sz-compact .dk-stat b{font-size:22px}.sz-compact .dk-stat b.key,.sz-compact .dk-stat b.time{font-size:16px}
+.sz-compact .dk-ov{height:28px}
+.sz-compact .tabs .b{height:20px}
+/* platine mini : en-tête, vue d'ensemble, Cue Play Sync Master */
+.sz-mini{gap:5px;padding:7px 9px}
+.sz-mini .dk-pitch,.sz-mini .dk-pads,.sz-mini .dk-loop,.sz-mini .dk-grid,.sz-mini .dk-artist{display:none}
+.deck.sz-mini .dk-mid,.deck.sz-mini.right .dk-mid{grid-template-columns:minmax(0,1fr)!important;grid-template-areas:"ctr"!important}
+.sz-mini .dk-ctr{display:flex;gap:4px;align-items:center}
+.sz-mini .dk-ctr>.r{display:contents}
+.sz-mini .dk-ctr>.r:has([data-ctl$=".keylock"]),.sz-mini .dk-ctr>.r:has([data-ctl$=".slip"]){display:none}
+.sz-mini .dk-ctr .b{flex:1;height:28px;min-width:0}
+.sz-mini .dk-ctr .b.big{order:-1;height:28px;font-size:11px;border-radius:7px}
+.sz-mini .b.play svg{width:16px;height:14px}
+/* la vue d'ensemble (ou la waveform de la platine) prend la hauteur laissée par le mixer */
+.deck.sz-mini{grid-template-rows:auto minmax(22px,1fr);align-content:stretch}
+.deck-waves .deck.sz-mini{grid-template-rows:auto 22px minmax(calc(var(--dkw) * .6),1fr)}
+.sz-mini .dk-ov{height:auto;min-height:22px}
+.deck-waves .sz-mini .dk-wave{height:auto;min-height:calc(var(--dkw) * .6)}
+.sz-mini .dk-wave{height:calc(var(--dkw) * .6)}
+.sz-mini .dk-stat b{font-size:19px}.sz-mini .dk-stat b.key,.sz-mini .dk-stat b.time{font-size:14px}
+.sz-mini .dk-stat .lbl{font-size:8.5px}
+.sz-mini .dk-id{width:22px;height:22px;font-size:12px}
+.sz-mini .dk-title{font-size:13px}
+
+/* mixer élastique, et mixer compact (potards sur deux colonnes) */
+#p-mixer{overflow:hidden}
+#p-mixer.mxc{padding:6px 5px 5px}
+.mxc .mx{gap:4px}
+.mxc .ch{width:auto;grid-template-columns:repeat(3,27px);column-gap:6px;row-gap:1px;justify-items:center}
+.mxc .ch>.nm,.mxc .ch>.fdr,.mxc .ch>.xfa{grid-column:1/-1}
+.mxc .kn svg{width:25px;height:25px}
+.mxc .kn span{font-size:9px;letter-spacing:.06em}
+.mxc .ch .kill{right:-7px;top:0;width:10px;height:10px}
+.mxc .ch .cueb{width:28px;height:22px;padding:0;align-self:center;font-size:9px}
+.mxc .mst{width:58px;gap:3px}
+.mxc .mst [data-ctl=cuemix],.mxc .mst [data-ctl=samplervol],.mxc .mst [data-ctl=split]{display:none}
+.mxc .xf{padding-top:3px}
+
+/* bibliothèque plein écran : waveforms en bandeau, la liste prend tout */
+#app.lib-full>:not(#p-lib):not(#p-wave):not(#p-side){display:none!important}
+#app.lib-full .beatrow,#app.lib-full .zoomb{display:none!important}
+#lib-btn[aria-pressed="true"],#stage-btn[aria-pressed="true"]{color:var(--white);border-color:var(--coach);background:color-mix(in srgb,var(--coach) 18%,#121418)}
+
+/* École : moins de commandes, coach à droite (environ un quart de l'écran) */
+.simple .dk-grid,.simple .dk-ctr>.r:has([data-ctl$=".slip"]){display:none}
+#p-coach{width:clamp(300px,25vw,420px)}
+
+/* Préparation : grand lecteur, structure, cues, grille */
+.prep-mode .deck.big .dk-wave{display:block;height:var(--dkw)}
+.prep-mode .deck.big .dk-ov{height:42px}
+.prep-mode .deck.big.sz-compact .dk-wave{height:calc(var(--dkw) * .8)}
+#p-prep{contain:size;overflow:auto;padding:10px 12px;display:grid;gap:12px;align-content:start;--dc:var(--A)}
+.pp-h{display:grid;grid-template-columns:auto minmax(0,1fr);gap:9px;align-items:center}
+.pp-h b{font:700 11px var(--ui);letter-spacing:.16em;text-transform:uppercase;color:var(--white)}
+.pp-t{color:var(--mu);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pp-sec{display:grid;gap:5px}
+.pp-bpm{display:flex;align-items:baseline;gap:6px}.pp-bpm b{font:700 26px var(--num);color:var(--white);letter-spacing:-.02em}.pp-bpm span{color:var(--dim);font-size:10px;letter-spacing:.14em;font-weight:600}
+.r.fixed.pp-g>.b{flex:1}
+.pp-list{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.pp-list li{display:grid;grid-template-columns:20px 62px minmax(0,1fr) auto;gap:6px;align-items:center;min-height:24px;padding:1px 6px 1px 3px;border-radius:5px;background:#111317;font-size:12px}
+.pp-list li>span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--tx)}
+.pp-list li i{width:18px;height:18px;border-radius:4px;background:var(--hc);color:#0a0b0d;font:700 10px/18px var(--num);text-align:center;font-style:normal}
+.pp-list li.empty i{background:transparent;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--hc) 70%,transparent);color:var(--mu)}
+.pp-list.mem li i,.pp-list.sec li i{width:6px;height:16px;border-radius:2px;justify-self:center}
+.pp-list.sd-hist li i{font-size:10px}
+.pp-go{background:none;border:0;padding:3px 0;text-align:left;color:var(--white);font:500 11.5px var(--num);cursor:pointer;white-space:nowrap}
+.pp-go:hover{color:var(--dc)}
+.pp-list li.empty .pp-go{color:var(--mu);font:500 11px var(--ui)}
+.pp-x{background:none;border:0;color:var(--mu);font-size:15px;line-height:1;cursor:pointer;padding:0 2px}.pp-x:hover{color:var(--bad)}
+.pp-empty{margin:0;color:var(--mu);font:400 12px/1.45 var(--ui)}
+
+/* Mix : panneau latéral à onglets à droite de la bibliothèque */
+#app{--sidew:clamp(250px,21vw,330px)}
+#app.has-side>#p-lib{margin-right:calc(var(--sidew) + 6px)}
+#p-side{contain:size;justify-self:end;width:var(--sidew);display:grid;grid-template-rows:auto minmax(0,1fr);overflow:hidden}
+.sd-tabs{padding:6px 6px 0}
+.sd-body{overflow:auto;padding:6px;min-height:0}
+.am-panel.docked{position:static;width:auto;max-height:none;box-shadow:none;border:0;background:none;padding:2px;z-index:auto}
+.am-panel.docked[hidden]{display:grid!important}
+.am-panel.docked h2 .x{display:none}
+.am-panel.docked{grid-template-columns:minmax(0,1fr)}
+.am-panel.docked .am-sec,.am-panel.docked .am-acts,.am-panel.docked .am-row,.am-panel.docked h2{flex-wrap:wrap;min-width:0}
+.am-panel.docked .am-row .sel{min-width:90px}
+
+/* compteur de temps et de phrase au-dessus des waveforms (Mix, École) */
+.beatrow{display:none;gap:4px;grid-template-columns:repeat(auto-fit,minmax(0,1fr))}
+#app.beatbar .beatrow{display:grid}
+#app.beatbar .zoomb{top:30px}
+.bb{display:flex;align-items:center;gap:9px;height:20px;padding:0 8px;border-radius:6px;background:#0d0f12;--dc:var(--A);font:600 11px var(--num);color:var(--white);min-width:0;overflow:hidden}
+.bb[data-deck="B"]{--dc:var(--B)}.bb[data-deck="C"]{--dc:var(--C)}.bb[data-deck="D"]{--dc:var(--D)}
+.bb-id{color:var(--dc);font:800 11px var(--ui)}
+.bb .beats{gap:3px}.bb .beats i{width:10px;height:10px;border-radius:2px;background:#262a32}.bb .beats i.on{background:var(--dc)}
+.bb .beats i:first-child.on{background:var(--white)}
+.bb .bars i{width:13px;height:5px}.bb .bars i.on{background:color-mix(in srgb,var(--dc) 55%,#262a32)}.bb .bars i.cur{background:var(--dc)}
+.bb b{margin-left:auto;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* mode scène : contraste renforcé, gros chiffres, textes d'au moins 11 px */
+html.stage{--bg:#000;--s1:#0b0c0e;--s2:#111316;--s3:#1d2026;--ln:#2d313a;--ln2:#3e4450;--tx:#f2f4f7;--mu:#cfd4dc;--dim:#b8bec8;--white:#fff}
+html.stage body{background:#000}
+html.stage #top{background:#000}
+html.stage .pnl{background:#0a0b0d;border-color:#2d313a}
+html.stage .b{color:#e3e6eb;border-color:#3a3f4a;background:#14161a}
+html.stage .b.cue{color:var(--cue)}html.stage .b.play{color:var(--dc)}
+html.stage .b.on{color:var(--dc,var(--white))}
+html.stage .b.cue.on,html.stage .b.play.on{color:#05070a}
+html.stage :is(.brand small,.seg button,.tb,.mclock span,.lbl,.b:not(.big),select.sel,.kn span,.fxu .tag,.dk-stat .lbl,.pv,.tabs .b,.xfa button,.mst .nm,.side button.it span,.libbar .count,.lt th,.lt .ondeck,.lt .ld,.lcard .mod,.go,kbd,.coach-hud .more,.am-meta,.am-tag,.am-ref,.am-sug .sc,.am-leg,.am-q li .n,.am-why,.cl-ok,.bb,.bb-id,.pp-bpm span,.pp-go,.pp-list li.empty .pp-go,.pp-list li i,.mxc .kn span){font-size:11px!important}
+html.stage .lt{font-size:13.5px}
+html.stage .lt th,html.stage .lbl,html.stage .kn span{color:#c3c9d2}
+html.stage .dk-title{font-size:16px}
+html.stage .dk-artist{font-size:12.5px;color:#cfd4dc}
+html.stage .dk-stat b{font-size:34px}
+html.stage .dk-stat b.key{font-size:24px}
+html.stage .dk-stat b.time{font-size:26px}
+html.stage .sz-compact .dk-stat b{font-size:28px}html.stage .sz-compact .dk-stat b.key,html.stage .sz-compact .dk-stat b.time{font-size:21px}
+html.stage .sz-mini .dk-stat b{font-size:24px}html.stage .sz-mini .dk-stat b.key,html.stage .sz-mini .dk-stat b.time{font-size:18px}
+html.stage .xfa button{width:19px;height:17px}
+html.stage .mxc .ch{grid-template-columns:repeat(3,31px)}
+html.stage .lane,html.stage .dk-wave,html.stage .dk-ov{background:#000}
+html.stage .lt tbody tr:nth-child(even){background:#0c0d10}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><radialGradient id="capg" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#4a505c"/><stop offset="1" stop-color="#16181d"/></radialGradient></defs></svg>
@@ -850,7 +1067,7 @@ body.pc-blind .lane::after,body.pc-blind .dk-ov::after{content:"À l’oreille";
     <div class="brand">MIXLAB</div>
     <div class="seg" id="presets" role="group" aria-label="Disposition"></div>
     <div class="seg" id="ndecks" role="group" aria-label="Nombre de platines"><button data-n="2">2 platines</button><button data-n="4">4 platines</button></div>
-    <details class="menu"><summary class="tb">Panneaux</summary><div class="pop" id="panels-pop"></div></details>
+    <details class="menu"><summary class="tb" title="Panneaux, zoom, taille des platines, mode scène">Affichage</summary><div class="pop" id="panels-pop"></div></details>
     <button class="tb" id="q-btn" title="Quantize : cues, hot cues et boucles se calent sur le temps">Quantize</button>
     <button class="tb" id="ag-btn" title="Gain auto : égalise le volume des morceaux au chargement">Gain auto</button>
     <div class="mclock" title="Tempo de la platine maître"><span>MASTER</span><b id="master-bpm">—</b></div>
@@ -930,6 +1147,7 @@ body.pc-blind .lane::after,body.pc-blind .dk-ov::after{content:"À l’oreille";
 <script src="mappings/index.js"></script>
 <script src="controllers.js"></script>
 <script src="perf.js"></script>
+<script src="view.js"></script>
 <script src="learn.js"></script>
 <script src="coach-live.js"></script>
 <script src="structure.js"></script>
