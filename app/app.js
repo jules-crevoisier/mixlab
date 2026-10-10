@@ -31,7 +31,7 @@ const fracLabel=x=>x>=1?String(x):'1/'+Math.round(1/x);
 
 /* ---------- registre des commandes (souris, clavier, MIDI) ---------- */
 const controls=new Map();
-const regAbs=(id,label,el,set)=>controls.set(id,{kind:'abs',label,el,set});
+const regAbs=(id,label,el,set,get)=>controls.set(id,{kind:'abs',label,el,set,get});
 const regBtn=(id,label,el,press,release)=>controls.set(id,{kind:'btn',label,el,press,release});
 const regRel=(id,label,el,move)=>controls.set(id,{kind:'rel',label,el,move});
 const ctl=id=>controls.get(id);
@@ -57,7 +57,7 @@ function knob(id,label,init,onChange,o={}){
   svg.addEventListener('dblclick',()=>set(init));
   svg.addEventListener('wheel',e=>{e.preventDefault();set(v-Math.sign(e.deltaY)*.03);},{passive:false});
   svg.addEventListener('keydown',e=>{if(e.key==='ArrowUp'||e.key==='ArrowRight'){set(v+.02);e.preventDefault();}if(e.key==='ArrowDown'||e.key==='ArrowLeft'){set(v-.02);e.preventDefault();}});
-  render();regAbs(id,o.aria||label,wrap,set);
+  render();regAbs(id,o.aria||label,wrap,set,()=>v);
   return{el:wrap,set,get:()=>v};
 }
 function btn(id,label,txt,cls,press,release,title){
@@ -164,7 +164,7 @@ function buildDeck(d){
   pitch.addEventListener('dblclick',()=>d.setPitch(0,true));
   d.ui.pitch=pitch;
   const pw=h('div',{'data-ctl':D+'.pitch',style:'height:100%;display:flex;justify-content:center',title:'Pitch : en haut plus lent, en bas plus rapide. Double-clic : retour à 0.'},pitch);
-  regAbs(D+'.pitch','Pitch '+D,pw,v=>d.setPitch((-1+2*v)*d.pitchRange,true));
+  regAbs(D+'.pitch','Pitch '+D,pw,v=>d.setPitch((-1+2*v)*d.pitchRange,true),()=>(d.pitch/d.pitchRange+1)/2);
   const rng=h('select',{class:'sel','aria-label':'Plage du pitch '+D,title:'Plage du pitch'},[8,16,50].map(r=>h('option',{value:r},'±'+r)));
   rng.addEventListener('change',()=>d.setRange(+rng.value/100));d.ui.rng=rng;
   const nL=btn(D+'.nudgeL','Nudge − '+D,'‹','',()=>d.nudge(-1),()=>d.nudge(0),'Maintiens pour freiner un instant');
@@ -232,7 +232,7 @@ function buildMixer(){
     const fd=h('input',{type:'range',class:'fd v up',min:0,max:1,step:.001,value:d.p.fader,'aria-label':'Fader '+D});
     const setF=v=>{d.p.fader=clamp(v,0,1);fd.value=d.p.fader;applyMix(d);};
     fd.addEventListener('input',()=>setF(+fd.value));
-    const fw=h('div',{'data-ctl':D+'.fader',style:'display:flex',title:'Fader de voie'},fd);regAbs(D+'.fader','Fader '+D,fw,setF);d.ui.fader={set:setF};
+    const fw=h('div',{'data-ctl':D+'.fader',style:'display:flex',title:'Fader de voie'},fd);regAbs(D+'.fader','Fader '+D,fw,setF,()=>d.p.fader);d.ui.fader={set:setF};
     const xa=h('div',{class:'xfa',title:'Côté du crossfader : A, milieu (pas affecté) ou B'},['A','T','B'].map(s=>h('button',{type:'button','data-s':s,onclick:()=>{d.xfa=s;applyXf();renderXfa();}},s==='T'?'·':s)));d.ui.xfa=xa;
     ch.append(cue,h('div',{class:'fdr'},vu,fw),xa);chs[D]=ch;applyMix(d);
   }
@@ -247,7 +247,7 @@ function buildMixer(){
   const xf=h('input',{type:'range',class:'fd h',min:0,max:1,step:.001,value:S.xf,'aria-label':'Crossfader'});
   const setX=v=>{S.xf=clamp(v,0,1);xf.value=S.xf;applyXf();};
   xf.addEventListener('input',()=>setX(+xf.value));xf.addEventListener('dblclick',()=>setX(.5));
-  const xw=h('div',{'data-ctl':'xf',title:'Crossfader. Double-clic : centrer.'},xf);regAbs('xf','Crossfader',xw,setX);ui.setX=setX;
+  const xw=h('div',{'data-ctl':'xf',title:'Crossfader. Double-clic : centrer.'},xf);regAbs('xf','Crossfader',xw,setX,()=>S.xf);ui.setX=setX;
   const curve=h('select',{class:'sel','aria-label':'Courbe du crossfader',title:'Courbe du crossfader'},h('option',{value:'mix'},'Mix'),h('option',{value:'smooth'},'Douce'),h('option',{value:'cut'},'Cut'));
   curve.value=S.curve;curve.addEventListener('change',()=>{S.curve=curve.value;applyXf();});
   M.append(mx,h('div',{class:'xf'},h('span',{class:'e',style:'color:var(--A)'},'A'),xw,h('span',{class:'e',style:'color:var(--B)'},'B'),curve));
@@ -544,12 +544,14 @@ function listMidi(){
   midi.access.inputs.forEach(inp=>{inp.onmidimessage=onMidi;n++;ul.append(h('li',{},'● '+(inp.manufacturer?inp.manufacturer+' ':'')+inp.name));});
   if(!n)ul.append(h('li',{style:'color:var(--mu)'},'Aucun contrôleur détecté. Branche-le, il apparaîtra ici.'));
   $('#midi-dot').classList.toggle('on',n>0);midi.last={};
+  window.Controllers&&Controllers.onDevices();
 }
 function onMidi(e){
   const[st,d1,d2=0]=e.data;if(st>=0xF0)return;
   const type=st&0xF0,ch=st&15;let key;
   if(type===0x90||type===0x80)key=`n${ch}.${d1}`;else if(type===0xB0)key=`c${ch}.${d1}`;else if(type===0xE0)key=`p${ch}`;else return;
   $('#midi-mon').textContent='Dernier message : '+midiKeyText(key)+' = '+(type===0xE0?((d2<<7)|d1):d2);
+  if(window.Controllers)return Controllers.onMidi(e,key,type,ch,d1,d2);
   if(midi.learn&&midi.target){
     if(type===0x80||(type===0x90&&d2===0))return;
     midi.map[key]=midi.target;store.set('midimap',midi.map);
@@ -572,6 +574,7 @@ function setLearn(on){
   if(on){$('#midi-modal').hidden=true;if(!midi.access)connectMidi();}
 }
 function renderMaps(){
+  if(window.Controllers)return Controllers.renderMaps();
   const ul=$('#map-list');ul.innerHTML='';const mapped=new Set(Object.values(midi.map));
   controls.forEach((c,id)=>c.el.classList.toggle('mapped',mapped.has(id)));
   const ents=Object.entries(midi.map);if(!ents.length)ul.append(h('li',{style:'color:var(--mu)'},'Aucun mapping pour l’instant.'));
@@ -588,6 +591,7 @@ function ledState(id){
 }
 function ledTick(){
   if(!midi.access)return;
+  if(window.Controllers)return Controllers.ledTick();
   const outs=[...midi.access.outputs.values()];if(!outs.length)return;
   for(const[key,id]of Object.entries(midi.map)){
     const st=ledState(id);if(st==null||midi.last[key]===st)continue;midi.last[key]=st;
@@ -602,21 +606,25 @@ function buildMidi(){
   document.addEventListener('pointerdown',e=>{if(!midi.learn)return;const t=e.target.closest('[data-ctl]');if(!t||t.closest('.modal,.learnbar'))return;e.preventDefault();e.stopPropagation();selectLearn(t.dataset.ctl);},true);
   document.addEventListener('click',e=>{if(midi.learn&&e.target.closest('[data-ctl]')&&!e.target.closest('.modal,.learnbar')){e.preventDefault();e.stopPropagation();}},true);
   $('#map-export').addEventListener('click',()=>{const ta=$('#map-json');(navigator.clipboard?navigator.clipboard.writeText(ta.value):Promise.reject()).then(()=>toast('Mapping copié','ok'),()=>ta.select());});
-  $('#map-import').addEventListener('click',()=>{try{const j=JSON.parse($('#map-json').value);if(!j.map)throw 0;midi.map=j.map;store.set('midimap',midi.map);renderMaps();toast('Mapping importé','ok');}catch(e){toast('Ce texte n’est pas un mapping Mixlab valide.');}});
-  $('#map-clear').addEventListener('click',()=>{midi.map={};store.set('midimap',midi.map);renderMaps();});
+  $('#map-import').addEventListener('click',()=>{if(window.Controllers)return Controllers.importText($('#map-json').value);try{const j=JSON.parse($('#map-json').value);if(!j.map)throw 0;midi.map=j.map;store.set('midimap',midi.map);renderMaps();toast('Mapping importé','ok');}catch(e){toast('Ce texte n’est pas un mapping Mixlab valide.');}});
+  $('#map-clear').addEventListener('click',()=>{window.Controllers&&Controllers.clearMeta();midi.map={};store.set('midimap',midi.map);renderMaps();});
+  window.Controllers&&Controllers.build();
   renderMaps();
 }
 
 /* ---------- clavier ---------- */
-const KEYS={q:'A.play',w:'A.cue',e:'A.sync',a:'A.nudgeL',s:'A.nudgeR',1:'A.pad1',2:'A.pad2',3:'A.pad3',4:'A.pad4',p:'B.play',o:'B.cue',i:'B.sync',k:'B.nudgeL',l:'B.nudgeR',7:'B.pad1',8:'B.pad2',9:'B.pad3',0:'B.pad4'};
+/* Touches physiques (e.code) : mêmes positions en AZERTY, QWERTY ou QWERTZ. Modifiables dans la fenêtre Contrôleur. */
+const KEYS_DEF={KeyQ:'A.play',KeyW:'A.cue',KeyE:'A.sync',KeyA:'A.nudgeL',KeyS:'A.nudgeR',Digit1:'A.pad1',Digit2:'A.pad2',Digit3:'A.pad3',Digit4:'A.pad4',
+  KeyP:'B.play',KeyO:'B.cue',KeyI:'B.sync',KeyK:'B.nudgeL',KeyL:'B.nudgeR',Digit7:'B.pad1',Digit8:'B.pad2',Digit9:'B.pad3',Digit0:'B.pad4',KeyZ:'xf-',KeyX:'xf+'};
+let KEYS=store.get('keys',null)||{...KEYS_DEF};
 document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){const m=$$('.modal').filter(x=>!x.hidden).pop();if(m){m.hidden=true;e.preventDefault();return;}if(midi.learn){setLearn(false);return;}}
   if(e.target.closest('input,textarea,select')||e.metaKey||e.ctrlKey||e.altKey)return;
-  const k=e.key.toLowerCase();
-  if(k==='z'||k==='x'){ui.setX(S.xf+(k==='z'?-.05:.05));return;}
-  if(k==='escape'&&midi.learn){setLearn(false);return;}
-  const id=KEYS[k];if(!id||e.repeat)return;const c=ctl(id);if(c){c.press(e);e.preventDefault();}
+  const id=KEYS[e.code];if(!id)return;
+  if(id==='xf-'||id==='xf+'){ui.setX(S.xf+(id==='xf-'?-.05:.05));e.preventDefault();return;}
+  if(e.repeat)return;const c=ctl(id);if(c){c.press(e);e.preventDefault();}
 });
-document.addEventListener('keyup',e=>{const id=KEYS[e.key.toLowerCase()];if(!id)return;const c=ctl(id);if(c&&c.release)c.release();});
+document.addEventListener('keyup',e=>{const id=KEYS[e.code];if(!id||id[0]==='x')return;const c=ctl(id);if(c&&c.release)c.release();});
 document.addEventListener('dragenter',e=>{if(e.dataTransfer&&[...e.dataTransfer.types].some(t=>t==='Files'||t==='text/mixlab-track'))document.body.classList.add('dragging');});
 document.addEventListener('dragend',()=>document.body.classList.remove('dragging'));
 document.addEventListener('dragleave',e=>{if(!e.relatedTarget)document.body.classList.remove('dragging');});
@@ -700,4 +708,5 @@ async function boot(){
   window.Coach&&Coach.ready&&Coach.ready();
   window.Desktop&&Desktop.boot();
 }
-setTimeout(boot,0);
+// Après le chargement de tous les scripts (learn.js, controllers.js…), pas avant : sinon leurs build() sont sautés.
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else setTimeout(boot,0);
