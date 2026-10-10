@@ -552,5 +552,5 @@ function addTrack(buffer,meta){
   const a=analyze(buffer,!!meta.key);
   const tr={id:++LIB.seq,title:meta.title,artist:meta.artist||'',genre:meta.genre||'',buffer,duration:buffer.duration,
     bpm:a.bpm,grid:a.grid,key:meta.key||a.key,rmsDb:a.rmsDb,wf:a.wf,cue:null,hot:Array(8).fill(null),ov:null,demo:!!meta.demo,added:new Date(),plays:0,file:meta.file||null,path:meta.path||null};
-  tr.cue=tr.grid;LIB.tracks.push(tr);return tr;
+  tr.cue=tr.grid;LIB.tracks.push(tr);window.Structure&&Structure.queue(tr);return tr;
 }
