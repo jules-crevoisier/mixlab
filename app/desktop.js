@@ -100,7 +100,7 @@ window.Desktop=(()=>{
 
   /* ---------- bibliothèque persistante ---------- */
   function snapshot(){
-    const tracks=LIB.tracks.filter(t=>t.path).map(t=>({path:t.path,title:t.title,artist:t.artist,genre:t.genre,bpm:t.bpm,grid:t.grid,key:t.key,cue:t.cue,hot:t.hot,plays:t.plays,added:t.added}));
+    const tracks=LIB.tracks.filter(t=>t.path).map(t=>({path:t.path,title:t.title,artist:t.artist,genre:t.genre,bpm:t.bpm,grid:t.grid,key:t.key,cue:t.cue,hot:t.hot,hotMeta:t.hotMeta,memCues:t.memCues,loops:t.loops,plays:t.plays,added:t.added}));
     const byId=new Map(LIB.tracks.map(t=>[t.id,t.path]));
     const playlists=LIB.playlists.map(p=>({id:p.id,name:p.name,paths:p.ids.map(i=>byId.get(i)).filter(Boolean)}));
     return JSON.stringify({version:1,tracks,playlists});
@@ -123,6 +123,8 @@ window.Desktop=(()=>{
         const tr=addTrack(buf,{title:t.title,artist:t.artist,genre:t.genre,key:t.key,file:t.path.split(/[\\/]/).pop(),path:t.path});
         if(t.bpm)tr.bpm=t.bpm;if(t.grid!=null)tr.grid=t.grid;tr.cue=t.cue??tr.grid;
         if(Array.isArray(t.hot))tr.hot=t.hot.slice(0,8).concat(Array(8).fill(null)).slice(0,8);
+        if(Array.isArray(t.hotMeta))tr.hotMeta=t.hotMeta.slice(0,8).concat(Array(8).fill(null)).slice(0,8);
+        if(Array.isArray(t.memCues))tr.memCues=t.memCues;if(Array.isArray(t.loops))tr.loops=t.loops;
         tr.plays=t.plays||0;if(t.added)tr.added=new Date(t.added);
         byPath.set(t.path,tr.id);ok++;
         if(ok%10===0){renderSide();renderTable();}
