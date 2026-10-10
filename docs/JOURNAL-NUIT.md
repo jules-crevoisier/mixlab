@@ -169,3 +169,16 @@ Corrigé dans la foulée :
 - **Tests fiabilisés** : le test de mise en page effaçait parfois lui-même les réglages qu'il vérifiait après rechargement.
 
 Lancé ensuite : la refonte du style visuel, d'après la direction donnée par la critique.
+
+## 06:00 · Nouveau style visuel
+
+Avant et après, en captures : `docs/design/avant/` et `docs/design/apres/`. Les règles sont dans `docs/design/STYLE.md`.
+
+- **Hiérarchie** : seul ce qui compte en live s'allume. La couleur de chaque platine ne sert plus qu'à la repérer (pastille, bord, tête de lecture, états actifs). Le violet est réservé au coach. CUE reste neutre au repos.
+- **Textes** : une échelle 11/13/16/24/32, plus rien sous 11 px, boutons en casse normale.
+- **Waveforms** : trois bandes adoucies (graves bleus, médiums ambrés, aigus presque blancs), la partie jouée désaturée, tête de lecture blanche.
+- **Mixer** : vrais potards de 28 à 32 px avec anneau, kill sur l'étiquette de l'EQ, faders gradués beaucoup plus longs, VU-mètres à segments, réglages rares rangés dans un menu.
+- **Platines** : pads de 40 px, bouton « Pro » qui replie Slip, Rev, Censor et la grille.
+- **Effets** : potards nommés, durée en boutons segmentés, ON à la couleur de la platine, rangée repliable.
+- **Fluidité** : le calcul d'une image passe de 5,5 ms à 2,2 ms avec 4 platines. Les platines à l'arrêt ne sont plus redessinées, et l'appli ralentit à 30 images par seconde quand elle n'est pas au premier plan.
+- **Reste à faire** : encore trop de commandes visibles (environ 130 à 1366 px au lieu de 110 visés), et l'École est à l'étroit à côté du panneau du coach.
