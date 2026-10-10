@@ -7,6 +7,7 @@
 
 mod files;
 mod midi;
+mod watch;
 #[cfg(debug_assertions)]
 mod selftest;
 
@@ -27,6 +28,13 @@ pub fn run() {
             files::save_export,
             files::save_binary,
             files::open_shop,
+            watch::folders_list,
+            watch::folders_add,
+            watch::folders_remove,
+            watch::folders_set_watch,
+            watch::folder_read,
+            watch::folders_scan,
+            watch::serato_read,
             midi::midi_open,
             midi::midi_signature,
             midi::midi_send,

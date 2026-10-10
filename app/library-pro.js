@@ -765,7 +765,7 @@ window.LibPro=(()=>{
           h('div',{class:'acts'},plSel,h('button',{type:'button',class:'b pri',onclick:()=>{const ts=plTracks();if(!ts.length){toast('Cette playlist est vide');return;}saveFile(safeName(plName())+'.m3u8',toM3U(ts,plName()),'audio/x-mpegurl');}},'M3U8'))),
         h('div',{},h('h3',{},'Playlist Spotify, Deezer…'),
           h('p',{},'Colle une liste « Artiste - Titre » ou un export CSV (Exportify pour Spotify, TuneMyMusic ou Soundiiz pour Deezer, YouTube Music, Apple Music). Mixlab retrouve les morceaux dans ta collection et te donne des liens d’achat pour les autres.'),
-          h('button',{type:'button',class:'b pri',onclick:()=>exchangeList('','')},'Retrouver une playlist…'))),
+          h('button',{type:'button',class:'b pri',onclick:()=>exchangeList('','')},'Retrouver une playlist…')),window.LibPlus?LibPlus.importBox():null),
       out);
   }
   function exchangeList(text,name){
@@ -826,7 +826,7 @@ window.LibPro=(()=>{
       p?{label:'Descendre dans la playlist',off:!ordered||i>=p.ids.length-1,fn:()=>movePl(p,t.id,i+1)}:null,
       p?{label:'Retirer de la playlist « '+p.name+' »',cls:'bad',fn:()=>{p.ids=p.ids.filter(x=>x!==t.id);saveMeta();renderSide();renderTable();toast('Retiré de « '+p.name+' »');}}:null,
       '-',
-      {label:'Analyser à nouveau'+(DP&&DP.locked&&DP.locked(t)?' (grille verrouillée)':''),off:!t.buffer||!!(DP&&DP.locked&&DP.locked(t)),fn:()=>reanalyze(t)},
+      {label:'Analyser à nouveau'+(DP&&DP.locked&&DP.locked(t)?' (grille verrouillée)':''),off:!t.buffer||!!(DP&&DP.locked&&DP.locked(t)),fn:()=>reanalyze(t)},...(window.LibPlus?LibPlus.rowItems(t):[]),
       // « Afficher le fichier » : seulement dans l'appli, quand elle sait ouvrir le dossier
       N0&&N0.revealFile&&t.path?{label:'Afficher le fichier',fn:()=>N0.revealFile(t.path)}:null,
     ]);
@@ -872,7 +872,7 @@ window.LibPro=(()=>{
       {label:'Monter',off:i<=0,fn:()=>{LIB.playlists.splice(i,1);LIB.playlists.splice(i-1,0,p);saveMeta();renderSide();}},
       {label:'Descendre',off:i>=LIB.playlists.length-1,fn:()=>{LIB.playlists.splice(i,1);LIB.playlists.splice(i+1,0,p);saveMeta();renderSide();}},
       {label:'Exporter en M3U8',off:!p.ids.length,fn:()=>saveFile(safeName(p.name)+'.m3u8',toM3U(ts(),p.name),'audio/x-mpegurl')},
-      {label:'Vider',off:!p.ids.length,fn:()=>{p.ids=[];saveMeta();renderSide();renderTable();}},'-',
+      {label:'Vider',off:!p.ids.length,fn:()=>{p.ids=[];saveMeta();renderSide();renderTable();}},...(window.LibPlus?LibPlus.plItems(p):[]),'-',
       {label:'Supprimer…',cls:'bad',fn:()=>deletePl(p)}]);
   }
   function plItem(b,p){b.title='Clic droit : renommer, déplacer, exporter, supprimer';b.addEventListener('contextmenu',e=>{e.preventDefault();plMenu(p,e);});b.addEventListener('dblclick',()=>renamePl(p));}

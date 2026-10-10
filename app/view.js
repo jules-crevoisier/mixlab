@@ -250,7 +250,7 @@ window.View=(()=>{
     pop.style.left=Math.max(6,Math.min(s.left/z,W-pop.offsetWidth-6))+'px';
   }
   function closeMenus(){$$('#top details[open]').forEach(x=>{x.open=false;});}
-  const COLLAPSE=['#ag-btn','#q-btn','#audio-btn','#midi-btn','#fs-btn','#pc-btn','#am-btn','#lib-btn','#rec-btn','#ndecks'];
+  const COLLAPSE=['#load-ind','#clk-btn','#ag-btn','#q-btn','#audio-btn','#midi-btn','#fs-btn','#pc-btn','#am-btn','#lib-btn','#rec-btn','#ndecks'];
   const overTop=t=>t.scrollWidth>t.clientWidth+1;
   // La barre du haut ne déborde jamais : les boutons les moins urgents passent dans « ⋯ », dans cet ordre.
   function fitTop(){
