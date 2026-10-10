@@ -631,5 +631,5 @@ window.Parcours=(()=>{
     if(!Coach.L.active&&Coach.render)Coach.render();
   }
   return{init,tick,open,exit,go:(c,s)=>{if(!prog.active)open(c);loadChapter(c,s||0);},skip:()=>advance(true),next:()=>advance(false),tap,mark,card,keepIssue,welcome,
-    summaryText,summary,CH,GLOSS,prog,P,get target(){return prog.active?P.target:null;},get active(){return prog.active;}};
+    summaryText,summary,CH,GLOSS,gloss,prog,P,get target(){return prog.active?P.target:null;},get active(){return prog.active;}};
 })();
