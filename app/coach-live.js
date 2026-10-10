@@ -17,7 +17,7 @@ window.MixCoach=(()=>{
   /* ---------- mesures ---------- */
   function meter(an){an.getFloatTimeDomainData(buf);let s=0,pk=0;for(let i=0;i<buf.length;i++){const v=buf[i];s+=v*v;const a=Math.abs(v);if(a>pk)pk=a;}return{db:10*Math.log10(s/buf.length+1e-12),pk};}
   const ema=(old,v,dt,tau)=>old+(v-old)*Math.min(1,dt/tau);
-  const gainOf=d=>d.p.fader*d.p.fader*xfGainOf(d);
+  const gainOf=d=>faderGain(d.p.fader)*xfGainOf(d);
   const on=d=>d.active&&d.track&&d.playing&&gainOf(d)>.05;
   const flat=d=>['low','mid','high'].every(b=>!d.p.kill[b]&&Math.abs(d.p[b]-.5)<.15)&&Math.abs(d.p.filter-.5)<.05;
   const remaining=d=>d.track?(d.track.duration-d.position())/Math.max(.01,d.rate):0;
@@ -60,7 +60,7 @@ window.MixCoach=(()=>{
     {id:'key',sev:'warn',after:3,test(x){
       if(!x.inc||gainOf(x.inc)<.3||gainOf(x.main)<.3)return null;
       const a=x.main.keyNow(),b=x.inc.keyNow();if(!a||!b||keysCompatible(a,b))return null;
-      return{msg:`Tonalités qui frottent : ${kname(x.main)} et ${kname(x.inc)}`,
+      return{msg:`Tonalités peu compatibles : ${kname(x.main)} et ${kname(x.inc)}`,
         why:`Garde ce passage court ou baisse les MID de ${x.inc.id}. Avec ${kname(x.main)}, ça sonne juste en ${neighbours(x.main)}.`,target:x.inc.id+'.mid'};}},
     {id:'gain',sev:'warn',after:3,test(x){
       if(!x.inc||!flat(x.main)||!flat(x.inc)||x.main.p.fader<.5||x.inc.p.fader<.5)return null;
@@ -76,10 +76,10 @@ window.MixCoach=(()=>{
       if(x.inc||!x.main||x.main.loop.on)return null;const r=remaining(x.main);if(r>30)return null;
       const next=decks.find(d=>d!==x.main&&d.active&&d.track&&!d.playing);
       if(!next)return{msg:`${x.main.id} se termine dans ${r.toFixed(0)} s`,why:'Charge le morceau suivant sur une autre platine, maintenant.',target:null,sev:r<12?'bad':'warn'};
-      return{msg:`${x.main.id} se termine dans ${r.toFixed(0)} s`,why:`Lance ${next.id} sur le prochain début de phrase (compteur P), fader encore bas.`,target:next.id+'.play',sev:r<12?'bad':'warn'};}},
+      return{msg:`${x.main.id} se termine dans ${r.toFixed(0)} s`,why:`Lance ${next.id} sur le prochain début de phrase (compteur P)${next.p.fader<.3?', fader encore bas, puis monte-le':''}.`,target:next.id+'.play',sev:r<12?'bad':'warn'};}},
     {id:'silence',sev:'bad',after:.8,test(x){
       if(x.aud.length||now()-C.lastAud>20)return null;
-      const next=decks.find(d=>d.active&&d.track);
+      const ready=d=>d.active&&d.track&&d.position()<d.track.duration-5,next=decks.find(d=>ready(d)&&!d.playing)||decks.find(ready);
       return{msg:'Silence sur la piste de danse',why:next?`Relance du son tout de suite : PLAY sur ${next.id} et fader en haut.`:'Charge un morceau et lance-le.',target:next?next.id+'.play':null};}},
     {id:'filter',sev:'tip',after:15,test(x){
       if(x.inc||!x.main||Math.abs(x.main.p.filter-.5)<.1)return null;
@@ -123,7 +123,8 @@ window.MixCoach=(()=>{
     score=clamp(score,0,100);
     const r={from:t.from.id,to:t.to.id,title:t.to.track?t.to.track.title:'',bars,score,good,tips,at:new Date()};
     C.hist.unshift(r);C.hist.length=Math.min(C.hist.length,6);
-    if(C.level!=='off')toast(`Transition ${r.from} → ${r.to} : ${score}/100`,score>=75?'ok':'');
+    // le bilan s'affiche dans le panneau Coach ; panneau fermé, une notification le signale
+    if(C.level!=='off'&&!panelOpen())toast(`Transition ${r.from} → ${r.to} : ${score}/100`,score>=75?'ok':'');
     renderPanel(true);
   }
 
@@ -134,7 +135,7 @@ window.MixCoach=(()=>{
     for(const d of decks){
       const L=C.lv[d.id]||(C.lv[d.id]={post:-90,pre:-90,pk:0});if(!d.active)continue;
       const r=meter(d.an);L.pk=r.pk;L.post=ema(L.post,r.db,dt,.4);
-      const g=d.p.fader*d.p.fader;if(g>.05&&d.playing)L.pre=ema(L.pre,r.db-20*Math.log10(g),dt,1.5);
+      const g=faderGain(d.p.fader);if(g>.05&&d.playing)L.pre=ema(L.pre,r.db-20*Math.log10(g),dt,1.5);
     }
   }
   // La piste principale est celle qui joue au public depuis le plus longtemps ;
@@ -167,6 +168,7 @@ window.MixCoach=(()=>{
       if(show)C.issues.set(r.id,{...s.res,sev,id:r.id});else C.issues.delete(r.id);
     }
     if(Coach.L.active&&!Coach.L.done)for(const[k,v]of C.issues)if(v.sev!=='bad')C.issues.delete(k);
+    if(window.Parcours&&Parcours.active)for(const[k,v]of C.issues)if(!Parcours.keepIssue(v))C.issues.delete(k);
     render();
   }
 
@@ -175,14 +177,23 @@ window.MixCoach=(()=>{
   function setTarget(id){
     if(C.target===id)return;
     if(C.target){const c=ctl(C.target);c&&c.el.classList.remove('coach-target');}
-    C.target=id;if(id){const c=ctl(id);c&&c.el.classList.add('coach-target');}
+    C.target=id;if(id){const c=ctl(id);if(c){c.el.classList.add('coach-target');window.revealCtl&&revealCtl(c.el);}}
   }
-  let lastKey='';
+  let lastKey='',lastSpot='';
+  // Panneau Coach ouvert : il affiche déjà le conseil, le bandeau se tait.
+  const panelOpen=()=>{const p=$('#p-coach');return !!(p&&!p.hidden&&p.offsetParent);};
+  // Sinon le bandeau se range dans la bibliothèque, entre sa barre d'outils et la liste : il ne cache aucune ligne.
+  function place(hud){
+    const lm=$('#p-lib:not([hidden]) .libmain'),tw=lm&&$(':scope>.tw',lm),spot=lm&&tw&&lm.offsetParent?'lib':'body';
+    if(spot===lastSpot&&hud.isConnected)return;lastSpot=spot;
+    if(spot==='lib'){tw.before(hud);hud.classList.add('inlib');}else{document.body.append(hud);hud.classList.remove('inlib');}
+  }
   function render(){
-    const b=top(),hud=C.el.hud;setTarget(b&&b.target||null);
-    const key=b?b.id+b.msg+b.why:'';
+    const b=top(),hud=C.el.hud;setTarget((window.Parcours&&Parcours.target)||(window.Coach&&Coach.target)?null:(b&&b.target||null));
+    const open=panelOpen(),key=b?b.id+b.msg+b.why+(open?'|p':''):'';
+    if(b&&!open)place(hud);
     if(key!==lastKey){
-      lastKey=key;hud.hidden=!b;
+      lastKey=key;hud.hidden=!b||open;
       if(b){hud.className='coach-hud '+b.sev;C.el.msg.textContent=b.msg;C.el.why.textContent=b.why;C.el.more.textContent=C.issues.size>1?`+${C.issues.size-1}`:'';}
       renderPanel(false);
     }
@@ -199,7 +210,7 @@ window.MixCoach=(()=>{
       h('summary',{},h('span',{class:'sc '+(r.score>=75?'ok':r.score>=50?'warn':'bad')},String(r.score)),` ${r.from} → ${r.to} · ${r.bars.toFixed(0)} mesures`),
       h('ul',{},r.good.map(g=>h('li',{class:'g'},g)),r.tips.map(t=>h('li',{class:'t'},t))))));
   }
-  function setLevel(l){C.level=l;store.set('coachLevel',l);C.el.lvl.value=l;$('#coachlive-btn').setAttribute('aria-pressed',String(l!=='off'));lastKey='x';renderPanel(true);}
+  function setLevel(l){C.level=l;store.set('coachLevel',l);C.el.lvl.value=l;const dt=$('#coachlive-dot');dt&&dt.classList.toggle('on',l!=='off');const cb=$('#coach-btn');cb&&cb.setAttribute('title',l==='off'?'Coach et leçons (conseils en direct coupés)':'Coach et leçons · conseils en direct : '+LEVELS[l]);lastKey='x';renderPanel(true);}
   function build(){
     C.el.msg=h('b',{});C.el.why=h('span',{});C.el.more=h('i',{class:'more',title:'Autres conseils dans le panneau Coach'});
     C.el.hud=h('div',{class:'coach-hud',hidden:true,role:'status','aria-live':'polite'},
@@ -209,10 +220,10 @@ window.MixCoach=(()=>{
     C.el.lvl=h('select',{class:'sel',title:'Ce que le coach signale pendant que tu mixes',onchange:e=>setLevel(e.target.value)},Object.entries(LEVELS).map(([k,v])=>h('option',{value:k},v)));
     C.el.list=h('div',{class:'cl-list'});C.el.hist=h('div',{class:'cl-hist'});
     $('#coach-live').after(h('div',{class:'live',id:'coach-direct'},
-      h('div',{class:'lr'},h('span',{class:'lbl'},'En direct'),C.el.lvl),C.el.list,
+      h('div',{class:'lr'},h('span',{class:'lbl',title:'Conseils pendant que tu mixes'},'Conseils'),C.el.lvl),C.el.list,
       h('div',{class:'lbl',style:'margin-top:4px'},'Dernières transitions'),C.el.hist));
-    const btn=h('button',{class:'tb',id:'coachlive-btn',title:'Coach en direct : conseils pendant que tu mixes','aria-pressed':'true',onclick:()=>setLevel(C.level==='off'?'debutant':'off')},'Conseils');
-    $('#coach-btn').before(btn);
+    // Un seul bouton Coach : le voyant dit si les conseils en direct sont actifs, le niveau se règle dans le panneau.
+    $('#coach-btn').prepend(h('span',{class:'dot',id:'coachlive-dot'}));
     setLevel(C.level);
   }
   return{build,tick,state:C,get target(){return C.target;},RULES,setLevel};

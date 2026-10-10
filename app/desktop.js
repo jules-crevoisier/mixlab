@@ -93,40 +93,52 @@ window.Desktop=(()=>{
   function importButtons(){
     if(!N)return null;
     return[
-      h('button',{class:'tb',type:'button',title:'Ajouter des morceaux',onclick:async()=>{const fs=await N.pickFiles();if(fs.length)importFiles(fs.map(fromPath),null);}},'Fichiers'),
-      h('button',{class:'tb',type:'button',title:'Ajouter un dossier entier (sous-dossiers compris)',onclick:async()=>{const fs=await N.pickFolder();if(!fs.length){return;}toast(fs.length+' morceaux trouvés, analyse en cours','ok');importFiles(fs.map(fromPath),null);}},'Dossier'),
+      h('button',{class:'tb imp',type:'button',title:'Ajouter des morceaux',onclick:async()=>{const fs=await N.pickFiles();if(fs.length)importFiles(fs.map(fromPath),null);}},'Fichiers'),
+      h('button',{class:'tb imp',type:'button',title:'Ajouter un dossier entier (sous-dossiers compris)',onclick:async()=>{const fs=await N.pickFolder();if(!fs.length){return;}toast(fs.length+' morceaux trouvés, analyse en cours','ok');importFiles(fs.map(fromPath),null);}},'Dossier'),
     ];
   }
 
-  /* ---------- bibliothèque persistante ---------- */
+  /* ---------- bibliothèque persistante ----------
+     Les morceaux introuvables au démarrage (disque débranché, fichier déplacé) restent
+     dans la sauvegarde avec leurs playlists : on peut les relocaliser plus tard. */
+  A.missing=[];
+  const rec=t=>({path:t.path,title:t.title,artist:t.artist,genre:t.genre,bpm:t.bpm,grid:t.grid,key:t.key,cue:t.cue,hot:t.hot,plays:t.plays,added:t.added,...(window.LibPro?LibPro.metaOut(t):{})});
   function snapshot(){
-    const tracks=LIB.tracks.filter(t=>t.path).map(t=>({path:t.path,title:t.title,artist:t.artist,genre:t.genre,bpm:t.bpm,grid:t.grid,key:t.key,cue:t.cue,hot:t.hot,plays:t.plays,added:t.added}));
+    const tracks=LIB.tracks.filter(t=>t.path).map(rec).concat(A.missing.map(m=>{const{pls,...r}=m;return r;}));
     const byId=new Map(LIB.tracks.map(t=>[t.id,t.path]));
-    const playlists=LIB.playlists.map(p=>({id:p.id,name:p.name,paths:p.ids.map(i=>byId.get(i)).filter(Boolean)}));
-    return JSON.stringify({version:1,tracks,playlists});
+    const playlists=LIB.playlists.map(p=>({id:p.id,name:p.name,paths:p.ids.map(i=>byId.get(i)).filter(Boolean).concat(A.missing.filter(m=>m.pls&&m.pls.includes(p.id)).map(m=>m.path))}));
+    return JSON.stringify({version:1,tracks,playlists,...(window.LibPro?LibPro.extraOut():{})});
   }
   async function save(){
     if(!N||!A.restored)return;
     const s=snapshot();if(s===A.lastSaved)return;
     try{await N.saveLibrary(s);A.lastSaved=s;}catch(e){}
   }
+  /* Charge un morceau enregistré (ou importé d'un autre logiciel) avec ses analyses et ses cues. */
+  async function loadRecord(t){
+    const ab=await N.readFile(t.path),pre=window.Persist?await Persist.pre(ab,t.path,{saved:!!t.bpm,key:t.key}):null;
+    const buf=await ctx.decodeAudioData(ab);
+    const tr=addTrack(buf,{title:t.title,artist:t.artist,genre:t.genre,file:t.path.split(/[\\/]/).pop(),path:t.path,...(pre?pre.meta:{}),key:t.key||(pre&&pre.meta.key)||null});
+    if(t.bpm)tr.bpm=t.bpm;if(t.grid!=null)tr.grid=t.grid;tr.cue=t.cue??tr.grid;
+    if(Array.isArray(t.hot))tr.hot=t.hot.slice(0,8).concat(Array(8).fill(null)).slice(0,8);
+    tr.plays=t.plays||0;if(t.added)tr.added=new Date(t.added);
+    window.LibPro&&LibPro.metaIn(tr,t);   // notes, tags, hotMeta, cues mémoire et boucles (avec conversion des anciennes sauvegardes)
+    if(pre)Persist.post(tr,pre); // tags tout de suite, cache écrit en fond
+    return tr;
+  }
   async function restore(){
     if(!N)return;
     let data=null;try{data=await N.loadLibrary();}catch(e){}
     const list=data&&Array.isArray(data.tracks)?data.tracks:[];
-    let ok=0,missing=0;const byPath=new Map();
+    let ok=0;const byPath=new Map(),lost=[];
     if(list.length)toast('Chargement de la bibliothèque : '+list.length+' morceaux');
     for(const t of list){
+      if(!t||!t.path||byPath.has(t.path))continue;
       try{
-        if(!(await N.exists(t.path))){missing++;continue;}
-        const buf=await ctx.decodeAudioData(await N.readFile(t.path));
-        const tr=addTrack(buf,{title:t.title,artist:t.artist,genre:t.genre,key:t.key,file:t.path.split(/[\\/]/).pop(),path:t.path});
-        if(t.bpm)tr.bpm=t.bpm;if(t.grid!=null)tr.grid=t.grid;tr.cue=t.cue??tr.grid;
-        if(Array.isArray(t.hot))tr.hot=t.hot.slice(0,8).concat(Array(8).fill(null)).slice(0,8);
-        tr.plays=t.plays||0;if(t.added)tr.added=new Date(t.added);
-        byPath.set(t.path,tr.id);ok++;
+        if(!(await N.exists(t.path))){lost.push(t);continue;}
+        byPath.set(t.path,(await loadRecord(t)).id);ok++;
         if(ok%10===0){renderSide();renderTable();}
-      }catch(e){missing++;}
+      }catch(e){lost.push(t);}
     }
     for(const p of (data&&data.playlists)||[]){
       const ids=(p.paths||[]).map(x=>byPath.get(x)).filter(Boolean);
@@ -134,10 +146,21 @@ window.Desktop=(()=>{
       if(cur){ids.forEach(i=>{if(!cur.ids.includes(i))cur.ids.push(i);});cur.name=p.name||cur.name;}
       else LIB.playlists.push({id:p.id,name:p.name||'Playlist',ids});
     }
+    A.missing=lost.map(t=>({...t,pls:((data&&data.playlists)||[]).filter(p=>(p.paths||[]).includes(t.path)).map(p=>p.id)}));
+    window.LibPro&&LibPro.extraIn(data||{});
     A.restored=true;A.lastSaved=snapshot();
     renderSide();renderTable();
-    if(ok)toast('Bibliothèque chargée : '+ok+' morceaux'+(missing?' ('+missing+' introuvables)':''),'ok');
+    if(ok||lost.length)toast('Bibliothèque chargée : '+ok+' morceaux'+(lost.length?' ('+lost.length+' introuvables, voir Fichiers manquants)':''),'ok');
   }
+  /* Morceau manquant retrouvé à un autre endroit : on le charge et on lui rend ses playlists. */
+  async function relocate(m,path){
+    const tr=await loadRecord({...m,path});
+    (m.pls||[]).forEach(id=>{const p=LIB.playlists.find(q=>q.id===id);if(p&&!p.ids.includes(tr.id))p.ids.push(tr.id);});
+    A.missing=A.missing.filter(x=>x!==m);
+    return tr;
+  }
+  const addMissing=list=>{const have=new Set(A.missing.map(m=>m.path));list.forEach(m=>{if(m.path&&!have.has(m.path)){have.add(m.path);A.missing.push(m);}});};
+  const dropMissing=m=>{A.missing=A.missing.filter(x=>x!==m);};
 
   /* ---------- démarrage ---------- */
   let modal=null;
@@ -153,5 +176,6 @@ window.Desktop=(()=>{
     setInterval(save,5000);
     window.addEventListener('beforeunload',save);
   }
-  return{init,boot,importButtons,pathOf,save,setHeadphones,setMaster,listOutputs,get native(){return !!N;}};
+  return{init,boot,importButtons,pathOf,save,setHeadphones,setMaster,listOutputs,loadRecord,relocate,addMissing,dropMissing,snapshot,
+    get missing(){return A.missing;},get native(){return !!N;}};
 })();

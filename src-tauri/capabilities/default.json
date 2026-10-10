@@ -3,5 +3,5 @@
   "identifier": "default",
   "description": "Fenêtre principale : événements (MIDI) et commandes de l'appli.",
   "windows": ["main"],
-  "permissions": ["core:default"]
+  "permissions": ["core:default", "core:window:allow-set-fullscreen", "core:window:allow-is-fullscreen"]
 }

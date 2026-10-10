@@ -30,7 +30,16 @@ const check = (ok, what, extra = '') => { console.log((ok ? 'OK   ' : 'ÉCHEC ')
   // B entre sans Sync, basses ouvertes, fader en haut.
   await W(() => { controls.get('B.play').press({}); decks[1].ui.fader.set(1); });
   check(await wait(() => MixCoach.state.issues.has('tempo') && MixCoach.state.issues.has('bass')), 'B sans Sync, basses ouvertes : tempo et basses signalés', JSON.stringify(await issues()));
-  check(await W(() => !document.querySelector('.coach-hud').hidden && document.querySelector('.coach-hud').classList.contains('bad')), 'Bandeau du coach visible en rouge');
+  // Panneau Coach ouvert : le conseil y est déjà, le bandeau ne le répète pas.
+  const coachOpen = await W(() => !document.getElementById('p-coach').hidden);
+  if (coachOpen) check(await wait(() => document.querySelector('.coach-hud').hidden && /Tempos|basses/i.test(document.querySelector('#coach-direct .cl-list').textContent)), 'Panneau Coach ouvert : le conseil est dans le panneau, pas de bandeau en double');
+  await W(() => setCoach(false));
+  check(await wait(() => !document.querySelector('.coach-hud').hidden && document.querySelector('.coach-hud').classList.contains('bad')), 'Panneau fermé : bandeau du coach visible en rouge');
+  // Le bandeau se range dans la bibliothèque, entre la barre d'outils et la liste : aucune ligne cachée.
+  check(await W(() => { const hud = document.querySelector('.coach-hud'), r = hud.getBoundingClientRect();
+    const rows = [...document.querySelectorAll('#p-lib tbody tr:not(.vpad)')].map(x => x.getBoundingClientRect()).filter(b => b.height > 0);
+    return !!hud.closest('#p-lib') && rows.every(b => b.bottom <= r.top + 0.5 || b.top >= r.bottom - 0.5); }), 'Bandeau dans la bibliothèque, sans recouvrir de ligne');
+  await W(() => setCoach(true));
   check(await W(() => !!document.querySelector('.coach-target')), 'Halo sur la commande à toucher', await W(() => MixCoach.target));
 
   await W(() => controls.get('B.sync').press({}));

@@ -37,7 +37,7 @@ const fakeNative = saved => `
 
   // 1. Premier lancement : import d'un dossier, pose d'un cue, sauvegarde.
   let page = await browser.newPage({ viewport: { width: 1600, height: 960 } });
-  page.on('pageerror', e => errors.push(e.message));
+  page.on('pageerror', e => errors.push(e.message + ' @' + ((e.stack || '').split('\n')[1] || '').trim()));
   await page.addInitScript(fakeNative(null));
   await page.goto(url);
   await page.waitForFunction(() => LIB.tracks.length >= 4 && decks[0].track, null, { timeout: 60000 });
@@ -74,7 +74,7 @@ const fakeNative = saved => `
 
   // 2. Relance : la bibliothèque revient avec ses cues et sa playlist.
   page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
-  page.on('pageerror', e => errors.push(e.message));
+  page.on('pageerror', e => errors.push(e.message + ' @' + ((e.stack || '').split('\n')[1] || '').trim()));
   await page.addInitScript(fakeNative(saved));
   await page.goto(url);
   await page.waitForFunction(() => LIB.tracks.some(t => t.path), null, { timeout: 60000 });
@@ -85,7 +85,7 @@ const fakeNative = saved => `
 
   // 3. Navigateur sans pont natif : le bouton Importer classique reste là.
   page = await browser.newPage();
-  page.on('pageerror', e => errors.push(e.message));
+  page.on('pageerror', e => errors.push(e.message + ' @' + ((e.stack || '').split('\n')[1] || '').trim()));
   await page.goto(url);
   await page.waitForFunction(() => LIB.tracks.length >= 2, null, { timeout: 60000 });
   if (!(await page.isVisible('label.filebtn'))) fail('bouton Importer absent en mode navigateur');
