@@ -629,7 +629,7 @@ function renderMaps(){
   $('#map-json').value=JSON.stringify({format:'mixlab-mapping',version:1,map:midi.map},null,1);
 }
 function ledState(id){
-  if(window.MixCoach&&MixCoach.target===id)return Math.floor(performance.now()/250)%2===0;
+  if((window.Parcours&&Parcours.target===id)||(window.Coach&&Coach.target===id)||(window.MixCoach&&MixCoach.target===id))return Math.floor(performance.now()/250)%2===0;
   const m=/^([A-D])\.(.+)$/.exec(id);if(!m)return null;const d=deckById(m[1]),a=m[2];if(!d)return null;
   if(a==='play')return d.playing;if(a==='sync')return d.sync;if(a==='master')return S.master===d;if(a==='keylock')return d.keyLock;if(a==='slip')return d.slip;
   if(a==='cue')return!!d.track&&!d.playing&&Math.abs(d.position()-d.track.cue)<.02;if(a==='cuech')return d.cueOn;if(a==='loop')return d.loop.on;if(a==='fxon')return d.fx.on;
@@ -730,6 +730,7 @@ function frame(){
   ledTick();
   if(window.Coach)Coach.tick(dt);
   if(window.MixCoach)MixCoach.tick(dt);
+  if(window.Parcours)Parcours.tick(dt);
   requestAnimationFrame(frame);
 }
 
@@ -755,6 +756,7 @@ async function boot(){
     renderSide();renderTable();
   }
   window.Coach&&Coach.ready&&Coach.ready();
+  window.Parcours&&Parcours.init();
   window.Desktop&&Desktop.boot();
 }
 // On attend que tous les scripts de la page (library-pro, coach…) soient exécutés.

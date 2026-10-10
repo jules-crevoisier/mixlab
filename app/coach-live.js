@@ -167,6 +167,7 @@ window.MixCoach=(()=>{
       if(show)C.issues.set(r.id,{...s.res,sev,id:r.id});else C.issues.delete(r.id);
     }
     if(Coach.L.active&&!Coach.L.done)for(const[k,v]of C.issues)if(v.sev!=='bad')C.issues.delete(k);
+    if(window.Parcours&&Parcours.active)for(const[k,v]of C.issues)if(!Parcours.keepIssue(v))C.issues.delete(k);
     render();
   }
 
@@ -179,7 +180,7 @@ window.MixCoach=(()=>{
   }
   let lastKey='';
   function render(){
-    const b=top(),hud=C.el.hud;setTarget(b&&b.target||null);
+    const b=top(),hud=C.el.hud;setTarget((window.Parcours&&Parcours.target)||(window.Coach&&Coach.target)?null:(b&&b.target||null));
     const key=b?b.id+b.msg+b.why:'';
     if(key!==lastKey){
       lastKey=key;hud.hidden=!b;
@@ -199,7 +200,7 @@ window.MixCoach=(()=>{
       h('summary',{},h('span',{class:'sc '+(r.score>=75?'ok':r.score>=50?'warn':'bad')},String(r.score)),` ${r.from} → ${r.to} · ${r.bars.toFixed(0)} mesures`),
       h('ul',{},r.good.map(g=>h('li',{class:'g'},g)),r.tips.map(t=>h('li',{class:'t'},t))))));
   }
-  function setLevel(l){C.level=l;store.set('coachLevel',l);C.el.lvl.value=l;$('#coachlive-btn').setAttribute('aria-pressed',String(l!=='off'));lastKey='x';renderPanel(true);}
+  function setLevel(l){C.level=l;store.set('coachLevel',l);C.el.lvl.value=l;const dt=$('#coachlive-dot');dt&&dt.classList.toggle('on',l!=='off');const cb=$('#coach-btn');cb&&cb.setAttribute('title',l==='off'?'Coach et leçons (conseils en direct coupés)':'Coach et leçons · conseils en direct : '+LEVELS[l]);lastKey='x';renderPanel(true);}
   function build(){
     C.el.msg=h('b',{});C.el.why=h('span',{});C.el.more=h('i',{class:'more',title:'Autres conseils dans le panneau Coach'});
     C.el.hud=h('div',{class:'coach-hud',hidden:true,role:'status','aria-live':'polite'},
@@ -209,10 +210,10 @@ window.MixCoach=(()=>{
     C.el.lvl=h('select',{class:'sel',title:'Ce que le coach signale pendant que tu mixes',onchange:e=>setLevel(e.target.value)},Object.entries(LEVELS).map(([k,v])=>h('option',{value:k},v)));
     C.el.list=h('div',{class:'cl-list'});C.el.hist=h('div',{class:'cl-hist'});
     $('#coach-live').after(h('div',{class:'live',id:'coach-direct'},
-      h('div',{class:'lr'},h('span',{class:'lbl'},'En direct'),C.el.lvl),C.el.list,
+      h('div',{class:'lr'},h('span',{class:'lbl',title:'Conseils pendant que tu mixes'},'Conseils'),C.el.lvl),C.el.list,
       h('div',{class:'lbl',style:'margin-top:4px'},'Dernières transitions'),C.el.hist));
-    const btn=h('button',{class:'tb',id:'coachlive-btn',title:'Coach en direct : conseils pendant que tu mixes','aria-pressed':'true',onclick:()=>setLevel(C.level==='off'?'debutant':'off')},'Conseils');
-    $('#coach-btn').before(btn);
+    // Un seul bouton Coach : le voyant dit si les conseils en direct sont actifs, le niveau se règle dans le panneau.
+    $('#coach-btn').prepend(h('span',{class:'dot',id:'coachlive-dot'}));
     setLevel(C.level);
   }
   return{build,tick,state:C,get target(){return C.target;},RULES,setLevel};
