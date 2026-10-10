@@ -116,6 +116,20 @@ Un mode dédié, séparé des leçons isolées. On le choisit au premier lanceme
 
 ---
 
+## Chantier 7 · Interface pour le live sur PC portable
+
+En soirée, on joue souvent sur un portable de 13 à 15 pouces, dans le noir. Tout doit rester lisible et réglable.
+- **Zoom global de l'interface** (80 à 150 %), avec un raccourci clavier, comme Serato et VirtualDJ.
+- **Taille des platines** : mini, compacte ou complète, en un clic sur l'en-tête (comme Traktor).
+- **Bibliothèque plein écran** d'une touche pour chercher, puis retour aux platines (comme rekordbox et Serato).
+- **Séparateurs à glisser** entre les waveforms, les platines et la bibliothèque. La disposition est retenue pour chaque preset.
+- **Hauteur et zoom des waveforms** réglables.
+- **Mode « scène »** : gros BPM et temps restant, contraste renforcé, plein écran.
+- **Presets calqués sur les logiciels connus** : on reprend la disposition et les conventions (jamais les logos, noms ou couleurs signature), pour qu'un DJ s'y retrouve tout de suite.
+- Testé en 1366×768 et 1280×800.
+
+---
+
 ## Mes propositions en plus
 
 1. **Planificateur de set** : une timeline pour préparer un mix à l'avance, morceau par morceau, avec la courbe d'énergie. On peut l'écouter, puis le jouer en vrai.
@@ -137,6 +151,8 @@ Un mode dédié, séparé des leçons isolées. On le choisit au premier lanceme
 3. Bibliothèque : tags, notes, couleurs, crates intelligentes, import et export rekordbox XML, M3U, iTunes.
 4. Performance : cues mémoire nommés, slicer, effets supplémentaires, suggestion du morceau suivant.
 5. Import de playlists externes (métadonnées) et correspondance avec la collection.
-6. Si le temps le permet : relecture des transitions, planificateur de set, défis.
+6. Interface live : zoom, tailles de platine, bibliothèque plein écran, séparateurs, mode scène.
+7. Inventaire complet de parité (docs/PARITE.md), puis les fonctions manquantes par ordre de priorité.
+8. Si le temps le permet : relecture des transitions, planificateur de set, défis.
 
 Chaque étape est vérifiée par des tests (navigateur headless et Rust), poussée sur la branche `nuit` et visible dans la pull request.
