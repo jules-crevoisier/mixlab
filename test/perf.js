@@ -260,6 +260,7 @@ const helpers = () => {
 
   // Captures : pads, unités d'effets, mixer.
   await W(() => { layout.preset = 'perf'; layout.visible = new Set(['fx', 'wave', 'mixer', 'lib']); layout.coach = false; applyLayout();
+    View.setSize('compact', true); // en 1366×768, Performance passe en platines mini : on veut voir les pads
     const a = decks[0]; a.load(LIB.tracks[0]); a.track.hot[0] = 10; a.track.hotMeta[0] = { name: 'Drop', color: '#2fa8ff' }; a.track.hot[1] = 30; a.track.hotMeta[1] = { name: 'Voix', color: '#e86bff' }; a.track.hot[4] = 50;
     a.track.memCues = [{ t: 20, label: 'Intro', color: '#ffffff' }]; a.padMode = 'hot'; renderPads(a);
     FXU[1].setMode('chain'); renderFxUnit(FXU[1]); FXU[0].setSlot(0, { type: 'echo' }); renderFxUnit(FXU[0]); });

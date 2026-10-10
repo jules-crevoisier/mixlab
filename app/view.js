@@ -66,6 +66,10 @@ window.View=(()=>{
     for(const sz of sizes){
       const vars=[];mxs.forEach(mx=>jogs(sz).forEach(j=>vars.push({sz,mx,j,ln:lane0})));
       const small=last=vars[vars.length-1],rs=room(small);nl++;note(small,rs);
+      // plutôt des waveforms un peu plus basses que des platines sans pads
+      let hit=false;
+      if((sz==='compact'||sz===user)&&sp.lane==null&&rs<L0-tol)for(const f of sz===user?[.8,.6]:[.8]){const t={...small,ln:Math.max(LANEMIN,Math.round(lane0*f))};if(t.ln>=lane0)break;nl++;const r=room(t);if(judge(t,r)){hit=true;break;}if(r>=Lp-1)break;}
+      if(hit)break;
       if(rs<LMIN-1||(rs<Lp-1&&user!==sz))continue;
       // platine trop étroite pour son jog : la taille complète n'apporte rien, la compacte est plus nette
       if(sz==='full'&&J&&!P.noJog&&user!=='full'&&decks.some(d=>d.active&&!panel(d).classList.contains('big')&&getComputedStyle($('.dk-plat',panel(d))).display==='none'))continue;
@@ -74,6 +78,7 @@ window.View=(()=>{
       if(done||judge(small,rs))break;
     }
     // bibliothèque agrandie à la main : on lui donne tout ce que les plus petites platines laissent
+    if(!ok&&sp.lib!=null&&sp.lane==null&&best)for(const f of [.82,.68]){const t={...best,ln:Math.max(LANEMIN,Math.round(lane0*f))};if(t.ln>=best.ln)continue;nl++;const r=room(t);if(r>bestR){best=t;bestR=r;}if(r>=L0-tol)break;}
     ok=ok||(sp.lib!=null&&best&&bestR>=Lp-1?{...best,L:Math.min(L0,bestR)}:fb);
     if(!ok){
       for(const ln of [Math.round(lane0*.82),Math.round(lane0*.68),LANEMIN].filter(x=>x<lane0&&x>=LANEMIN)){const r=room({...last,ln});nl++;if(r>=LMIN-1){ok={...last,ln,L:Math.max(LMIN,Math.min(r,Lp))};break;}}
@@ -92,8 +97,11 @@ window.View=(()=>{
   function after(){
     decks.forEach(d=>{const el=panel(d),pl=$('.dk-plat',el),dw=$('.dk-wave',el);
       d.ui.jogOn=!!(d.active&&pl&&pl.offsetParent&&!V.libFull);d.ui.dwOn=!!(d.active&&dw&&dw.offsetParent&&!V.libFull);});
+    tabsMore();
     syncMenu();
   }
+  // modes de pads trop larges pour une platine compacte : fondu à droite tant qu'il reste des onglets à faire défiler
+  function tabsMore(){$$('.deck .tabs').forEach(t=>t.classList.toggle('more',t.scrollWidth-t.scrollLeft>t.clientWidth+2));}
   function layoutHook(){
     const A=app(),P=PR();
     A.classList.toggle('lib-full',V.libFull);A.classList.toggle('prep-mode',!!P.prep);A.classList.toggle('simple',!!P.simple);
@@ -304,6 +312,9 @@ window.View=(()=>{
       if(dw&&!$('.zoomb',dw))dw.append(h('div',{class:'zoomb'},h('button',{class:'b',type:'button',title:'Dézoomer',onclick:e=>{e.stopPropagation();window.setZoom(ui.zoom*1.5);}},'−'),h('button',{class:'b',type:'button',title:'Zoomer',onclick:e=>{e.stopPropagation();window.setZoom(ui.zoom/1.5);}},'+')));
     });
     // Ctrl + molette sur une waveform : zoom de la waveform (pas de la page)
+    A.addEventListener('wheel',e=>{const tb=!(e.ctrlKey||e.metaKey)&&e.target.closest('.sz-compact .tabs');
+      if(tb&&tb.scrollWidth>tb.clientWidth&&Math.abs(e.deltaY)>Math.abs(e.deltaX)){e.preventDefault();tb.scrollLeft+=e.deltaY;}},{passive:false});
+    A.addEventListener('scroll',e=>{if(e.target.classList&&e.target.classList.contains('tabs'))tabsMore();},true);
     A.addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;if(!e.target.closest('.lane,.dk-wave'))return;e.preventDefault();window.setZoom(ui.zoom*(e.deltaY>0?1.25:.8));},{passive:false});
     document.addEventListener('keydown',e=>{
       const mod=(e.ctrlKey||e.metaKey)&&!e.altKey;

@@ -932,16 +932,27 @@ body:has(.split.drag){cursor:row-resize;user-select:none}
 .sz-compact .dk-mid{display:contents}
 .sz-compact>.dk-head{grid-area:head}.sz-compact>.dk-ov{grid-area:ov}.sz-compact>.dk-wave{grid-area:dw}.sz-compact .dk-ctr{grid-area:ctr}
 .sz-compact>.dk-pads{grid-area:pads}.sz-compact>.dk-loop{grid-area:loop}
+/* boucles : Reloop a la place de son mot, /2 et ×2 en chiffres lisibles */
+.dk-loop>[data-ctl$=".reloop"]{flex:1.5 1 0;letter-spacing:0;min-width:max-content}
+.dk-loop>[data-ctl$=".loophalf"],.dk-loop>[data-ctl$=".loopdbl"]{font-family:var(--num);font-size:12px;letter-spacing:0}
 .deck.sz-compact .dk-pitch{grid-area:pitch;height:auto;min-height:0}
 .dk-pitch>[data-ctl]{contain:size;height:auto!important;min-height:40px}
 .sz-compact .dk-ctr{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;align-content:start}
 .sz-compact .dk-ctr>.r{display:contents}
 .sz-compact .dk-ctr>.r>*{grid-column:span 2}
-.sz-compact .dk-ctr>.r:has([data-ctl$=".slip"]),.sz-compact .dk-ctr>.r:has([data-ctl$=".keylock"])>:not([data-ctl]){display:none}
+.sz-compact .dk-ctr>.r:has([data-ctl$=".keylock"])>:not([data-ctl]){display:none}
+.sz-compact .dk-ctr>.r:has([data-ctl$=".slip"])>.b{height:22px;font-size:9.5px;padding:0 2px}
 .sz-compact .dk-ctr .b.big{grid-column:span 3;height:40px}
 .sz-compact .dk-stat b{font-size:22px}.sz-compact .dk-stat b.key,.sz-compact .dk-stat b.time{font-size:16px}
 .sz-compact .dk-ov{height:28px}
-.sz-compact .tabs .b{height:20px}
+.deck.sz-compact{gap:5px}
+.sz-compact .dk-pads{gap:4px}
+/* modes de pads sur une seule ligne (défile si vraiment trop étroit) */
+.sz-compact .tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:2px}
+.sz-compact .tabs::-webkit-scrollbar{display:none}
+.sz-compact .tabs.more{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent)}
+.sz-compact .tabs .b{height:20px;font-size:9px;letter-spacing:0;padding:0 3px;flex:1 0 auto}
+@container (max-width:380px){.sz-compact .dk-artist{display:none}}
 /* platine mini : en-tête, vue d'ensemble, Cue Play Sync Master */
 .sz-mini{gap:5px;padding:7px 9px}
 .sz-mini .dk-pitch,.sz-mini .dk-pads,.sz-mini .dk-loop,.sz-mini .dk-grid,.sz-mini .dk-artist{display:none}
@@ -975,6 +986,13 @@ body:has(.split.drag){cursor:row-resize;user-select:none}
 .mxc .ch .cueb{width:28px;height:22px;padding:0;align-self:center;font-size:9px}
 .mxc .mst{width:58px;gap:3px}
 .mxc .mst [data-ctl=cuemix],.mxc .mst [data-ctl=samplervol],.mxc .mst [data-ctl=split]{display:none}
+/* master compact : MASTER et CASQUE côte à côte, sélecteurs (effet de voie, EQ) sous le VU */
+.mxc .mst{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:84px;column-gap:2px;row-gap:3px;align-content:start}
+.mxc .mst>.nm,.mxc .mst>.mvu,.mxc .mst>.limt,.mxc .mst>.mxs{grid-column:1/-1;justify-self:center}
+.mxc .mst>[data-ctl=master]{grid-area:2/1}.mxc .mst>[data-ctl=cuevol]{grid-area:2/2}
+.mxc .mst .kn span{letter-spacing:0;white-space:nowrap}
+.mxc .mst>[data-ctl=master] span{visibility:hidden} /* déjà écrit au-dessus */
+.mxc .mst>.mxs{width:78px;height:22px;font-size:10px;padding:0 2px}
 .mxc .xf{padding-top:3px}
 
 /* bibliothèque plein écran : waveforms en bandeau, la liste prend tout */
@@ -983,7 +1001,7 @@ body:has(.split.drag){cursor:row-resize;user-select:none}
 #lib-btn[aria-pressed="true"],#stage-btn[aria-pressed="true"]{color:var(--white);border-color:var(--coach);background:color-mix(in srgb,var(--coach) 18%,#121418)}
 
 /* École : moins de commandes, coach à droite (environ un quart de l'écran) */
-.simple .dk-grid,.simple .dk-ctr>.r:has([data-ctl$=".slip"]){display:none}
+.simple .dk-grid{display:none}
 #p-coach{width:clamp(300px,25vw,420px)}
 
 /* Préparation : grand lecteur, structure, cues, grille */
@@ -1044,7 +1062,7 @@ html.stage .b{color:#e3e6eb;border-color:#3a3f4a;background:#14161a}
 html.stage .b.cue{color:var(--cue)}html.stage .b.play{color:var(--dc)}
 html.stage .b.on{color:var(--dc,var(--white))}
 html.stage .b.cue.on,html.stage .b.play.on{color:#05070a}
-html.stage :is(.brand small,.seg button,.tb,.mclock span,.lbl,.b:not(.big),select.sel,.kn span,.fxu .tag,.dk-stat .lbl,.pv,.tabs .b,.xfa button,.mst .nm,.side button.it span,.libbar .count,.lt th,.lt .ondeck,.lt .ld,.lcard .mod,.go,kbd,.coach-hud .more,.am-meta,.am-tag,.am-ref,.am-sug .sc,.am-leg,.am-q li .n,.am-why,.cl-ok,.bb,.bb-id,.pp-bpm span,.pp-go,.pp-list li.empty .pp-go,.pp-list li i,.mxc .kn span){font-size:11px!important}
+html.stage :is(.brand small,.seg button,.tb,.mclock span,.lbl,.b:not(.big),select.sel,.kn span,.fxu .tag,.dk-stat .lbl,.pv,.tabs .b,.xfa button,.mst .nm,.side button.it span,.libbar .count,.lt th,.lt .ondeck,.lt .ld,.lcard .mod,.go,kbd,.coach-hud .more,.am-meta,.am-tag,.am-ref,.am-sug .sc,.am-leg,.am-q li .n,.am-why,.cl-ok,.bb,.bb-id,.pp-bpm span,.pp-go,.pp-list li.empty .pp-go,.pp-list li i,.mxc .kn span,.limt){font-size:11px!important}
 html.stage .lt{font-size:13.5px}
 html.stage .lt th,html.stage .lbl,html.stage .kn span{color:#c3c9d2}
 html.stage .dk-title{font-size:16px}
@@ -1053,7 +1071,7 @@ html.stage .dk-stat b{font-size:34px}
 html.stage .dk-stat b.key{font-size:24px}
 html.stage .dk-stat b.time{font-size:26px}
 html.stage .sz-compact .dk-stat b{font-size:28px}html.stage .sz-compact .dk-stat b.key,html.stage .sz-compact .dk-stat b.time{font-size:21px}
-html.stage .sz-mini .dk-stat b{font-size:24px}html.stage .sz-mini .dk-stat b.key,html.stage .sz-mini .dk-stat b.time{font-size:18px}
+html.stage .sz-mini .dk-stat b{font-size:26px}html.stage .sz-mini .dk-stat b.key,html.stage .sz-mini .dk-stat b.time{font-size:20px}
 html.stage .xfa button{width:19px;height:17px}
 html.stage .mxc .ch{grid-template-columns:repeat(3,31px)}
 html.stage .lane,html.stage .dk-wave,html.stage .dk-ov{background:#000}
