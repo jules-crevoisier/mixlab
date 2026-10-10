@@ -11,7 +11,7 @@ window.View=(()=>{
   const SIZES=['full','compact','mini'],SNAME={auto:'Auto',full:'Complètes',compact:'Compactes',mini:'Mini'};
   const LMIN=205,LANEMIN=26;
   const V={zoom:clamp(+store.get('uiZoom',1)||1,.8,1.5),stage:!!store.get('stage',false),libFull:false,
-    sizes:store.get('deckSizes',{}),splits:store.get('splits',{}),cur:null,el:{},sig:{}};
+    sizes:store.get('deckSizes',{}),fxFold:!!store.get('fxFold',false),splits:store.get('splits',{}),cur:null,el:{},sig:{}};
   const key=()=>layout.preset+':'+S.numDecks;
   const PR=()=>PRESETS[layout.preset];
   const css=(k,v)=>document.documentElement.style.setProperty(k,v);
@@ -31,7 +31,7 @@ window.View=(()=>{
       const mp=s!=='mini'?2:t.sz==='mini'?t.mp??2:0; // petites platines de Préparation : sans pads
       el.classList.toggle('mini-nl',mp<2);el.classList.toggle('mini-np',mp<1);});
     $('#p-mixer').classList.toggle('mxc',t.mx==='compact');$('#p-fx').classList.toggle('fxfold',!!t.fx);
-    css('--jog',t.j+'px');css('--lane',t.ln+'px');css('--dkw',t.ln+'px');css('--fdr',t.mx==='compact'?'58px':'104px');
+    css('--jog',t.j+'px');css('--lane',t.ln+'px');css('--dkw',t.ln+'px');css('--fdr',t.mx==='compact'?'92px':'150px');
     A.style.gridTemplateRows=rowsFor(t);
   }
   function fits(){
@@ -65,7 +65,7 @@ window.View=(()=>{
     const mxs=P.mixer==='compact'?['compact']:['full','compact'];
     const J=(P.jog&&P.jog[n])||0,jogs=sz=>sz==='full'&&!P.noJog&&J?[J,Math.round(J*.86),Math.round(J*.74)]:[J||120];
     // rangée d'effets repliée sur une ligne : avant de passer à une taille de platine plus petite (toujours en mode scène)
-    const fxOn=layout.visible.has('fx')&&layout.rows.some(r=>r.a.includes('fx')),fxs=!fxOn?[false]:V.stage?[true]:[false,true];
+    const fxOn=layout.visible.has('fx')&&layout.rows.some(r=>r.a.includes('fx')),fxs=!fxOn?[false]:V.stage||V.fxFold?[true]:[false,true];
     // pour chaque taille, on essaie d'abord la variante la plus petite : si elle ne tient pas, la taille est écartée
     let ok=null,fb=null,nl=0,last=null,lastVars=[];A.classList.add('fitting');
     let best=null,bestR=-1e9;const note=(t,r)=>{if(r>bestR){bestR=r;best=t;}};
@@ -176,8 +176,10 @@ window.View=(()=>{
     if(V.el.zv)V.el.zv.textContent=Math.round(V.zoom*100)+' %';
     fit();fitTop();closeMenus();if(!quiet)toast('Zoom de l’interface : '+Math.round(V.zoom*100)+' %');
   }
+  // rangée d'effets repliée sur une ligne (nom, cible, effet, dosage, On), retenue d'une session à l'autre
+  function toggleFxFold(){V.fxFold=!V.fxFold;store.set('fxFold',V.fxFold);fit();FXU.forEach(renderFxUnit);}
   function setStage(on){
-    V.stage=on;store.set('stage',on);document.documentElement.classList.toggle('stage',on);
+    V.stage=on;store.set('stage',on);document.documentElement.classList.toggle('stage',on);readTokens();
     if(V.el.stageBtn)V.el.stageBtn.setAttribute('aria-pressed',String(on));if(V.el.stageCk)V.el.stageCk.checked=on;
     fit();fitTop();
   }
@@ -225,7 +227,7 @@ window.View=(()=>{
     V.el.morePop=h('div',{class:'pop vmore',role:'menu'});
     V.el.more=h('details',{class:'tbmore',id:'top-more',hidden:true},h('summary',{class:'tb ico',title:'Autres commandes','aria-label':'Autres commandes'},'⋯'),V.el.morePop);
     V.el.morePop.addEventListener('click',e=>{if(e.target.closest('button,label.tb'))V.el.more.open=false;});
-    top.insertBefore(V.el.libBtn,rec);top.append(V.el.stageBtn,V.el.fsBtn,V.el.more);
+    top.insertBefore(V.el.libBtn,$('#audio-btn')||rec);top.append(V.el.stageBtn,V.el.fsBtn,V.el.more);
     regBtn('ui.libfull','Bibliothèque plein écran',V.el.libBtn,()=>toggleLib(!V.libFull));
     regBtn('ui.stage','Mode scène',V.el.stageBtn,()=>setStage(!V.stage));
     $$('details',top).forEach(menuPop);
@@ -350,7 +352,7 @@ window.View=(()=>{
     if(++tk%20===0){renderPrep();renderSide2();}
   }
   function build(){
-    css('--uiz',String(V.zoom));document.documentElement.classList.toggle('stage',V.stage);
+    css('--uiz',String(V.zoom));document.documentElement.classList.toggle('stage',V.stage);readTokens();
     const A=app();
     V.el.spw=splitter('sp-wave','spw','Hauteur des waveforms : glisse',(s,dy)=>{sp().lane=clamp(s.lane+dy/nLanes(),LANEMIN,220);},()=>{delete sp().lane;});
     V.el.spl=splitter('sp-lib','spl','Hauteur de la bibliothèque : glisse',(s,dy)=>{sp().lib=clamp(s.lib-dy,LMIN,s.H*.85)/s.H;},()=>{delete sp().lib;});
@@ -390,5 +392,5 @@ window.View=(()=>{
     const mo=new MutationObserver(refit);decks.forEach(d=>mo.observe(panel(d),{childList:true}));
     document.fonts&&document.fonts.ready.then(()=>{fit();fitTop();});
   }
-  return{build,layout:layoutHook,fit,fitTop,closeMenus,tick,setZoom,setStage,setSize,toggleLib,toggleFs,cycle,state:V,get zoom(){return V.zoom;},get libFull(){return V.libFull;}};
+  return{build,layout:layoutHook,fit,toggleFxFold,fitTop,closeMenus,tick,setZoom,setStage,setSize,toggleLib,toggleFs,cycle,state:V,get zoom(){return V.zoom;},get libFull(){return V.libFull;}};
 })();

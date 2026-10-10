@@ -238,10 +238,10 @@ window.DeckPro=(()=>{
     E.tm.textContent=tr?fmtTime(pvPos(),false)+' / '+fmtTime(tr.duration,false):'';
     E.root.title=tr?'Pré-écoute : '+(tr.artist?tr.artist+' - ':'')+tr.title:'';
     const cv=E.cv;if(!fitCanvas(cv))return;const g=cv.getContext('2d'),W=cv.width,H=cv.height;
-    g.fillStyle='#07080a';g.fillRect(0,0,W,H);if(!tr||!tr.wf)return;
-    const wf=tr.wf,n=wf.l.length,mid=H/2,sc=wf.scale*mid*.95;g.fillStyle=PV.tr===tr?'#8fa3bd':'#4a5260';
+    g.fillStyle=TK['wave-bg'];g.fillRect(0,0,W,H);if(!tr||!tr.wf)return;
+    const wf=tr.wf,n=wf.l.length,mid=H/2,sc=wf.scale*mid*.95;g.fillStyle=PV.tr===tr?TK['text-mid']:TK['surface-4'];
     for(let x=0;x<W;x++){const i0=Math.floor(x/W*n),i1=Math.max(i0+1,Math.floor((x+1)/W*n));let m=0;for(let i=i0;i<i1;i++)m=Math.max(m,wf.l[i],wf.m[i]);const hh=Math.max(.5,m*sc);g.fillRect(x,mid-hh,1,hh*2);}
-    if(PV.tr===tr){const px=pvPos()/tr.duration*W;g.fillStyle='rgba(5,6,8,.55)';g.fillRect(0,0,px,H);g.fillStyle='#a78bfa';g.fillRect(px-1,0,2,H);}
+    if(PV.tr===tr){const px=pvPos()/tr.duration*W;g.fillStyle=rgba(TK['surface-0'],.55);g.fillRect(0,0,px,H);g.fillStyle=TK.live;g.fillRect(px-1,0,2,H);}
   }
 
   /* ---------- morceau suivant chargé à la fin ---------- */
@@ -468,9 +468,9 @@ window.DeckPro=(()=>{
 .dp-pv{display:flex;align-items:center;gap:6px;min-width:0}
 .dp-pvb.on{color:var(--coach);border-color:var(--coach)}
 .dp-pvc{width:150px;height:22px;border:1px solid var(--ln2);border-radius:3px;cursor:pointer;background:#07080a}
-.dp-pvt{font:500 10px var(--num);color:var(--mu);min-width:72px}
-.dp-f{display:grid;gap:4px;margin:0 0 10px;font-size:12px;color:var(--mu)}
-.dp-c{display:flex;gap:7px;align-items:center;margin:0 0 10px;font-size:12px;color:var(--tx);cursor:pointer}
+.dp-pvt{font:500 11px var(--num);color:var(--mu);min-width:72px}
+.dp-f{display:grid;gap:4px;margin:0 0 10px;font-size:13px;color:var(--mu)}
+.dp-c{display:flex;gap:7px;align-items:center;margin:0 0 10px;font-size:13px;color:var(--tx);cursor:pointer}
 .dp-rr{display:flex;gap:8px;align-items:center}
 .dp-rng{flex:1;accent-color:var(--coach)}
 .dp-v{font:600 11px var(--num);color:var(--white);min-width:52px;text-align:right}

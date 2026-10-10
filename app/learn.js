@@ -62,7 +62,7 @@ window.Coach=(()=>{
        A().fx.toggle('A',true);A().fx.setMode('single');A().fx.setType('reverb');A().fx.beats=.5;A().fx.on=false;A().fx.apply();setFxUi(A());layout.visible.add('fx');applyLayout();L.stats={cut:null};},
      steps:[
        {t:'Lance la platine A',target:'A.play',why:'A joue sa dernière phrase avant l’outro. Les effets sont dans la bande FX, sous les platines.',check:()=>A().playing},
-       {t:'Sur l’unité FX assignée à A, choisis « Écho » et une durée de 1 temps',target:()=>'#fxu-'+A().fx.n+(A().fx.type==='echo'?' .bt':' select'),why:'Un écho d’un temps répète chaque son exactement sur le temps suivant : il reste dans le groove.',check:()=>A().fx.type==='echo'&&A().fx.beats===1},
+       {t:'Sur l’unité FX assignée à A, choisis « Écho » et une durée de 1 temps',target:()=>'#fxu-'+A().fx.n+(A().fx.type==='echo'?' .bseg':' select'),why:'Un écho d’un temps répète chaque son exactement sur le temps suivant : il reste dans le groove.',check:()=>A().fx.type==='echo'&&A().fx.beats===1},
        {t:'Monte le dosage vers 60 % et active l’effet (On)',target:()=>A().fx.amount<.4?'A.fxamt':'A.fxon',why:'L’écho s’ajoute au son de A. Pour l’instant on l’entend à peine : il va prendre toute la place quand A sera coupé.',check:()=>A().fx.on&&A().fx.amount>=.4},
        {t:'Coupe le fader de A d’un coup, sur le dernier temps d’une phrase',target:'A.fader',why:'Le son de A disparaît mais l’écho, placé après le fader dans la chaîne de A, continue de résonner et s’éteint tout seul.',
         hint(){const bi=A().barInfo();return bi&&!bi.pre?`A : mesure ${bi.barIn+1}/8, temps ${bi.beat+1}.`:'';},
@@ -93,7 +93,7 @@ window.Coach=(()=>{
       return;
     }
     const n=les.steps.length;
-    el.append(h('div',{},h('div',{class:'lbl',style:'color:var(--coach)'},les.mod),h('div',{style:'font-weight:600;font-size:14px;color:var(--white)'},les.title),h('div',{class:'prog'},h('i',{style:`width:${(L.done?n:L.i)/n*100}%`}))));
+    el.append(h('div',{},h('div',{class:'lbl',style:'color:var(--coach)'},les.mod),h('div',{style:'font-weight:600;font-size:13px;color:var(--white)'},les.title),h('div',{class:'prog'},h('i',{style:`width:${(L.done?n:L.i)/n*100}%`}))));
     el.append(h('ol',{class:'steps'},les.steps.map((s,i)=>h('li',{class:L.done||i<L.i?'done':i===L.i?'cur':''},s.t))));
     if(L.done)el.append(h('div',{class:'donebox flash'},h('b',{},'Bravo, leçon réussie.'),h('ul',{},les.finish().map(x=>h('li',{},x)))));
     else{const s=les.steps[L.i];L.hintEl=h('div',{class:'hx'},'');L.lastHint='';el.append(h('div',{class:'now',id:'coach-now'},h('div',{class:'t'},`Étape ${L.i+1}/${n} · ${s.t}`),h('div',{class:'why'},s.why),L.hintEl));}
@@ -114,7 +114,7 @@ window.Coach=(()=>{
   let tEl=null,tId=null;
   function setTarget(id){
     const el=!id?null:/^[#.\[]/.test(id)?$(id):(ctl(id)||{}).el||null;
-    if(tEl&&tEl!==el)tEl.classList.remove('coach-target');tEl=el;tId=el?id:null;if(el)el.classList.add('coach-target');
+    if(tEl&&tEl!==el)tEl.classList.remove('coach-target');tEl=el;tId=el?id:null;if(el){el.classList.add('coach-target');window.revealCtl&&revealCtl(el);}
   }
   function tick(dt){
     {const s=L.active&&!L.done&&!$('#p-coach').hidden?L.active.steps[L.i]:null;let id=null;try{id=s?(typeof s.target==='function'?s.target():s.target):null;}catch(e){}setTarget(id);}

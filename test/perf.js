@@ -210,7 +210,7 @@ const helpers = () => {
   await sleep(200);
   const n1 = await meas(500);
   const lab = await W(() => $('span', decks[0].ui.k.filter.el).textContent);
-  check(n0.rms < .002 && n1.rms > .01 && lab === 'BRUIT', 'Effet de voie « Bruit » : le potard ajoute du bruit filtré', `${n0.rms.toFixed(4)} → ${n1.rms.toFixed(4)} · ${lab}`);
+  check(n0.rms < .002 && n1.rms > .01 && /^bruit$/i.test(lab), 'Effet de voie « Bruit » : le potard ajoute du bruit filtré', `${n0.rms.toFixed(4)} → ${n1.rms.toFixed(4)} · ${lab}`);
   const spaceTail = async knob => {
     await W(k => { const a = decks[0]; setColorFx('space'); a.ui.k.filter.set(k); a.seek(a.timeOfBeat(96)); a.play(); }, knob);
     await sleep(900); await W(() => decks[0].pause()); await sleep(80); return (await meas(300)).rms;
