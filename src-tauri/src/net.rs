@@ -852,14 +852,14 @@ mod tests {
         assert_eq!(base64(b"f"), "Zg==");
         assert_eq!(base64(b"fo"), "Zm8=");
         assert_eq!(base64(b"foo"), "Zm9v");
-        assert_eq!(base64(b"source:hackme"), "c291cmNlOmhhY2ttZQ==");
+        assert_eq!(base64(b"user:pw"), "dXNlcjpwdw==");
     }
 
     #[test]
     fn source_request_has_auth_mount_and_no_header_injection() {
         let r = source_request(&cfg("icecast", 8000));
         assert!(r.starts_with("PUT /live HTTP/1.1\r\n"));
-        assert!(r.contains("Authorization: Basic c291cmNlOmhhY2ttZQ==\r\n"));
+        assert!(r.contains(&format!("Authorization: Basic {}\r\n", base64(b"source:hackme"))));
         assert!(r.contains("Content-Type: audio/webm\r\n"));
         assert!(r.contains("Expect: 100-continue\r\n"));
         assert!(r.contains("Ice-Name: MixlabX-Injecte: 1\r\n"));
@@ -899,7 +899,7 @@ mod tests {
         drop(s);
         let (head, body) = h.join().unwrap();
         assert!(head.starts_with("PUT /live HTTP/1.1"));
-        assert!(head.contains("Authorization: Basic c291cmNlOmhhY2ttZQ=="));
+        assert!(head.contains(&format!("Authorization: Basic {}", base64(b"source:hackme"))));
         assert!(head.contains("Ice-Audio-Info: bitrate=128"));
         assert_eq!(body, b"\x1aE\xdf\xa3 octets webm");
     }
