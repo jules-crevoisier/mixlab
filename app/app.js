@@ -357,45 +357,53 @@ async function importFiles(files,deck){
   }
 }
 
-/* ---------- dispositions ---------- */
+/* ---------- dispositions ----------
+   Chaque preset reprend les emplacements et les conventions d'une famille de logiciels
+   du métier (jamais leurs noms, logos ou couleurs). Rien ne défile : View.fit répartit
+   la hauteur entre waveforms, platines et bibliothèque, et réduit les platines si besoin. */
 const PANELS={fx:'Effets',wave:'Waveforms',mixer:'Mixer',lib:'Bibliothèque'};
 const twoRows=n=>n===2?[['deckA','mixer','deckB']]:[['deckA','mixer','deckB'],['deckC','mixer','deckD']];
 const PRESETS={
-  perf:{name:'Performance',title:'Waveforms parallèles en haut, grandes platines, bibliothèque dessous. Le mixer de ta table fait le reste.',
-    order:['fx','wave','BLOCK','lib'],block:n=>n===2?[['deckA','mixer','deckB']]:[['deckC','deckA','mixer','deckB','deckD']],show:['fx','wave','lib'],lane:{2:64,4:46},jog:{2:160,4:104}},
-  export:{name:'Export',title:'Waveforms larges, platines de part et d’autre du mixer, effets sous les platines.',
-    order:['wave','BLOCK','fx','lib'],block:twoRows,show:['wave','mixer','fx','lib'],lane:{2:80,4:54},jog:{2:120,4:100}},
-  studio:{name:'Studio',title:'Pas de platines rondes : chaque deck a sa waveform, effets en haut, mixer au centre.',
-    order:['fx','BLOCK','lib'],block:twoRows,show:['fx','mixer','lib'],deckWaves:true,noJog:true,lane:{2:64,4:46},jog:{2:0,4:0}},
-  mix:{name:'Mix',title:'Grandes platines, mixer au centre, waveforms en haut : la disposition la plus simple à prendre en main.',
-    order:['wave','BLOCK','fx','lib'],block:twoRows,show:['wave','mixer','lib'],lane:{2:70,4:50},jog:{2:200,4:110}},
-  ecole:{name:'École',title:'Disposition Mix avec le coach ouvert et ses leçons guidées.',
-    order:['wave','BLOCK','fx','lib'],block:twoRows,show:['wave','mixer','lib'],coach:true,lane:{2:64,4:46},jog:{2:150,4:100}}
+  perf:{name:'Performance',title:'Waveforms parallèles sur toute la largeur, grandes platines, petit mixer et grande bibliothèque. Pensé pour jouer sur une table.',
+    order:['fx','wave','BLOCK','lib'],block:n=>n===2?[['deckA','mixer','deckB']]:[['deckC','deckA','mixer','deckB','deckD']],show:['fx','wave','mixer','lib'],mixer:'compact',lane:{2:70,4:40},jog:{2:170,4:120},lib:.45},
+  export:{name:'Préparation',title:'Préparer ses morceaux : un grand lecteur avec la structure, la liste des cues, l’éditeur de grille et la bibliothèque en grand. Pas de mixer ni d’effets.',
+    order:['BLOCK','lib'],block:n=>n===2?[['big','m1','prep']]:[['big','m1','prep'],['big','m2','prep'],['big','m3','prep']],show:['lib'],prep:true,noJog:true,lane:{2:110,4:96},lib:.42},
+  studio:{name:'Studio',title:'Effets en haut, A et C à gauche, B et D à droite autour du mixer complet, une waveform par platine. Dense.',
+    order:['fx','BLOCK','lib'],block:twoRows,show:['fx','mixer','lib'],deckWaves:true,noJog:true,lane:{2:84,4:48},lib:.34},
+  mix:{name:'Mix',title:'Waveforms parallèles avec compteur de temps et de phrase, grandes platines, mixer au centre, panneau latéral à onglets.',
+    order:['wave','BLOCK','fx','lib'],block:twoRows,show:['wave','mixer','lib'],beatBar:true,side:true,lane:{2:62,4:38},jog:{2:190,4:120},lib:.34},
+  ecole:{name:'École',title:'La disposition Mix en plus simple, avec le coach et ses leçons à droite.',
+    order:['wave','BLOCK','fx','lib'],block:twoRows,show:['wave','mixer','lib'],coach:true,simple:true,beatBar:true,lane:{2:50,4:36},jog:{2:160,4:110},lib:.34}
 };
-const layout={preset:store.get('preset','ecole'),visible:new Set(store.get('visible',null)||PRESETS[store.get('preset','ecole')].show),coach:false};
+const layout={preset:store.get('preset','ecole'),visible:new Set(store.get('visible',null)||PRESETS[store.get('preset','ecole')]?.show||PRESETS.ecole.show),coach:false,focus:'A',rows:[]};
+if(!PRESETS[layout.preset])layout.preset='ecole';
 function applyLayout(){
   const P=PRESETS[layout.preset],n=S.numDecks,vis=layout.visible,app=$('#app');
   let block=P.block(n);if(!vis.has('mixer'))block=block.map(r=>r.filter(x=>x!=='mixer'));
-  const ncol=block[0].length,rows=[];
+  // Préparation : la platine choisie occupe le grand lecteur, les autres se rangent dessous.
+  const act=decks.filter(d=>d.active),big=act.find(d=>d.id===layout.focus)||act[0],rest=act.filter(d=>d!==big),slot={big,m1:rest[0],m2:rest[1],m3:rest[2]};
+  decks.forEach(d=>{const el=$('#p-deck'+d.id),s=P.prep?Object.keys(slot).find(k=>slot[k]===d):null;el.style.gridArea=s||'deck'+d.id;el.classList.toggle('big',s==='big');});
+  const ncol=block[0].length,rows=[],line=(a,kind)=>rows.push({a:Array(ncol).fill(a),kind});
   for(const it of P.order){
-    if(it==='BLOCK')block.forEach(r=>rows.push([r,'auto']));
-    else if(vis.has(it))rows.push([Array(ncol).fill(it),it==='lib'?'minmax(150px,1fr)':'auto']);
+    if(it==='BLOCK'){if(rows.length&&rows[rows.length-1].kind==='wave')line('spw','split');block.forEach(r=>rows.push({a:r,kind:'deck'}));}
+    else if(vis.has(it)){if(it==='lib')line('spl','split');line(it,it);}
   }
-  if(!vis.has('lib'))rows.push([Array(ncol).fill('.'),'1fr']);
-  app.style.gridTemplateColumns=block[0].map(x=>x==='mixer'?'auto':'minmax(0,1fr)').join(' ');
-  app.style.gridTemplateRows=rows.map(r=>r[1]).join(' ');
-  app.style.gridTemplateAreas=rows.map(r=>'"'+r[0].join(' ')+'"').join(' ');
-  for(const k of Object.keys(PANELS))$('#p-'+k).hidden=!vis.has(k)||(k!=='mixer'&&!P.order.includes(k));
+  if(!vis.has('lib'))line('.','fill');
+  layout.rows=rows;
+  app.style.gridTemplateColumns=block[0].map(x=>x==='mixer'?'auto':x==='prep'?'minmax(260px,.85fr)':x==='big'?'minmax(0,1.6fr)':'minmax(0,1fr)').join(' ');
+  app.style.gridTemplateAreas=rows.map(r=>'"'+r.a.join(' ')+'"').join(' ');
+  for(const k of Object.keys(PANELS))$('#p-'+k).hidden=!vis.has(k)||(k==='mixer'?!block.flat().includes('mixer'):!P.order.includes(k));
   decks.forEach(d=>{
     const on=d.active;$('#p-deck'+d.id).hidden=!on;$('#lane-'+d.id).hidden=!on;$('#fx-'+d.id).hidden=!on;$('#ch-'+d.id).hidden=!on;
     if(!on&&d.playing)d.pause();
   });
-  app.classList.toggle('deck-waves',!!P.deckWaves);app.classList.toggle('no-jog',!!P.noJog);app.classList.toggle('compact',n===4&&block.length>1);
-  document.documentElement.style.setProperty('--lane',P.lane[n]+'px');document.documentElement.style.setProperty('--jog',(P.jog[n]||120)+'px');
+  app.classList.toggle('deck-waves',!!P.deckWaves);app.classList.toggle('no-jog',!!P.noJog);
+  if(window.View)View.layout();
+  else{app.style.gridTemplateRows=rows.map(r=>r.kind==='lib'?'minmax(150px,1fr)':r.kind==='fill'?'1fr':r.kind==='split'?'0':'auto').join(' ');document.documentElement.style.setProperty('--lane',P.lane[n]+'px');document.documentElement.style.setProperty('--jog',(P.jog&&P.jog[n]||120)+'px');}
   $('#p-coach').hidden=!layout.coach;$('#coach-btn').setAttribute('aria-pressed',String(layout.coach));
   $$('#presets button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.p===layout.preset)));
   $$('#ndecks button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.n===n)));
-  $$('#panels-pop input').forEach(c=>c.checked=vis.has(c.value));
+  $$('#panels-pop input[value]').forEach(c=>{if(c.value in PANELS)c.checked=vis.has(c.value);});
   applyXf();renderTable();
   store.set('preset',layout.preset);store.set('visible',[...vis]);store.set('decks',n);
 }
@@ -430,35 +438,51 @@ function buildTop(){
 }
 
 /* ---------- dessin ---------- */
+/* Waveform défilante. Les trois bandes sont dessinées une seule fois par morceau, par zoom
+   et par taille dans des tuiles hors écran (le max de chaque colonne : pas de scintillement
+   au dézoom). Chaque frame ne fait que recopier les tuiles, puis pose la grille, les cues
+   et la tête de lecture. Le cache vit sur le canvas : deux vues d'un même morceau ne se gênent pas. */
+const TILE=1024;
+const uiScale=()=>(window.devicePixelRatio||1)*(window.View?View.zoom:1);
+function waveTile(wc,i){
+  let c=wc.t.get(i);if(c)return c;
+  if(wc.t.size>40)wc.t.delete(wc.t.keys().next().value);
+  c=document.createElement('canvas');c.width=TILE;c.height=wc.H;
+  const g=c.getContext('2d'),wf=wc.tr.wf,n=wf.l.length,mid=wc.H/2,sc=wf.scale*mid*.92,x0=i*TILE,k=WF/wc.pB;
+  g.globalCompositeOperation=wc.band.op;
+  for(const[arr,col,mul]of[[wf.l,wc.band.l,1],[wf.m,wc.band.m,.82],[wf.h,wc.band.h,.5]]){
+    g.fillStyle=col;g.beginPath();
+    for(let x=0;x<TILE;x++){
+      let m=0;
+      if(k<1){const f=(x0+x+.5)*k-.5,j=Math.floor(f),u=f-j;if(j<0||j+1>=n)continue;m=arr[j]+(arr[j+1]-arr[j])*u;}
+      else{const i0=Math.floor((x0+x)*k),i1=Math.min(n,Math.max(i0+1,Math.floor((x0+x+1)*k)));if(i0>=n)break;for(let j=Math.max(0,i0);j<i1;j++)if(arr[j]>m)m=arr[j];}
+      const hh=m*sc*mul;if(hh>.25)g.rect(x,mid-hh,1,hh*2);
+    }
+    g.fill();
+  }
+  wc.t.set(i,c);return c;
+}
 function drawWave(d,cv,lane){
   if(!fitCanvas(cv))return;
-  const g=cv.getContext('2d'),W=cv.width,H=cv.height,mid=H/2,dpr=window.devicePixelRatio||1;
+  const g=cv.getContext('2d',{alpha:false}),W=cv.width,H=cv.height,mid=H/2,dpr=uiScale();
   g.fillStyle='#050608';g.fillRect(0,0,W,H);
-  if(!d.track){g.fillStyle='#5b616c';g.font=`500 ${11*dpr}px Inter,sans-serif`;g.fillText('PLATINE '+d.id+' · glisse un morceau ici',12*dpr,mid+4*dpr);return;}
-  const tr=d.track,pos=d.position(),pps=W/ui.zoom/d.rate,t0=pos-(W/2)/pps,t1=pos+(W/2)/pps;
+  if(!d.track){g.fillStyle='#8a919c';g.font=`500 ${11*dpr}px Inter,sans-serif`;g.fillText('PLATINE '+d.id+' · glisse un morceau ici',12*dpr,mid+4*dpr);return;}
+  const tr=d.track,pos=d.position(),pB=W/ui.zoom,pps=pB/d.rate,t0=pos-(W/2)/pps,t1=pos+(W/2)/pps;
   if(d.loop.on){g.fillStyle='rgba(63,214,121,.14)';const x0=(d.loop.start-t0)*pps,x1=(d.loop.end-t0)*pps;g.fillRect(x0,0,x1-x0,H);g.fillStyle='rgba(63,214,121,.8)';g.fillRect(x0,0,dpr,H);g.fillRect(x1-dpr,0,dpr,H);}
   if(d.loopIn!=null){g.fillStyle='rgba(63,214,121,.8)';g.fillRect((d.loopIn-t0)*pps,0,2*dpr,H);}
   const b0=Math.ceil(d.beatIdx(t0)),b1=Math.floor(d.beatIdx(t1));
-  g.font=`500 ${9*dpr}px "JetBrains Mono",monospace`;
+  g.font=`500 ${9.5*dpr}px "JetBrains Mono",monospace`;
   for(let b=b0;b<=b1;b++){
     const x=Math.round((d.timeOfBeat(b)-t0)*pps),m4=((b%4)+4)%4,m32=((b%32)+32)%32;
     if(m32===0){g.fillStyle='rgba(167,139,250,.75)';g.fillRect(x-dpr,0,2*dpr,H);g.fillStyle='rgba(167,139,250,.18)';g.fillRect(x,0,(d.timeOfBeat(b+32)-d.timeOfBeat(b))*pps,3*dpr);}
     else if(m4===0){g.fillStyle='rgba(255,255,255,.22)';g.fillRect(x-dpr*.5,0,1.5*dpr,H);}
     else{g.fillStyle='rgba(255,255,255,.07)';g.fillRect(x,0,dpr,H);}
-    if(m4===0&&b>=0){g.fillStyle=m32===0?'#a78bfa':'rgba(255,255,255,.4)';g.fillText(m32===0?'P'+(b/32+1):String(b/4+1),x+3*dpr,H-4*dpr);}
+    if(m4===0&&b>=0){g.fillStyle=m32===0?'#b9a6ff':'rgba(255,255,255,.55)';g.fillText(m32===0?'P'+(b/32+1):String(b/4+1),x+3*dpr,H-4*dpr);}
   }
-  const wf=tr.wf,sc=wf.scale*mid*.92,n=wf.l.length;
-  const env=new Float32Array(W);
-  const layer=(arr,col,mul)=>{
-    for(let x=0;x<W;x++){const i=((t0+x/pps)*WF)|0;env[x]=i<0||i>=n?0:arr[i]*sc*mul;}
-    g.fillStyle=col;g.beginPath();g.moveTo(0,mid);
-    for(let x=0;x<W;x++)g.lineTo(x,mid-env[x]);
-    for(let x=W-1;x>=0;x--)g.lineTo(x,mid+env[x]);
-    g.closePath();g.fill();
-  };
-  g.globalCompositeOperation=BAND.op;
-  layer(wf.l,BAND.l,1);layer(wf.m,BAND.m,.82);layer(wf.h,BAND.h,.5);
-  g.globalCompositeOperation='source-over';
+  // bandes : recopie des tuiles
+  let wc=cv._wc;if(!wc||wc.tr!==tr||wc.wf!==tr.wf||wc.pB!==pB||wc.H!==H||wc.band!==BAND)wc=cv._wc={tr,wf:tr.wf,pB,H,band:BAND,t:new Map()};
+  const i0=Math.max(0,Math.floor(t0*pB/TILE)),i1=Math.floor(t1*pB/TILE),tw=TILE/d.rate;
+  for(let i=i0;i<=i1;i++){if(i*TILE/pB>tr.duration)break;g.drawImage(waveTile(wc,i),Math.round((i*TILE/pB-t0)*pps),0,tw,H);}
   window.Structure&&Structure.drawLane(g,d,t0,pps,W,H,dpr);
   g.fillStyle='rgba(6,7,9,.42)';g.fillRect(0,0,W/2,H);
   const mark=(t,col,label)=>{const x=(t-t0)*pps;if(x<-30||x>W+30)return;g.fillStyle=col;g.fillRect(x-dpr*.5,0,1.5*dpr,H);g.beginPath();g.moveTo(x-5*dpr,0);g.lineTo(x+5*dpr,0);g.lineTo(x,7*dpr);g.fill();if(label){g.fillRect(x,8*dpr,12*dpr,12*dpr);g.fillStyle='#05070a';g.fillText(label,x+3*dpr,17*dpr);}};
@@ -467,12 +491,13 @@ function drawWave(d,cv,lane){
   g.fillStyle='rgba(255,255,255,.18)';g.fillRect(W/2-3*dpr,0,6*dpr,H);g.fillStyle='#fff';g.fillRect(W/2-dpr,0,2*dpr,H);
   if(lane){
     const ki=keyInfo(d.keyNow()),bi=d.barInfo(),cnt=(bi&&!bi.pre?`  ·  ${bi.barIn+1}.${bi.beat+1}  ·  P${bi.phrase+1}`:'')+(window.Structure?Structure.tag(tr,pos):''),txt=`${tr.title}  ·  ${d.bpm.toFixed(2)}  ·  ${ki?ki.code:'—'}${cnt}${d.sync?'  ·  SYNC':''}${S.master===d?'  ·  MASTER':''}`;
-    g.font=`600 ${10.5*dpr}px Inter,sans-serif`;const tw=g.measureText(txt).width;
-    g.fillStyle='rgba(5,6,8,.75)';g.fillRect(0,0,tw+30*dpr,15*dpr);
-    g.fillStyle=COL[d.id];g.fillRect(0,0,16*dpr,15*dpr);g.fillStyle='#05070a';g.fillText(d.id,5*dpr,11*dpr);
-    g.fillStyle='#d6d9df';g.fillText(txt,22*dpr,11*dpr);
-    const rem=fmtTime(pos-tr.duration);g.font=`500 ${10.5*dpr}px "JetBrains Mono",monospace`;const rw=g.measureText(rem).width;
-    g.fillStyle='rgba(5,6,8,.75)';g.fillRect(W-rw-60*dpr,0,rw+10*dpr,15*dpr);g.fillStyle=tr.duration-pos<30?'#ff4d5e':'#d6d9df';g.fillText(rem,W-rw-55*dpr,11*dpr);
+    const fs=Math.min(11,Math.max(9,H/dpr*.2)),lh=(fs+5)*dpr;
+    g.font=`600 ${fs*dpr}px Inter,sans-serif`;const tw2=g.measureText(txt).width;
+    g.fillStyle='rgba(5,6,8,.78)';g.fillRect(0,0,tw2+30*dpr,lh);
+    g.fillStyle=COL[d.id];g.fillRect(0,0,16*dpr,lh);g.fillStyle='#05070a';g.fillText(d.id,4.5*dpr,lh-4.5*dpr);
+    g.fillStyle='#e4e7ec';g.fillText(txt,22*dpr,lh-4.5*dpr);
+    const rem=fmtTime(pos-tr.duration);g.font=`500 ${fs*dpr}px "JetBrains Mono",monospace`;const rw=g.measureText(rem).width;
+    g.fillStyle='rgba(5,6,8,.78)';g.fillRect(W-rw-60*dpr,0,rw+10*dpr,lh);g.fillStyle=tr.duration-pos<30?'#ff4d5e':'#e4e7ec';g.fillText(rem,W-rw-55*dpr,lh-4.5*dpr);
   }
 }
 function drawOverview(d){
@@ -637,8 +662,8 @@ function frame(){
     d.tick();if(!d.active)continue;
     if(d.playing&&!d.logged&&d.track&&t-d.playStart>30000){d.logged=true;d.track.plays++;LIB.history.push({track:d.track,time:new Date(),deck:d.id});renderSide();}
     if(waveVis)drawWave(d,d.ui.lane,true);
-    if(dw)drawWave(d,d.ui.dw,false);
-    drawOverview(d);if(jog)drawPlatter(d);
+    if(d.ui.dwOn??dw)drawWave(d,d.ui.dw,false);
+    drawOverview(d);if(d.ui.jogOn??jog)drawPlatter(d);
     const tr=d.track,B=d.ui.b;
     if(tr){
       const pos=d.position(),rem=tr.duration-pos,ki=keyInfo(d.keyNow());
@@ -655,7 +680,7 @@ function frame(){
     B.loop.classList.toggle('on',d.loop.on);B.loop.classList.toggle('loopon',d.loop.on);B.relp.classList.toggle('on',d.loop.on);B.lin.classList.toggle('on',d.loopIn!=null);
     d.ui.lsz.textContent=fracLabel(d.loopSize);d.ui.jsz.textContent=String(d.jumpSize);
     d.ui.fx.on.classList.toggle('on',d.fx.on);d.ui.cueb.classList.toggle('on',d.cueOn);
-    $('#p-deck'+d.id).classList.toggle('isMaster',S.master===d);
+    (d.ui.panel||(d.ui.panel=$('#p-deck'+d.id))).classList.toggle('isMaster',S.master===d);
     d.ui.pads.forEach((p,i)=>{
       if(d.padMode==='hot'){p.classList.toggle('set',!!(tr&&tr.hot[i]!=null));p.classList.toggle('lit',d.hotHeld===i);}
       else p.classList.toggle('lit',d.padMode==='roll'?d.rolling===ROLLS[i]:d.padMode==='smp'?!!SAMPLER.playing[i]:false);
@@ -676,6 +701,7 @@ function frame(){
     if(rkStr!==libRefKey){libRefKey=rkStr;renderTable();}
   }
   ledTick();
+  if(window.View)View.tick();
   if(window.Coach)Coach.tick(dt);
   if(window.MixCoach)MixCoach.tick(dt);
   requestAnimationFrame(frame);
@@ -686,6 +712,7 @@ async function boot(){
   buildSamples();
   S.numDecks=store.get('decks',2);
   buildTop();buildFx();buildLanes();decks.forEach(buildDeck);buildMixer();buildLib();buildMidi();
+  window.View&&View.build();
   window.Desktop&&Desktop.init();
   layout.coach=!!PRESETS[layout.preset].coach;
   applyLayout();
@@ -705,4 +732,5 @@ async function boot(){
   window.Coach&&Coach.ready&&Coach.ready();
   window.Desktop&&Desktop.boot();
 }
-setTimeout(boot,0);
+// au DOMContentLoaded : tous les modules (view, coach, structure, auto-mix…) sont chargés avant le démarrage
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(boot,0));else setTimeout(boot,0);
