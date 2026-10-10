@@ -102,7 +102,7 @@ window.Desktop=(()=>{
      Les morceaux introuvables au démarrage (disque débranché, fichier déplacé) restent
      dans la sauvegarde avec leurs playlists : on peut les relocaliser plus tard. */
   A.missing=[];
-  const rec=t=>({path:t.path,title:t.title,artist:t.artist,genre:t.genre,bpm:t.bpm,grid:t.grid,key:t.key,cue:t.cue,hot:t.hot,plays:t.plays,added:t.added,...(window.LibPro?LibPro.metaOut(t):{})});
+  const rec=t=>({path:t.path,title:t.title,artist:t.artist,genre:t.genre,bpm:t.bpm,grid:t.grid,key:t.key,cue:t.cue,hot:t.hot,hotMeta:t.hotMeta,memCues:t.memCues,loops:t.loops,plays:t.plays,added:t.added,...(window.LibPro?LibPro.metaOut(t):{})});
   function snapshot(){
     const tracks=LIB.tracks.filter(t=>t.path).map(rec).concat(A.missing.map(m=>{const{pls,...r}=m;return r;}));
     const byId=new Map(LIB.tracks.map(t=>[t.id,t.path]));
@@ -120,6 +120,8 @@ window.Desktop=(()=>{
     const tr=addTrack(buf,{title:t.title,artist:t.artist,genre:t.genre,key:t.key,file:t.path.split(/[\\/]/).pop(),path:t.path});
     if(t.bpm)tr.bpm=t.bpm;if(t.grid!=null)tr.grid=t.grid;tr.cue=t.cue??tr.grid;
     if(Array.isArray(t.hot))tr.hot=t.hot.slice(0,8).concat(Array(8).fill(null)).slice(0,8);
+    if(Array.isArray(t.hotMeta))tr.hotMeta=t.hotMeta.slice(0,8).concat(Array(8).fill(null)).slice(0,8);
+    if(Array.isArray(t.memCues))tr.memCues=t.memCues;if(Array.isArray(t.loops))tr.loops=t.loops;
     tr.plays=t.plays||0;if(t.added)tr.added=new Date(t.added);
     window.LibPro&&LibPro.metaIn(tr,t);
     return tr;

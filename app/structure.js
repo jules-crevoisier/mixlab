@@ -74,7 +74,7 @@ window.Structure=(()=>{
       const m=f=>src.reduce((s,b)=>s+b[f],0)/src.length;
       ph.push({k,n:sl.length,L:db(m('l')),M:db(m('m')),H:db(m('h')),T:db(m('t')),silent:!act.length});
     }
-    if(!ph.length){tr.sections=[{start:0,end:tr.duration,type:'couplet',label:TYPES.couplet.label}];tr.memCues=[];tr.energy=1;return done(tr);}
+    if(!ph.length){tr.sections=[{start:0,end:tr.duration,type:'couplet',label:TYPES.couplet.label}];tr.memCues=(tr.memCues||[]).filter(m=>!m.type);tr.energy=1;return done(tr);}
     // la dernière phrase incomplète (moins de 4 mesures) se fond dans la précédente
     if(ph.length>1&&ph[ph.length-1].n<4){const p=ph.pop();ph[ph.length-1].n+=p.n;}
     const live=ph.filter(p=>!p.silent),mx=f=>Math.max(...live.map(p=>p[f])),maxL=mx('L'),maxM=mx('M'),maxT=mx('T');
@@ -139,7 +139,7 @@ window.Structure=(()=>{
     const dr=first('drop')||first('couplet');if(dr)add(dr.start,dr.type==='drop'?'Drop':'Graves','drop');
     const br=first('break');if(br)add(br.start,'Break','break');
     const ou=[...tr.sections].reverse().find(s=>s.type==='outro');if(ou)add(ou.start,'Outro','outro');
-    tr.memCues=mc.sort((x,y)=>x.t-y.t);
+    tr.memCues=(tr.memCues||[]).filter(m=>!m.type).concat(mc).sort((x,y)=>x.t-y.t);
     done(tr);
   }
   function done(tr){

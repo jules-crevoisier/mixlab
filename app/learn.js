@@ -15,7 +15,7 @@ window.Coach=(()=>{
   }
   const posText=ob=>{const r=((Math.round(ob)%32)+32)%32;return`mesure ${Math.floor(r/4)+1}, temps ${r%4+1}`;};
   function startOk(){const ls=B().lastStart;if(!ls||ls.otherBeat==null)return false;const r=Math.round(ls.otherBeat);return Math.abs(ls.otherBeat-r)<.2&&((r%32)+32)%32===0;}
-  function setFxUi(d){d.ui.fx.sel.value=d.fx.type;d.ui.fx.bv.textContent=beatsLabel(d.fx.beats);}
+  function setFxUi(d){renderFxUnit(d.fx);d.ui.fx.sel.value=d.fx.type;d.ui.fx.bv.textContent=beatsLabel(d.fx.beats);}
   function prep(){
     resetMixer();
     if(S.numDecks!==2){S.numDecks=2;}
@@ -59,10 +59,10 @@ window.Coach=(()=>{
     {id:'echo',lvl:2,mod:'Module 4 · Transitions',title:'Sortie en écho',mins:'5 min',
      intro:'Pour changer d’ambiance d’un coup : on coupe A sur la fin d’une phrase en laissant résonner un écho calé sur le tempo, puis B démarre sur le 1.',
      setup(){prep();A().seek(A().timeOfBeat(160));B().track.cue=B().timeOfBeat(0);B().seek(B().track.cue);B().ui.fader.set(0);
-       A().fx.setType('reverb');A().fx.beats=.5;A().fx.on=false;A().fx.apply();setFxUi(A());layout.visible.add('fx');applyLayout();L.stats={cut:null};},
+       A().fx.toggle('A',true);A().fx.setMode('single');A().fx.setType('reverb');A().fx.beats=.5;A().fx.on=false;A().fx.apply();setFxUi(A());layout.visible.add('fx');applyLayout();L.stats={cut:null};},
      steps:[
        {t:'Lance la platine A',target:'A.play',why:'A joue sa dernière phrase avant l’outro. Les effets sont dans la bande FX, sous les platines.',check:()=>A().playing},
-       {t:'Sur FX A, choisis « Écho » et une durée de 1 temps',target:()=>A().fx.type==='echo'?'#fx-A .bt':'#fx-A select',why:'Un écho d’un temps répète chaque son exactement sur le temps suivant : il reste dans le groove.',check:()=>A().fx.type==='echo'&&A().fx.beats===1},
+       {t:'Sur l’unité FX assignée à A, choisis « Écho » et une durée de 1 temps',target:()=>'#fxu-'+A().fx.n+(A().fx.type==='echo'?' .bt':' select'),why:'Un écho d’un temps répète chaque son exactement sur le temps suivant : il reste dans le groove.',check:()=>A().fx.type==='echo'&&A().fx.beats===1},
        {t:'Monte le dosage vers 60 % et active l’effet (On)',target:()=>A().fx.amount<.4?'A.fxamt':'A.fxon',why:'L’écho s’ajoute au son de A. Pour l’instant on l’entend à peine : il va prendre toute la place quand A sera coupé.',check:()=>A().fx.on&&A().fx.amount>=.4},
        {t:'Coupe le fader de A d’un coup, sur le dernier temps d’une phrase',target:'A.fader',why:'Le son de A disparaît mais l’écho, placé après le fader dans la chaîne de A, continue de résonner et s’éteint tout seul.',
         hint(){const bi=A().barInfo();return bi&&!bi.pre?`A : mesure ${bi.barIn+1}/8, temps ${bi.beat+1}.`:'';},

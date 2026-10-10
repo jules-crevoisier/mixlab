@@ -81,15 +81,48 @@ select.sel{background:var(--s2);border:1px solid var(--ln2);border-radius:3px;he
 .kn span{font-size:8.5px;letter-spacing:.12em;color:var(--dim);font-weight:600}
 
 /* ---------- FX ---------- */
-#p-fx{display:flex;gap:4px;padding:0;background:transparent;border:0}
-.fxu{flex:1;min-width:0;display:flex;align-items:center;gap:6px;background:var(--s1);border:1px solid var(--ln);border-radius:4px;padding:3px 6px;--dc:var(--A)}
-.fxu[data-deck="B"]{--dc:var(--B)}.fxu[data-deck="C"]{--dc:var(--C)}.fxu[data-deck="D"]{--dc:var(--D)}
-.fxu .tag{font:700 10px var(--ui);letter-spacing:.1em;color:var(--dc);white-space:nowrap}
+#p-fx{display:flex;gap:6px;padding:0;background:transparent;border:0}
+.fxu{flex:1 1 0;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;background:var(--s1);border:1px solid var(--ln);border-radius:10px;padding:4px 8px;--dc:var(--coach)}
+.fxu .tag{font:800 11px var(--ui);letter-spacing:.12em;color:var(--white)}
+.fxu .asg{display:flex;gap:2px}
+.fxu .asg button{width:22px;height:22px;padding:0;border-radius:5px;border:1px solid #2a2e36;background:#14161b;color:#9aa1ad;font:700 10px var(--ui);cursor:pointer;--tc:var(--white)}
+.fxu .asg [data-t=A]{--tc:var(--A)}.fxu .asg [data-t=B]{--tc:var(--B)}.fxu .asg [data-t=C]{--tc:var(--C)}.fxu .asg [data-t=D]{--tc:var(--D)}
+.fxu .asg button[aria-pressed="true"]{background:var(--tc);border-color:var(--tc);color:#0a0b0d}
 .fxu .bt{display:flex;align-items:center;gap:2px}
-.fxu .bt b{font:500 11px var(--num);min-width:28px;text-align:center;color:var(--white)}
-.fxu .kn svg{width:22px;height:22px}
-.fxu .kn span{display:none}
-.fxu select{flex:1;min-width:70px;max-width:120px}
+.fxu .bt b{font:600 11px var(--num);min-width:30px;text-align:center;color:var(--white)}
+.fxu .slots{display:flex;flex-wrap:wrap;gap:4px 12px;flex:1 1 100%;min-width:0;align-items:center}
+.fxu .fxon{margin-left:auto}
+.fxu.chain .slot .kn span{display:none}
+.fxu .slot{display:flex;align-items:center;gap:5px;min-width:0}
+.fxu .slot select{width:100px}
+.fxu .kn{grid-template-columns:auto auto;align-items:center;gap:3px}
+.fxu .kn svg{width:24px;height:24px}
+.fxu .kn span{font-size:10px;letter-spacing:.02em;text-transform:none;color:var(--mu);font-weight:500}
+.fxu .slon{min-width:24px}
+.fxu.chain .kp,.fxu.single .slot:not(:first-child),.fxu.single .slon{display:none}
+.fxu .slot.np1 .kp1,.fxu .slot.np2 .kp2{display:none}
+.fxu .fxon{min-width:40px;--dc:var(--coach)}
+.fxu .fxon.pend{animation:blink .25s infinite;border-color:var(--coach)}
+/* popover (hot cue, cues mémoire, sampler) */
+.popx{position:fixed;z-index:65;width:min(300px,calc(100vw - 16px));max-height:min(420px,calc(100vh - 16px));overflow:auto;background:var(--s2);border:1px solid var(--ln2);border-radius:10px;padding:8px 10px 10px;display:grid;gap:7px;box-shadow:0 18px 50px rgba(0,0,0,.7);font-size:12px}
+.popx .ph{display:flex;align-items:center;justify-content:space-between;gap:8px}.popx .ph b{color:var(--white);font-size:12px}
+.popx .x{border:0;background:none;color:var(--mu);font-size:18px;cursor:pointer;line-height:1}
+.popx .pin{width:100%;min-width:0;background:#0c0d10;border:1px solid var(--ln2);border-radius:6px;height:26px;padding:0 8px;font-size:12px}
+.popx .sws{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+.popx .sw{height:22px;border-radius:5px;border:2px solid transparent;background:var(--c);cursor:pointer}
+.popx .sw[aria-pressed="true"]{border-color:var(--white);box-shadow:0 0 0 1px #000 inset}
+.popx .pa{display:flex;gap:6px;flex-wrap:wrap}.popx .pa .b{flex:1}
+.popx .ps{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:2px}
+.popx .ps .lbl{font-size:10px}
+.popx .pl{display:grid;gap:4px}
+.popx .pr{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:5px;align-items:center}
+.popx .pr .pin{height:24px}
+.popx .pr .tm{font:600 11px var(--num);text-transform:none;letter-spacing:0;min-width:58px}
+.popx .dot{width:16px;height:16px;border-radius:50%;border:1px solid #000;background:var(--c);cursor:pointer;padding:0}
+.popx .pn{font:600 11px var(--num);color:var(--mu);min-width:16px;text-align:center}
+.popx .pe{color:var(--mu);font-size:11.5px;line-height:1.35}
+.popx .prow{display:grid;grid-template-columns:64px minmax(0,1fr);gap:8px;align-items:center}.popx .prow .lbl{font-size:10px}
+.popx .prg{width:100%;accent-color:var(--coach)}
 
 /* ---------- waveforms empilées ---------- */
 #p-wave{padding:3px;display:grid;gap:3px;background:#050608}
@@ -162,8 +195,9 @@ select.sel{background:var(--s2);border:1px solid var(--ln2);border-radius:3px;he
 .pad{height:30px;font:600 10px var(--num);letter-spacing:0;text-transform:none;border-radius:3px}
 .pad.set{background:color-mix(in srgb,var(--hc) 80%,#000);color:#05070a;border-color:var(--hc)}
 .pad.lit{background:var(--hc);color:#05070a;border-color:var(--hc);box-shadow:0 0 10px color-mix(in srgb,var(--hc) 50%,transparent)}
-.pad.m-roll{--hc:#4ad0ff}.pad.m-jump{--hc:#ffd34d}.pad.m-smp{--hc:#ff6fae}
-.pad.m-roll,.pad.m-jump,.pad.m-smp{color:color-mix(in srgb,var(--hc) 80%,#fff);border-color:color-mix(in srgb,var(--hc) 35%,#2a2e37)}
+.pad.m-roll{--hc:#4ad0ff}.pad.m-jump{--hc:#ffd34d}.pad.m-smp{--hc:#ff6fae}.pad.m-slice{--hc:#7d9bff}.pad.m-sloop{--hc:#3fd679}.pad.m-pitch{--hc:#e86bff}
+.tabs .lst{flex:none;min-width:28px;font-size:13px}
+.pad.m-roll,.pad.m-jump,.pad.m-smp,.pad.m-slice,.pad.m-sloop,.pad.m-pitch{color:color-mix(in srgb,var(--hc) 80%,#fff);border-color:color-mix(in srgb,var(--hc) 35%,#2a2e37)}
 .dk-loop .sz{font:600 11px var(--num);min-width:30px;text-align:center;color:var(--white)}
 .dk-loop .b.loopon{--dc:var(--ok)}
 .compact .dk-plat{display:none}
@@ -193,6 +227,9 @@ select.sel{background:var(--s2);border:1px solid var(--ln2);border-radius:3px;he
 .mst{width:70px;display:grid;justify-items:center;gap:4px;padding:2px 0;border-left:1px solid var(--ln);border-right:1px solid var(--ln);margin:0 2px}
 .mst .nm{font:700 10px var(--ui);letter-spacing:.14em;color:var(--white)}
 .mvu{display:flex;gap:2px;height:120px}
+.vu.lim{width:5px;background:#050608}
+.limt{font:700 10px var(--ui);letter-spacing:.08em;color:#4a505b;margin-top:-2px}.limt.on{color:var(--warn)}
+.mst .mxs{width:66px;padding:0 2px}
 .xf{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:6px;align-items:center;padding:4px 2px 0;border-top:1px solid var(--ln)}
 .xf .fd.h{width:100%;height:26px}
 .xf .e{font:700 11px var(--ui)}
@@ -427,10 +464,21 @@ select.sel{background:#181b20;border:1px solid #262a31;border-radius:6px;height:
 
 /* pads 2×4 : couleur du cue, plus vive à l'appui */
 .tabs{gap:3px}
-.tabs .b{height:22px;font-size:9px;border-radius:5px}
+.tabs{flex-wrap:wrap}
+.tabs .b{height:22px;font-size:10px;letter-spacing:.04em;padding:0 4px;border-radius:5px;flex:1 1 auto;min-width:max-content}
+.dk-loop{gap:4px}.dk-loop .b{padding:0 4px;letter-spacing:0;min-width:0}
+.dk-loop .lbl{font-size:10px}
+/* platines étroites (4 platines sur une ligne) : on replie plutôt que de déborder */
+@container (max-width:340px){
+  .dk-head{gap:6px}.dk-head .dk-stat.t{display:none}
+  .dk-stat b{font-size:20px}.dk-stat b.key{font-size:15px}
+  .dk-loop,.dk-grid{flex-wrap:wrap;row-gap:3px}
+  .dk-loop>.b,.dk-grid>.b{flex:1 0 auto}
+  .dk-ctr .b{letter-spacing:0;padding:0 2px;min-width:20px}.dk-ctr .b[data-ctl$='.keylock']{flex:2 0 auto}.dk-ctr .keyd{min-width:18px}
+}
 .tabs .b[aria-pressed="true"]{color:var(--white);background:var(--s3);border-color:var(--ln2)}
 .pads{gap:5px}
-.pad{height:38px;border-radius:7px;background:#16191e;border-color:#23272e;color:#5d636e;font:600 11px var(--num)}
+.pad{height:38px;border-radius:7px;background:#16191e;border-color:#2a2f37;color:#a3aab5;font:600 11px var(--num);overflow:hidden}
 .pad.set{background:color-mix(in srgb,var(--hc) 72%,#000);border-color:color-mix(in srgb,var(--hc) 90%,#fff);color:#0a0b0d;box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
 .pad.lit{background:var(--hc);box-shadow:0 0 16px color-mix(in srgb,var(--hc) 55%,transparent)}
 .compact .pad{height:28px}
@@ -803,6 +851,7 @@ body.pc-blind .lane::after,body.pc-blind .dk-ov::after{content:"À l’oreille";
 <script src="library-pro.js"></script>
 <script src="mappings/index.js"></script>
 <script src="controllers.js"></script>
+<script src="perf.js"></script>
 <script src="learn.js"></script>
 <script src="coach-live.js"></script>
 <script src="structure.js"></script>
