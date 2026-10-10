@@ -263,6 +263,32 @@ const fakeMidi = () => {
   check(await W(() => !document.querySelector('#audio-modal') || document.querySelector('#audio-modal').hidden), 'Échap ferme la fenêtre Audio');
   await W(() => { Object.keys(KEYS).forEach(k => delete KEYS[k]); Object.assign(KEYS, KEYS_DEF); });
 
+  // Clavier sans getLayoutMap (webview WebKit) : la disposition vient de la langue, et se choisit.
+  check(await W(() => [Controllers.guessLayout('fr-FR'), Controllers.guessLayout('fr-BE'), Controllers.guessLayout('fr-CA'), Controllers.guessLayout('fr-CH'), Controllers.guessLayout('de-DE'), Controllers.guessLayout('en-US'), Controllers.guessLayout('cs')].join()) === 'azerty,azerty,qwerty,qwertz,qwertz,qwerty,qwertz',
+    'Disposition devinée d’après la langue (fr AZERTY, fr-CA QWERTY, fr-CH et de QWERTZ)');
+  for (const [locale, want] of [['fr-FR', ['A', 'Z', 'W', 'Q']], ['de-DE', ['Q', 'W', 'Y', 'A']]]) {
+    const ctxK = await browser.newContext({ viewport: { width: 1400, height: 900 }, locale });
+    const pk = await ctxK.newPage(); pk.on('pageerror', e => errors.push(e.message));
+    await pk.addInitScript(() => { Object.defineProperty(Navigator.prototype, 'keyboard', { get: () => undefined, configurable: true }); });
+    await pk.goto(url);
+    await pk.waitForFunction(() => typeof LIB !== 'undefined' && LIB.tracks.length >= 4 && window.Controllers, null, { timeout: 30000 });
+    await pk.evaluate(() => { document.querySelector('#midi-modal').hidden = false; });
+    const names = await pk.evaluate(() => ({ kb: !!navigator.keyboard, has: Controllers.hasLayoutMap(), keys: ['KeyQ', 'KeyW', 'KeyZ', 'KeyA'].map(Controllers.keyName), kbd: (document.querySelector('#key-list li[data-code="KeyQ"] kbd') || {}).textContent, row: !document.querySelector('#kb-layout-row').hidden, opt: document.querySelector('#kb-layout').selectedOptions[0].textContent }));
+    check(!names.kb && !names.has && JSON.stringify(names.keys) === JSON.stringify(want) && names.kbd === want[0] && names.row, `Sans getLayoutMap, ${locale} : touches affichées en ${locale === 'fr-FR' ? 'AZERTY' : 'QWERTZ'} et choix du clavier proposé`, JSON.stringify(names));
+    if (locale === 'fr-FR') {
+      await pk.selectOption('#kb-layout', 'qwerty');
+      const q = await pk.evaluate(() => ({ k: Controllers.keyName('KeyQ'), kbd: document.querySelector('#key-list li[data-code="KeyQ"] kbd').textContent, st: localStorage.getItem('mixlab2.kbLayout') }));
+      check(q.k === 'Q' && q.kbd === 'Q' && q.st === '"qwerty"', 'Choix QWERTY : la liste suit et le choix est gardé', JSON.stringify(q));
+      await pk.reload(); await pk.waitForFunction(() => window.Controllers && document.querySelector('#kb-layout'), null, { timeout: 30000 });
+      check(await pk.evaluate(() => Controllers.keyName('KeyQ') === 'Q' && document.querySelector('#kb-layout').value === 'qwerty'), 'Choix du clavier retrouvé après rechargement');
+    }
+    await ctxK.close();
+  }
+  // Avec getLayoutMap (Chromium) : le système fait foi, le choix est masqué.
+  await page.waitForTimeout(100);
+  const sys = await W(() => ({ has: Controllers.hasLayoutMap(), hidden: !document.querySelector('#kb-layout-row') || document.querySelector('#kb-layout-row').hidden }));
+  check(!sys.has || sys.hidden, 'Avec getLayoutMap : le choix de disposition est masqué', JSON.stringify(sys));
+
   check(errors.length === 0, 'Aucune erreur dans la page', errors.join(' | '));
   await browser.close();
   if (failed) { console.log(failed + ' échec(s)'); process.exit(1); }

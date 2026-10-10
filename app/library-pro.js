@@ -56,6 +56,7 @@ window.LibPro=(()=>{
   }
   const idbDo=(mode,fn)=>idb().then(db=>new Promise((ok,ko)=>{const tx=db.transaction('kv',mode),r=fn(tx.objectStore('kv'));tx.oncomplete=()=>ok(r&&r.result);tx.onerror=()=>ko(tx.error);}));
   const idbGet=k=>idbDo('readonly',st=>st.get(k)),idbSet=(k,v)=>idbDo('readwrite',st=>st.put(v,k));
+  // hot cues, noms et couleurs (hotMeta), cues mémoire et boucles gardées passent par metaOut/metaIn
   const recOf=t=>({k:t._bk||bkey(t),title:t.title,artist:t.artist,genre:t.genre,file:t.file||null,bpm:t.bpm,grid:t.grid,key:t.key,cue:t.cue,hot:t.hot,plays:t.plays,added:t.added,...metaOut(t)});
   function applyRec(t,r){
     if(r.bpm)t.bpm=r.bpm;if(r.grid!=null)t.grid=r.grid;if(r.cue!=null)t.cue=r.cue;if(r.key)t.key=r.key;
@@ -104,7 +105,7 @@ window.LibPro=(()=>{
   document.addEventListener('click',async e=>{
     const l=e.target.closest&&e.target.closest('.libbar label.filebtn');if(!l||N()||!window.showOpenFilePicker)return;
     e.preventDefault();
-    let hs=[];try{hs=await showOpenFilePicker({multiple:true,types:[{description:'Audio',accept:{'audio/*':['.mp3','.wav','.aif','.aiff','.flac','.ogg','.m4a','.aac']}}]});}catch(err){return;}
+    let hs=[];try{hs=await showOpenFilePicker({multiple:true,types:[{description:'Audio',accept:{'audio/*':AUDIO_EXT.map(e=>'.'+e)}}]});}catch(err){return;}
     hs.forEach(x=>B.handles.set(x.name.toLowerCase(),x));
     try{await idbSet('handles',Object.fromEntries(B.handles));}catch(err){}
     importFiles(await Promise.all(hs.map(x=>x.getFile())),null);
@@ -117,11 +118,30 @@ window.LibPro=(()=>{
     if(files.length)await importFiles(files,null);return files.length;
   }
   const saveMeta=()=>{if(!N()){clearTimeout(B.timer);B.timer=setTimeout(browserSave,400);}};
+  /* Cues : les platines lisent hot (temps), hotMeta ({name,color} par pad), memCues ({t,label,color},
+     ceux qui ont un type viennent de l'analyse de structure) et loops ({start,end,label}).
+     Anciennes sauvegardes : mem ({t,name}) et hotName (noms seuls) sont convertis au chargement. */
+  const userCues=t=>(t.memCues||[]).filter(m=>m&&!m.type&&isFinite(m.t)).map(m=>({t:+m.t,label:m.label||'',color:m.color||'#ffffff'}));
+  function cuesIn(t,r){
+    let hm=Array.isArray(r.hotMeta)?r.hotMeta:null;
+    if(!hm&&Array.isArray(r.hotName))hm=r.hotName.map(n=>n?{name:String(n),color:null}:null);
+    if(hm)t.hotMeta=hm.slice(0,8).map(m=>m&&(m.name||m.color)?{name:String(m.name||''),color:m.color||null}:null).concat(Array(8).fill(null)).slice(0,8);
+    let mc=Array.isArray(r.memCues)?r.memCues:null;
+    if(!mc&&Array.isArray(r.mem))mc=r.mem.map(m=>m&&{t:m.t,label:m.name||'',color:m.color});
+    if(mc){
+      const user=mc.filter(m=>m&&!m.type&&isFinite(m.t)).map((m,i)=>({t:+m.t,label:m.label||'Cue '+(i+1),color:m.color||'#ffffff'}));
+      t.memCues=(t.memCues||[]).filter(m=>m&&m.type).concat(user).sort((a,b)=>a.t-b.t);
+    }
+    if(Array.isArray(r.loops))t.loops=r.loops.filter(l=>l&&isFinite(l.start)&&isFinite(l.end)&&l.end>l.start).map((l,i)=>({start:+l.start,end:+l.end,label:l.label||'Boucle '+(i+1)}));
+    delete t.mem;delete t.hotName;
+  }
   function metaOut(t){
     const o={};
     if(t.rating)o.rating=t.rating;if(t.color)o.color=t.color;if(t.comment)o.comment=t.comment;
     if(t.tags&&t.tags.length)o.tags=t.tags;if(t.energyUser!=null)o.energyUser=t.energyUser;
-    if(t.mem&&t.mem.length)o.mem=t.mem;if(t.hotName&&t.hotName.some(Boolean))o.hotName=t.hotName;
+    const user=userCues(t);if(user.length)o.memCues=user;
+    if(t.hotMeta&&t.hotMeta.some(Boolean))o.hotMeta=t.hotMeta.slice(0,8).map(m=>m?{name:m.name||'',color:m.color||null}:null);
+    if(t.loops&&t.loops.length)o.loops=t.loops.map(l=>({start:l.start,end:l.end,label:l.label||''}));
     if(t.lastPlayed)o.lastPlayed=t.lastPlayed;
     return o;
   }
@@ -130,8 +150,7 @@ window.LibPro=(()=>{
     if(r.color)t.color=+r.color;if(r.comment)t.comment=String(r.comment);
     if(Array.isArray(r.tags))t.tags=r.tags.map(String);
     if(r.energyUser!=null)t.energyUser=+r.energyUser;
-    if(Array.isArray(r.mem))t.mem=r.mem.filter(m=>m&&isFinite(m.t)).map(m=>({t:+m.t,name:m.name||''}));
-    if(Array.isArray(r.hotName))t.hotName=r.hotName.slice(0,8);
+    cuesIn(t,r);
     if(r.lastPlayed)t.lastPlayed=new Date(r.lastPlayed);
   }
   const DEFAULT_PL=new Set(LIB.playlists.map(p=>p.id));
@@ -421,7 +440,9 @@ window.LibPro=(()=>{
     return 'file://localhost'+(/^[a-z]:/i.test(p)?'/':p.startsWith('/')?'':'/')+enc;
   }
   const xmlDoc=text=>{const d=new DOMParser().parseFromString(text,'application/xml');if(d.getElementsByTagName('parsererror').length)throw new Error('Ce fichier XML est abîmé ou incomplet.');return d;};
-  const newRec=o=>({title:'',artist:'',genre:'',comment:'',bpm:null,key:null,rating:0,color:0,plays:0,added:null,duration:0,loc:'',path:'',file:'',grid:null,cue:null,hot:Array(8).fill(null),hotName:Array(8).fill(''),mem:[],...o});
+  const newRec=o=>({title:'',artist:'',genre:'',comment:'',bpm:null,key:null,rating:0,color:0,plays:0,added:null,duration:0,loc:'',path:'',file:'',grid:null,cue:null,hot:Array(8).fill(null),hotMeta:Array(8).fill(null),memCues:[],loops:[],...o});
+  const hex2=n=>Math.max(0,Math.min(255,n|0)).toString(16).padStart(2,'0');
+  const markColor=m=>{const r=m.getAttribute('Red'),g=m.getAttribute('Green'),b=m.getAttribute('Blue');return r!=null&&g!=null&&b!=null?'#'+hex2(+r)+hex2(+g)+hex2(+b):null;};
   function parseRekordbox(text){
     const d=xmlDoc(text),root=d.documentElement;
     if(root.nodeName!=='DJ_PLAYLISTS')throw new Error('Ce n’est pas un export rekordbox (DJ_PLAYLISTS absent).');
@@ -438,11 +459,18 @@ window.LibPro=(()=>{
         rating:Math.round((parseInt(a('Rating'))||0)/51),color:(COLORS.find(c=>c.rb.toLowerCase()===a('Colour').toLowerCase())||{id:0}).id,plays:parseInt(a('PlayCount'))||0,
         added:a('DateAdded')||null,duration:parseFloat(a('TotalTime'))||0,loc,path,file:base(path),grid});
       for(const m of e.getElementsByTagName('POSITION_MARK')){
-        const num=parseInt(m.getAttribute('Num')),t=parseFloat(m.getAttribute('Start')),nm=m.getAttribute('Name')||'';
+        const num=parseInt(m.getAttribute('Num')),t=parseFloat(m.getAttribute('Start')),end=parseFloat(m.getAttribute('End')),nm=m.getAttribute('Name')||'';
         if(!isFinite(t))continue;
-        if(num>=0&&num<8){r.hot[num]=t;r.hotName[num]=nm;}else if(num<0)r.mem.push({t,name:nm});
+        const loop=m.getAttribute('Type')==='4'&&isFinite(end)&&end>t,col=markColor(m);
+        if(num>=0&&num<8){r.hot[num]=t;r.hotMeta[num]=nm||col?{name:nm,color:col}:null;}
+        else if(num<0&&loop)r.loops.push({start:t,end,label:nm||'Boucle '+(r.loops.length+1)});
+        else if(num<0)r.memCues.push({t,label:nm,color:col||'#ffffff'});
       }
-      if(r.mem.length)r.cue=r.mem.shift().t;
+      // le premier cue mémoire sans nom devient le point de cue de la platine (comme à l'export)
+      r.memCues.sort((a,b)=>a.t-b.t);
+      const c0=r.memCues.findIndex(m=>!m.label);
+      if(c0>=0)r.cue=r.memCues.splice(c0,1)[0].t;else if(r.memCues.length)r.cue=r.memCues[0].t;
+      r.memCues.forEach((m,i)=>{if(!m.label)m.label='Cue '+(i+1);});
       byId.set(a('TrackID'),tracks.length);byLoc.set(loc,tracks.length);tracks.push(r);
     }
     const playlists=[];
@@ -538,7 +566,7 @@ window.LibPro=(()=>{
   const VERS=/\b(original|extended|radio|club|album|single|clean|dirty|explicit|main)\s+(mix|edit|version)\b|\b(19|20)\d\d\s+remaster(ed)?\b|\bremaster(ed)?(\s+(19|20)\d\d)?(\s+version)?\b/g;
   function normTitle(s){
     return fold(s).replace(/[([][^)\]]*\b(feat|ft|featuring)\b\.?[^)\]]*[)\]]/g,' ').replace(/\s(feat|ft|featuring)\.?\s.*?(?=\s[-([]|$)/g,' ')
-      .replace(/\.(mp3|wav|aiff?|flac|m4a|ogg|aac)$/,'').replace(/[([\]){}]/g,' ').replace(/\s[-–—]\s/g,' ').replace(VERS,' ').replace(/&/g,' and ').replace(/[^a-z0-9]+/g,' ').trim();
+      .replace(AUDIO_RE,'').replace(/[([\]){}]/g,' ').replace(/\s[-–—]\s/g,' ').replace(VERS,' ').replace(/&/g,' and ').replace(/[^a-z0-9]+/g,' ').trim();
   }
   const artists=s=>fold(s).split(/\s*(?:,|;|\/|&|\+|\bx\b|\band\b|\bet\b|\bfeat\.?|\bft\.?|\bfeaturing\b|\bvs\.?)\s*/).map(x=>x.replace(/^the\s+/,'').replace(/[^a-z0-9]+/g,' ').trim()).filter(Boolean);
   const dice=(a,b)=>{if(!a.length||!b.length)return 0;const B=new Set(b);let n=0;new Set(a).forEach(x=>{if(B.has(x))n++;});return 2*n/(new Set(a).size+B.size);};
@@ -571,8 +599,10 @@ window.LibPro=(()=>{
     if(r.genre&&!t.genre)t.genre=r.genre;if(r.plays>(t.plays||0))t.plays=r.plays;
     if(full){
       if(r.bpm)t.bpm=r.bpm;if(r.grid!=null)t.grid=r.grid;if(r.key)t.key=r.key;if(r.cue!=null)t.cue=r.cue;
-      if(r.hot&&r.hot.some(x=>x!=null)){t.hot=r.hot.slice(0,8);t.hotName=(r.hotName||[]).slice(0,8);}
-      if(r.mem&&r.mem.length)t.mem=r.mem.map(m=>({...m}));t.ov=null;
+      if(r.hot&&r.hot.some(x=>x!=null)){t.hot=r.hot.slice(0,8);t.hotMeta=(r.hotMeta||[]).slice(0,8).concat(Array(8).fill(null)).slice(0,8);}
+      if(r.memCues&&r.memCues.length)cuesIn(t,{memCues:r.memCues});
+      if(r.loops&&r.loops.length)t.loops=r.loops.map(l=>({...l}));
+      t.ov=null;
     }
     saveMeta(t);
   }
@@ -642,7 +672,8 @@ window.LibPro=(()=>{
   }
 
   /* ---------- export ---------- */
-  const mark=(name,num,t,col)=>`      <POSITION_MARK Name="${xa(name)}" Type="0" Start="${(+t).toFixed(3)}" Num="${num}"${col?` Red="${parseInt(col.slice(1,3),16)}" Green="${parseInt(col.slice(3,5),16)}" Blue="${parseInt(col.slice(5,7),16)}"`:''}/>`;
+  const rgb=col=>/^#[0-9a-f]{6}$/i.test(col||'')?` Red="${parseInt(col.slice(1,3),16)}" Green="${parseInt(col.slice(3,5),16)}" Blue="${parseInt(col.slice(5,7),16)}"`:'';
+  const mark=(name,num,t,col,end)=>`      <POSITION_MARK Name="${xa(name)}" Type="${end!=null?4:0}" Start="${(+t).toFixed(3)}"${end!=null?` End="${(+end).toFixed(3)}"`:''} Num="${num}"${rgb(col)}/>`;
   function toRekordbox(tracks=LIB.tracks,playlists=LIB.playlists,crates=S.crates){
     const ix=new Map(tracks.map((t,i)=>[t.id,i+1]));
     const L=['<?xml version="1.0" encoding="UTF-8"?>','<DJ_PLAYLISTS Version="1.0.0">','  <PRODUCT Name="Mixlab" Version="0.3.0" Company="Mixlab"/>',`  <COLLECTION Entries="${tracks.length}">`];
@@ -654,8 +685,9 @@ window.LibPro=(()=>{
       const kids=[];
       if(t.bpm&&t.grid!=null){const beat=60/t.bpm;let g=t.grid;while(g<0)g+=4*beat;kids.push(`      <TEMPO Inizio="${g.toFixed(3)}" Bpm="${t.bpm.toFixed(2)}" Metro="4/4" Battito="1"/>`);}
       if(t.cue!=null)kids.push(mark('',-1,t.cue));
-      (t.mem||[]).forEach(m=>kids.push(mark(m.name,-1,m.t)));
-      (t.hot||[]).forEach((x,n)=>{if(x!=null)kids.push(mark(t.hotName&&t.hotName[n]||'',n,x,HOT[n]));});
+      userCues(t).forEach(m=>kids.push(mark(m.label,-1,m.t,m.color&&m.color.toLowerCase()!=='#ffffff'?m.color:null)));
+      (t.loops||[]).forEach(l=>kids.push(mark(l.label||'',-1,l.start,null,l.end)));
+      (t.hot||[]).forEach((x,n)=>{if(x!=null)kids.push(mark(hotName(t,n),n,x,hotColor(t,n)));});
       const attrs=Object.entries(at).map(([k,v])=>k+'="'+xa(v)+'"').join(' ');
       L.push(kids.length?`    <TRACK ${attrs}>`:`    <TRACK ${attrs}/>`);if(kids.length)L.push(...kids,'    </TRACK>');
     });

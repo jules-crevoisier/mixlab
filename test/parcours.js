@@ -204,6 +204,57 @@ const check = (ok, what, extra = '') => { console.log((ok ? 'OK   ' : 'ÉCHEC ')
   check(await p3.evaluate(() => store.get('welcome') === 'rekordbox' && layout.preset === 'export' && !Parcours.active && !document.querySelector('.pc-wel')), 'rekordbox : disposition Export, parcours sauté');
   await ctx3.close();
 
+  // 5 ter. L'interface grandit vraiment : on compte, chapitre par chapitre, les commandes actives
+  // (affichées, non grisées, cliquables) et celles visibles mais grisées.
+  const ctx4 = await browser.newContext({ viewport: { width: 1600, height: 950 } });
+  const p4 = await ctx4.newPage();watch(p4);
+  await p4.goto(url + '#welcome'); await ready(p4);
+  await p4.click('#pc-novice');
+  const census = () => p4.evaluate(() => {
+    const sel = 'button,input:not([type="file"]),select,summary,[data-ctl],label.tb';
+    const act = [], grey = [];
+    for (const e of document.querySelectorAll(sel)) {
+      if (e.closest('#pc,.pc-wel,.pc-pop,#coach,.toast')) continue;
+      if (e.parentElement && e.parentElement.closest('[data-ctl]')) continue;   // l'input d'un fader compte avec son fader
+      const r = e.getBoundingClientRect(); if (!r.width || !r.height) continue;
+      if (getComputedStyle(e).visibility === 'hidden') continue;
+      if (e.closest('.pc-lockp')) continue;                                       // dans un panneau verrouillé (étiquette « Débloqué au chapitre N »)
+      const id = e.dataset.ctl || e.id || (e.textContent || e.title || e.getAttribute('aria-label') || '').trim().slice(0, 18);
+      if (e.closest('[inert]')) grey.push(id); else act.push(id);
+    }
+    return { act, grey, hidden: document.querySelectorAll('.pc-hide').length, lock: [...document.querySelectorAll('.pc-lock')].map(e => e.dataset.ctl || e.id || e.className) };
+  });
+  // plafond de commandes actives par chapitre (l'interface ne grandit qu'au rythme des leçons)
+  const CAPS = [7, 20, 24, 32, 34, 34, 45, 60, 70, 110, 115, 140, 170, 999];
+  const counts = [], hidesEarly = [], seen = {};
+  for (let c = 0; c < 14; c++) {
+    await p4.evaluate(c => Parcours.go(c, 0), c); await sleep(150);
+    const r = await census(); seen[c] = r; counts.push(r.act.length);
+    if (c < 4 && r.lock.some(x => !/\.jog$/.test(x))) hidesEarly.push('ch' + (c + 1) + ' grise ' + r.lock.filter(x => !/\.jog$/.test(x)).join(','));
+  }
+  const ch1 = seen[0];
+  const ctl1 = ch1.act.filter(x => /^[A-D]\.|^master$|^xf$|^cue|^split$|^sampler/.test(x)).sort();
+  check(JSON.stringify(ctl1) === JSON.stringify(['A.fader', 'A.play', 'master']), 'Chapitre 1 : seules les commandes enseignées sont actives (▶ A, fader A, master)', ctl1.join(','));
+  check(ch1.act.every(x => /^(A\.fader|A\.play|master|pc-btn|coach-btn|coach-close|fs-btn|sp-wave|sp-lib)$/.test(x)), 'Chapitre 1 : rien d’autre de cliquable (ni Auto-mix, ni Contrôleur, ni Audio, ni Biblio, ni sélecteurs du mixer)', ch1.act.join(','));
+  check(ch1.grey.every(x => /\.jog$/.test(x)), 'Chapitre 1 : les commandes avancées sont masquées, pas grisées (seule la platine reste visible)', ch1.grey.join(','));
+  check(!hidesEarly.length, 'Chapitres 1 à 4 : on masque, on ne grise pas', hidesEarly.join(' | '));
+  const adv = ['A.keylock', 'A.slip', 'A.rev', 'A.censor', 'am-btn', 'midi-btn', 'A.pad1', 'A.loop', 'A.tap', 'A.cup'];
+  check([0, 1, 2, 3].every(c => adv.every(x => !seen[c].act.includes(x) && !seen[c].grey.includes(x))), 'KEY LOCK, SLIP, REV, CENSOR, AUTO-MIX, CONTRÔLEUR, pads, boucles, grille et rangée pro masqués aux chapitres 1 à 4');
+  check(!seen[1].act.some(x => /^(Compatibles|Import \/ export|Infos|Colonnes|preview|Tous les morceaux)/.test(x)), 'Chapitre 2 : bibliothèque réduite à la recherche, à l’import et au chargement', seen[1].act.filter(x => !/^[AB]\./.test(x)).join(','));
+  check(counts.every((n, i) => n <= CAPS[i]), 'Commandes actives sous le plafond de chaque chapitre', counts.join(' '));
+  check(counts.every((n, i) => !i || n >= counts[i - 1]), 'L’interface ne fait que grandir d’un chapitre à l’autre', counts.join(' '));
+  check(seen[4].grey.includes('A.keylock') && !seen[4].act.includes('A.keylock'), 'Chapitre 5 : les commandes à venir apparaissent grisées');
+  check(seen[10].act.includes('A.keylock') && seen[11].act.includes('A.pad1') && seen[11].act.includes('A.slip') && seen[13].act.includes('am-btn'), 'Chaque commande se débloque à son chapitre (KEY LOCK 11, pads et SLIP 12, Auto-mix 14)', [10, 11, 13].map(c => seen[c].act.filter(x => /keylock|pad1|slip|am-btn/.test(x)).join('+')).join(' / '));
+  // une commande reconstruite pendant le parcours (platine rechargée, bibliothèque redessinée) reste verrouillée
+  await p4.evaluate(() => Parcours.go(0, 0)); await sleep(100);
+  await p4.evaluate(() => { buildDeck(decks[0]); buildLib(); }); await sleep(150);
+  const reb = await census();
+  check(!reb.act.includes('A.keylock') && !reb.act.includes('A.pad1') && !reb.act.includes('A.cue'), 'Commandes reconstruites : de nouveau masquées', reb.act.join(','));
+  await p4.evaluate(() => Parcours.exit()); await sleep(150);
+  const all = await census();
+  check(all.grey.length === 0 && ['A.keylock', 'A.slip', 'A.rev', 'A.censor', 'am-btn', 'midi-btn', 'A.pad1', 'B.play'].every(x => all.act.includes(x)) && all.act.length > counts[11], 'Sortie du parcours : toutes les commandes reviennent', all.act.length + ' actives');
+  await ctx4.close();
+
   // 6. Tour complet : chaque étape des 14 chapitres s'affiche, cible une commande qui existe, et se passe.
   const bad = [];
   for (let c = 0; c < 14; c++) {
@@ -211,7 +262,7 @@ const check = (ok, what, extra = '') => { console.log((ok ? 'OK   ' : 'ÉCHEC ')
     const ns = await p2.evaluate(() => Parcours.P.steps.length);
     for (let i = 0; i < ns; i++) {
       await sleep(50);
-      const r = await p2.evaluate(() => { const s = Parcours.P.steps[Parcours.prog.step]; let tg = null; try { tg = typeof s.target === 'function' ? s.target(Parcours.P.st) : s.target; } catch (e) { return 'cible en erreur : ' + e.message; } if (tg && !(/^[#.\[]/.test(tg) ? document.querySelector(tg) : controls.get(tg))) return 'cible introuvable : ' + tg; return null; });
+      const r = await p2.evaluate(() => { const s = Parcours.P.steps[Parcours.prog.step]; let tg = null; try { tg = typeof s.target === 'function' ? s.target(Parcours.P.st) : s.target; } catch (e) { return 'cible en erreur : ' + e.message; } if (!tg) return null; const el = /^[#.\[]/.test(tg) ? document.querySelector(tg) : (controls.get(tg) || {}).el; if (!el) return 'cible introuvable : ' + tg; if (el.closest('.pc-hide,.pc-lock,.pc-lockp')) return 'cible encore verrouillée : ' + tg; return null; });
       if (r) bad.push(`ch${c + 1} étape ${i + 1} ${r}`);
       await p2.evaluate(() => Parcours.skip());
     }

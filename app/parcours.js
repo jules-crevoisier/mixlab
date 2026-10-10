@@ -113,33 +113,61 @@ window.Parcours=(()=>{
   });
 
   /* ---------- l'interface qui grandit ----------
-     [chapitre qui débloque (index), sélecteurs, 'hide' pour masquer au lieu de griser] */
+     [chapitre qui débloque (index), sélecteurs, mode].
+     Mode par défaut : masqué aux chapitres 1 à 4 (on ne voit que ce qu'on apprend),
+     grisé ensuite (on devine ce qui arrive). 'hide' : toujours masqué. 'grey' : toujours grisé.
+     Les panneaux entiers (.pnl) restent visibles avec une étiquette « Débloqué au chapitre N ».
+     Les sélecteurs visent data-ctl ou des classes stables, jamais une position (nth-child). */
   const LOCKS=[
-    [1,'#p-lib,[data-ctl="A.cue"],[data-ctl="B.cue"]'],
-    [2,'[data-ctl$=".trim"],.fdr .vu,.mvu'],
-    [3,'#p-deckB,#ch-B,.ch .cueb,[data-ctl="cuemix"],[data-ctl="cuevol"],[data-ctl="split"]'],
+    [1,'#p-lib,[data-ctl$=".cue"]'],
+    [1,'.libbar .imp'],
+    [2,'[data-ctl$=".trim"],.fdr .vu,.mvu,.limt'],
+    [3,'#p-deckB,#ch-B,.ch .cueb,[data-ctl="cuemix"],[data-ctl="cuevol"],[data-ctl="split"],#audio-btn'],
     [4,'#p-wave'],[4,'#coach-live','hide'],
     [6,'.dk-pitch,[data-ctl$=".sync"],[data-ctl$=".master"],.dk-stat:last-child,.mclock'],
+    [6,'.dk-plat','grey'],
     [7,'.ch .eq'],
     [8,'.xf,.xfa'],[8,'#coach-direct','hide'],
-    [9,'.dk-loop,[data-ctl$=".filter"]'],
-    [10,'.dk-stat.k,.dk-ctr .r:nth-child(2)'],
-    [11,'.dk-pads,.dk-ctr .r:nth-child(3),.dk-grid,.dk-pro,[data-ctl="samplervol"]'],
-    [13,'#rec-btn,#presets,#ndecks,details.menu,#q-btn,#ag-btn'],
+    [9,'.dk-loop,[data-ctl$=".filter"],.mst .cfx,.xf select,.fxu'],
+    [10,'.dk-stat.k,.dk-ks,.libbar .compat'],
+    [11,'.dk-pads,.dk-sl,[data-ctl="samplervol"]'],
+    [12,'.dk-pads .tabs .b:not([data-m="hot"]):not([data-m="smp"])'],
+    [12,'.dk-pads .lst,.dk-grid,#lib-side,.libbar>:not(input[type="search"]):not(.compat):not(.imp):not(.count),#lib-btn'],
+    [13,'.dk-pro,.mst .eqm,#rec-btn,#presets,#ndecks,details.menu,#q-btn,#ag-btn,#am-btn,#midi-btn,#stage-btn'],
   ];
   const PANELS_AT={fx:9};
+  const HIDE_UNTIL=4;   // chapitres 1 à 4 (index 0 à 3) : on masque au lieu de griser
+  const LOCK_CLS=['pc-lock','pc-lockp','pc-hide'];
+  function lockDom(){
+    if(!prog.active)return;
+    const c=prog.free?99:prog.ch,want=new Map();
+    // une commande peut être visée par plusieurs règles : la plus tardive l'emporte
+    for(const[at,sel,mode]of LOCKS){if(c>=at)continue;
+      for(const e of $$(sel)){
+        const cls=e.classList.contains('pnl')?'pc-lockp':mode==='hide'||(mode!=='grey'&&c<HIDE_UNTIL)?'pc-hide':'pc-lock';
+        const prev=want.get(e);if(!prev||at>prev.at)want.set(e,{at,cls});
+      }}
+    for(const e of $$('.pc-lock,.pc-lockp,.pc-hide'))if(!want.has(e)){e.classList.remove(...LOCK_CLS);e.inert=false;delete e.dataset.pcLock;}
+    for(const[e,{at,cls}]of want){
+      for(const k of LOCK_CLS)if(k!==cls&&e.classList.contains(k))e.classList.remove(k);
+      if(!e.classList.contains(cls))e.classList.add(cls);
+      if(!e.inert)e.inert=true;
+      if(cls==='pc-lockp'){const t='Débloqué au chapitre '+(at+1);if(e.dataset.pcLock!==t)e.dataset.pcLock=t;}else if(e.dataset.pcLock)delete e.dataset.pcLock;
+    }
+  }
+  // Platines, bibliothèque et panneaux se reconstruisent : on reverrouille ce qui réapparaît.
+  let lockRaf=0;
+  const relock=()=>{if(!prog.active||lockRaf)return;lockRaf=requestAnimationFrame(()=>{lockRaf=0;lockDom();});};
+  new MutationObserver(muts=>{if(prog.active&&muts.some(m=>m.addedNodes.length))relock();}).observe(document.documentElement,{childList:true,subtree:true});
   function applyLocks(){
     const c=prog.free?99:prog.ch;
-    for(const[at,sel,mode]of LOCKS)$$(sel).forEach(e=>{
-      const lock=c<at,cls=mode==='hide'?'pc-hide':e.classList.contains('pnl')?'pc-lockp':'pc-lock';
-      e.classList.toggle(cls,lock);e.inert=lock;
-      if(cls==='pc-lockp'){if(lock)e.dataset.pcLock='Débloqué au chapitre '+(at+1);else delete e.dataset.pcLock;}
-    });
+    lockDom();
     const vis=new Set(['mixer','wave','lib']);for(const[k,at]of Object.entries(PANELS_AT))if(c>=at)vis.add(k);
     if(c>=99)['fx','wave','lib'].forEach(k=>vis.add(k));
     layout.visible=vis;layout.preset='ecole';layout.coach=true;S.numDecks=2;applyLayout();
+    lockDom();
   }
-  function clearLocks(){$$('.pc-lock,.pc-lockp,.pc-hide').forEach(e=>{e.classList.remove('pc-lock','pc-lockp','pc-hide');e.inert=false;delete e.dataset.pcLock;});}
+  function clearLocks(){$$('.pc-lock,.pc-lockp,.pc-hide').forEach(e=>{e.classList.remove(...LOCK_CLS);e.inert=false;delete e.dataset.pcLock;});}
   const blind=on=>document.body.classList.toggle('pc-blind',!!on);
 
   /* ---------- outils pour les chapitres ---------- */
@@ -631,5 +659,5 @@ window.Parcours=(()=>{
     if(!Coach.L.active&&Coach.render)Coach.render();
   }
   return{init,tick,open,exit,go:(c,s)=>{if(!prog.active)open(c);loadChapter(c,s||0);},skip:()=>advance(true),next:()=>advance(false),tap,mark,card,keepIssue,welcome,
-    summaryText,summary,CH,GLOSS,gloss,prog,P,get target(){return prog.active?P.target:null;},get active(){return prog.active;}};
+    summaryText,summary,CH,GLOSS,gloss,prog,P,LOCKS,get target(){return prog.active?P.target:null;},get active(){return prog.active;}};
 })();

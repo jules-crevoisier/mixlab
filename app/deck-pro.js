@@ -1,7 +1,7 @@
 'use strict';
 /* =====================================================================
    Mixlab · platines et mixer « pro »
-   Réglages de jeu (fenêtre Réglages, ouverte depuis Panneaux) :
+   Réglages de jeu (fenêtre Réglages, ouverte depuis le menu Affichage) :
    - mode du bouton Cue (CDJ, Denon, Numark), Cue Play, sens du pitch ;
    - sync calée sur le temps, la mesure ou la phrase de 8 mesures ;
    - courbe des faders de voie, courbe réglable et inversion du crossfader,
@@ -407,8 +407,6 @@ window.DeckPro=(()=>{
       X.metro=btn(D+'.metro','Métronome '+D,'Métro','',()=>{d.metro=!d.metro;d._mk=null;if(d.metro&&!hpRouted())toast('Métronome au casque : active Split ou choisis une sortie casque (bouton Audio)');},null,'Métronome au casque, calé sur la grille : vérifie qu’elle tombe juste');
       X.root=h('div',{class:'r dk-pro'},X.cup,X.dbl,X.ks,h('span',{class:'dp-kf'},h('span',{class:'lbl'},'ct'),fm,X.fine,fp),X.lock,X.metro,X.cd);
       (grid||$('.dk-loop',P0)||P0.lastElementChild).after(X.root);
-      // parcours débutant : la rangée suit le verrou de la rangée Grille
-      if(grid&&grid.classList.contains('pc-lock')){X.root.classList.add('pc-lock');X.root.inert=true;}
       d.ui.dp=X;
     }
     const X=d.ui.dp;

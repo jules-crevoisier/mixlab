@@ -11,6 +11,11 @@ function fmtTime(s,tenths=true){if(!isFinite(s))s=0;const neg=s<0;s=Math.abs(s);
 function toast(msg,cls){const t=h('div',{class:'toast '+(cls||'')},msg);$('#toasts').append(t);setTimeout(()=>t.remove(),3400);}
 function fitCanvas(cv){const r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;const w=Math.round(r.width*d),hh=Math.round(r.height*d);if(w<2||hh<2)return false;if(cv.width!==w||cv.height!==hh){cv.width=w;cv.height=hh;}return true;}
 const COL={A:'#2ec5e8',B:'#ff8f3a',C:'#ff5fa2',D:'#3fd68f'};
+// Extensions audio acceptées : la même liste que AUDIO_EXT de src-tauri/src/files.rs et electron/main.js
+// (le pont natif donne des fichiers sans type MIME : on se fie à l'extension).
+const AUDIO_EXT=['mp3','wav','aif','aiff','flac','ogg','m4a','aac','opus'];
+const AUDIO_RE=new RegExp('\\.('+AUDIO_EXT.join('|')+')$','i');
+const isAudioFile=f=>!!f&&(/^audio\//.test(f.type||'')||AUDIO_RE.test(f.name||''));
 const HOT=['#ff4d5e','#ffa53a','#ffd34d','#3fd679','#31d3c8','#2fa8ff','#7d6bff','#e86bff'];
 /* Couleurs des waveforms : convention du métier (graves chauds, médiums verts, aigus froids),
    avec un mode additif « RGB », un mode monochrome et une palette pour daltoniens. */
@@ -235,7 +240,7 @@ function buildDeck(d){
   B.cue=btn(D+'.cue','Cue '+D,'Cue','big cue',()=>d.cueDown(),()=>d.cueUp(),'Cue : à l’arrêt, pose le point de départ. En lecture, y revient. Maintiens pour pré-écouter.');
   B.play=btn(D+'.play','Play '+D,playIcon(),'big play',()=>d.togglePlay(),null,'Lecture / pause');
   d.ui.b=B;
-  const ctr=h('div',{class:'dk-ctr'},h('div',{class:'r'},B.sync,B.master),h('div',{class:'r'},B.kl,km,d.ui.keyd,kp),h('div',{class:'r'},B.slip,B.rev,B.cen),h('div',{class:'r'},B.cue,B.play));
+  const ctr=h('div',{class:'dk-ctr'},h('div',{class:'r dk-sm'},B.sync,B.master),h('div',{class:'r dk-ks'},B.kl,km,d.ui.keyd,kp),h('div',{class:'r dk-sl'},B.slip,B.rev,B.cen),h('div',{class:'r dk-tr'},B.cue,B.play));
   // colonne pitch
   d.ui.pv=h('span',{class:'pv'},'0.00%');
   const pitch=h('input',{type:'range',class:'fd v pitch',min:-1,max:1,step:.0005,value:0,'aria-label':'Pitch '+D});
@@ -320,9 +325,9 @@ function buildMixer(){
   }
   const mvuL=h('canvas',{class:'vu'}),mvuR=h('canvas',{class:'vu'});ui.mvu=[mvuL,mvuR];
   ui.lim=h('canvas',{class:'vu lim'});ui.limL=h('span',{class:'limt',title:'Limiteur du master : s’allume quand il réduit le volume pour éviter la saturation. Baisse les gains si ça reste allumé.'},'LIM');
-  const cfx=h('select',{class:'sel mxs','aria-label':'Effet de voie',title:'Effet de voie : ce que fait le potard FILTRE de chaque voie'},COLOR_FX.map(([k,n])=>h('option',{value:k},n)));
+  const cfx=h('select',{class:'sel mxs cfx','aria-label':'Effet de voie',title:'Effet de voie : ce que fait le potard FILTRE de chaque voie'},COLOR_FX.map(([k,n])=>h('option',{value:k},n)));
   cfx.value=S.colorFx;cfx.addEventListener('change',()=>setColorFx(cfx.value));ui.cfx=cfx;
-  const eqm=h('select',{class:'sel mxs','aria-label':'Mode d’EQ',title:'Isolateur : les potards coupent complètement la bande. Classique : plancher à -26 dB, comme un mixer de club.'},h('option',{value:'iso'},'EQ iso'),h('option',{value:'classic'},'EQ classique'));
+  const eqm=h('select',{class:'sel mxs eqm','aria-label':'Mode d’EQ',title:'Isolateur : les potards coupent complètement la bande. Classique : plancher à -26 dB, comme un mixer de club.'},h('option',{value:'iso'},'EQ iso'),h('option',{value:'classic'},'EQ classique'));
   eqm.value=S.eqMode;eqm.addEventListener('change',()=>{S.eqMode=eqm.value;store.set('eqMode',S.eqMode);decks.forEach(applyMix);});
   const mk=knob('master','MASTER',S.masterVol,v=>setMasterVol(v),{bip:false,title:'Volume général'});
   const cm=knob('cuemix','MIX',S.cueMix,v=>{S.cueMix=v;applyCue();},{bip:false,title:'Casque : à gauche le cue seul, à droite le master'});
@@ -378,12 +383,12 @@ function buildLib(){
   const side=h('nav',{class:'side',id:'lib-side','aria-label':'Collection'});
   const q=h('input',{type:'search',placeholder:'Rechercher (/ ou Ctrl+F)',title:'Mots libres, ou par champ : bpm:120-126 key:8A key:~8A rating:>=4 tag:peak genre:house energie:>=7 couleur:rouge','aria-label':'Rechercher'});
   q.addEventListener('input',()=>{lib.q=q.value.trim().toLowerCase();lib.tw.scrollTop=0;renderTable();});
-  const comp=h('button',{class:'tb',type:'button','aria-pressed':'false',title:'Ne montrer que les morceaux compatibles (tonalité et tempo) avec la platine maître'},'Compatibles');
+  const comp=h('button',{class:'tb compat',type:'button','aria-pressed':'false',title:'Ne montrer que les morceaux compatibles (tonalité et tempo) avec la platine maître'},'Compatibles');
   comp.addEventListener('click',()=>{lib.compat=!lib.compat;comp.setAttribute('aria-pressed',String(lib.compat));renderTable();});
   const addTo=h('select',{class:'sel','aria-label':'Ajouter le morceau sélectionné à une playlist'});
   addTo.addEventListener('change',()=>{const pl=LIB.playlists.find(p=>p.id===addTo.value);if(pl&&ui.sel){if(!pl.ids.includes(ui.sel))pl.ids.push(ui.sel);toast('Ajouté à « '+pl.name+' »','ok');renderSide();}addTo.value='';});
   lib.addTo=addTo;
-  const file=h('label',{class:'tb filebtn'},'Importer',h('input',{type:'file',multiple:true,accept:'audio/*',onchange:e=>{importFiles([...e.target.files],null);e.target.value='';}}));
+  const file=h('label',{class:'tb filebtn imp'},'Importer',h('input',{type:'file',multiple:true,accept:'audio/*,'+AUDIO_EXT.map(e=>'.'+e).join(','),onchange:e=>{importFiles([...e.target.files],null);e.target.value='';}}));
   lib.count=h('span',{class:'count'},'');
   lib.thead=h('thead');lib.tbody=h('tbody');
   lib.tw=h('div',{class:'tw'},h('table',{class:'lt'},lib.thead,lib.tbody));
@@ -475,7 +480,7 @@ function paintRows(){
 }
 async function importFiles(files,deck){
   for(const f of files){
-    if(!/^audio\//.test(f.type)&&!/\.(mp3|wav|aiff?|flac|ogg|m4a|aac)$/i.test(f.name))continue;
+    if(!isAudioFile(f))continue;
     const path=window.Desktop?await Desktop.pathOf(f):null;
     if(path&&LIB.tracks.some(t=>t.path===path)){toast('« '+f.name+' » est déjà dans la bibliothèque');continue;}
     try{

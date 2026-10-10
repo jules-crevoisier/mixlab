@@ -349,10 +349,28 @@ function renderClock(){
 }
 
 /* ---------- clavier : un « contrôleur » de plus, par touches physiques ---------- */
+/* Le nom affiché d'une touche dépend de la disposition du clavier. Chromium la donne
+   (navigator.keyboard.getLayoutMap) ; les webviews WebKit (macOS, Linux) ne la donnent pas :
+   on prend alors la disposition choisie dans la fenêtre Contrôleur, devinée d'après la langue. */
 let layoutMap=null;
-try{navigator.keyboard&&navigator.keyboard.getLayoutMap&&navigator.keyboard.getLayoutMap().then(m=>{layoutMap=m;renderKeys();}).catch(()=>{});}catch(e){}
+try{navigator.keyboard&&navigator.keyboard.getLayoutMap&&navigator.keyboard.getLayoutMap().then(m=>{layoutMap=m&&m.size?m:null;renderKeys();}).catch(()=>{});}catch(e){}
 const KEY_NAMES={Space:'Espace',ArrowLeft:'←',ArrowRight:'→',ArrowUp:'↑',ArrowDown:'↓',Enter:'Entrée',Backspace:'Retour',Tab:'Tab',Comma:',',Period:'.',Semicolon:';',Slash:'/',Minus:'-',Equal:'=',BracketLeft:'[',BracketRight:']',Quote:"'",Backquote:'`',Backslash:'\\',IntlBackslash:'<'};
-C.keyName=code=>{const l=layoutMap&&layoutMap.get(code);if(l&&l.trim())return l.toUpperCase();return KEY_NAMES[code]||code.replace(/^Key|^Digit|^Numpad/,'');};
+const LAYOUTS={
+  qwerty:{name:'QWERTY',map:{}},
+  azerty:{name:'AZERTY',map:{KeyQ:'A',KeyA:'Q',KeyW:'Z',KeyZ:'W',KeyM:',',Semicolon:'M',Comma:';',Period:':',Slash:'!',Minus:')',Equal:'=',BracketLeft:'^',BracketRight:'$',Quote:'Ù',Backquote:'²',Backslash:'*'}},
+  qwertz:{name:'QWERTZ',map:{KeyY:'Z',KeyZ:'Y',Minus:'ß',Equal:'´',BracketLeft:'Ü',BracketRight:'+',Semicolon:'Ö',Quote:'Ä',Backquote:'^',Backslash:'#',Slash:'-'}},
+};
+// fr (sauf Canada et Suisse) : AZERTY ; allemand, Europe centrale, Suisse : QWERTZ ; sinon QWERTY.
+C.guessLayout=(lang=navigator.language||'')=>{const l=String(lang).toLowerCase();
+  if(/^(de|cs|sk|hu|sl|hr|bs|sr-latn|lb|rm)\b/.test(l)||/-(ch|li)\b/.test(l))return'qwertz';
+  if(/^(fr(?!-ca)|br|wo)\b/.test(l)||/^nl-be\b/.test(l))return'azerty';
+  return'qwerty';};
+C.kbLayout=()=>{const v=store.get('kbLayout','auto');return LAYOUTS[v]?v:C.guessLayout();};
+C.setKbLayout=v=>{store.set('kbLayout',LAYOUTS[v]?v:'auto');renderKeys();};
+C.hasLayoutMap=()=>!!layoutMap;
+C.keyName=code=>{const l=layoutMap&&layoutMap.get(code);if(l&&l.trim())return l.toUpperCase();
+  const f=LAYOUTS[C.kbLayout()].map[code];if(f)return f;
+  return KEY_NAMES[code]||code.replace(/^Key|^Digit|^Numpad/,'');};
 const keyAct=id=>id==='xf-'?'Crossfader vers A':id==='xf+'?'Crossfader vers B':(ctl(id)?ctl(id).label:id);
 const saveKeys=()=>{store.set('keys',KEYS);renderKeys();};
 C.kcap=null;
@@ -374,6 +392,9 @@ function renderKeys(){
       h('button',{title:'Supprimer ce raccourci',onclick:()=>{delete KEYS[code];saveKeys();}},'×')));
   }
   const add=$('#key-add');if(add)add.textContent=C.kcap&&!C.kcap.old?'Appuie sur une touche… (Échap : annuler)':'Ajouter une touche';
+  // le choix de disposition ne sert que si le système ne la donne pas
+  const lr=$('#kb-layout-row'),ls=$('#kb-layout');if(lr)lr.hidden=!!layoutMap;
+  if(ls){const v=store.get('kbLayout','auto');ls.value=LAYOUTS[v]?v:'auto';ls.options[0].textContent='Automatique ('+LAYOUTS[C.guessLayout()].name+')';}
 }
 C.renderKeys=renderKeys;
 
@@ -400,7 +421,11 @@ C.build=()=>{
   if(kb){const col=kb.parentElement,h3=col.querySelector('h3');if(h3)h3.textContent='Clavier';
     const act=h('select',{class:'sel wide','aria-label':'Action du nouveau raccourci'},h('option',{value:'xf-'},'Crossfader vers A'),h('option',{value:'xf+'},'Crossfader vers B'),
       [...controls].filter(([,c])=>c.kind==='btn').map(([id,c])=>h('option',{value:id},c.label)));
-    kb.replaceWith(h('p',{},'Les touches suivent leur place sur le clavier, pas la lettre : elles tombent au même endroit en AZERTY et en QWERTY.'),h('ul',{class:'maps keyl',id:'key-list'}),act,
+    const lay=h('select',{class:'sel',id:'kb-layout','aria-label':'Disposition du clavier',title:'Sert seulement à afficher le nom des touches',onchange:e=>C.setKbLayout(e.target.value)},
+      h('option',{value:'auto'},'Automatique'),Object.entries(LAYOUTS).map(([k,l])=>h('option',{value:k},l.name)));
+    kb.replaceWith(h('p',{},'Les touches suivent leur place sur le clavier, pas la lettre : elles tombent au même endroit en AZERTY et en QWERTY.'),
+      h('div',{class:'r fixed',id:'kb-layout-row',style:'margin:2px 0 6px',hidden:!!layoutMap},h('span',{class:'lbl'},'Ton clavier'),lay),
+      h('ul',{class:'maps keyl',id:'key-list'}),act,
       h('div',{class:'r fixed',style:'margin-top:4px'},h('button',{class:'b',type:'button',id:'key-add',onclick:()=>C.keyCapture(act.value,null)},'Ajouter une touche'),
         h('button',{class:'b',type:'button',title:'Revenir aux raccourcis d’origine',onclick:()=>{Object.keys(KEYS).forEach(k=>delete KEYS[k]);Object.assign(KEYS,KEYS_DEF);saveKeys();}},'Réinitialiser')));
     renderKeys();}

@@ -104,6 +104,16 @@ const fakeNative = saved => `
   await page.waitForFunction(() => LIB.tracks.length >= 4 && decks[1].track, null, { timeout: 60000 });
   const W = (f, a) => page.evaluate(f, a);
 
+  // Extensions audio : la page, l'appli Tauri (files.rs) et Electron acceptent exactement les mêmes.
+  const fs = require('fs'), root = path.resolve(__dirname, '..');
+  const rsExt = (/const AUDIO_EXT: &\[&str\] = &\[([^\]]*)\]/.exec(fs.readFileSync(path.join(root, 'src-tauri/src/files.rs'), 'utf8')) || [])[1];
+  const elExt = (/extensions: \[([^\]]*)\]/.exec(fs.readFileSync(path.join(root, 'electron/main.js'), 'utf8')) || [])[1];
+  const norm = x => (x || '').replace(/["'\s]/g, '').split(',').filter(Boolean).sort().join();
+  const pageExt = await W(() => AUDIO_EXT.slice().sort().join());
+  check(pageExt === norm(rsExt) && pageExt === norm(elExt) && pageExt.includes('opus'), 'extensions audio identiques dans la page, files.rs et Electron (opus compris)', [pageExt, norm(rsExt), norm(elExt)].join(' / '));
+  const opus = await W(() => [isAudioFile({ name: 'Set - Live.OPUS', type: '' }), isAudioFile({ name: 'a.aif', type: '' }), isAudioFile({ name: 'notes.txt', type: '' }), isAudioFile({ name: 'x', type: 'audio/ogg' })].join());
+  check(opus === 'true,true,false,true', 'import : un .opus sans type MIME (pont natif) est accepté, un .txt refusé', opus);
+
   // Lecture des formats.
   const rb = await W(x => { const r = LibPro.parseRekordbox(x); return { n: r.tracks.length, t0: r.tracks[0], t1: r.tracks[1], key0: keyInfo(r.tracks[0].key).code, key1: keyInfo(r.tracks[1].key).code, pls: r.playlists }; }, RB);
   check(rb.n === 3, 'rekordbox : 3 morceaux lus');
@@ -111,7 +121,13 @@ const fakeNative = saved => `
   check(rb.t0.bpm === 120 && rb.key0 === '8A' && rb.key1 === '8A' && rb.t0.rating === 4 && rb.t1.rating === 5 && rb.t0.color === 2 && rb.t1.color === 6, 'rekordbox : BPM, tonalité, note et couleur');
   check(rb.t0.comment === 'Ouverture & montée' && rb.t0.plays === 7 && rb.t0.genre === 'Techno', 'rekordbox : commentaire, lectures, genre');
   check(Math.abs(rb.t0.grid - 0.05) < 1e-6 && Math.abs(rb.t1.grid - 1.2375) < 1e-6, 'rekordbox : grille (Battito 3 ramené sur le premier temps de la mesure)', rb.t1.grid);
-  check(rb.t0.cue === 0.05 && rb.t0.mem.length === 1 && rb.t0.mem[0].name === 'Break' && rb.t0.hot[0] === 2.05 && rb.t0.hotName[0] === 'Drop' && rb.t0.hot[2] === 6.05, 'rekordbox : cue, cue mémoire nommé, hot cues (et boucle)');
+  check(rb.t0.cue === 0.05 && rb.t0.memCues.length === 1 && rb.t0.memCues[0].label === 'Break' && rb.t0.hot[0] === 2.05 && rb.t0.hot[2] === 6.05, 'rekordbox : cue, cue mémoire nommé, hot cues (et boucle)', JSON.stringify(rb.t0.memCues));
+  check(rb.t0.hotMeta[0] && rb.t0.hotMeta[0].name === 'Drop' && rb.t0.hotMeta[0].color === '#28e214' && !rb.t0.mem && !rb.t0.hotName, 'rekordbox : nom et couleur du hot cue lus dans les champs des platines (hotMeta)', JSON.stringify(rb.t0.hotMeta[0]));
+  // Anciennes sauvegardes (mem / hotName) : converties vers memCues / hotMeta, sans toucher aux cues de structure.
+  const mig = await W(() => { const t = { memCues: [{ t: 30, label: 'Drop', color: '#ff4d5e', type: 'drop' }] };
+    LibPro.metaIn(t, { mem: [{ t: 4, name: 'Break' }, { t: 1, name: '' }], hotName: ['Intro', '', 'Voix'] }); return t; });
+  check(mig.memCues.length === 3 && mig.memCues[0].label === 'Cue 2' && mig.memCues[1].label === 'Break' && mig.memCues[2].type === 'drop' && mig.hotMeta[0].name === 'Intro' && mig.hotMeta[1] === null && mig.hotMeta[2].name === 'Voix' && !('mem' in mig) && !('hotName' in mig),
+    'anciennes sauvegardes : mem et hotName convertis en memCues et hotMeta', JSON.stringify(mig));
   check(JSON.stringify(rb.pls) === JSON.stringify([{ name: 'Club / Samedi', items: [0, 1] }, { name: 'Par chemin', items: [0] }]), 'rekordbox : playlists et dossiers', JSON.stringify(rb.pls));
 
   const it = await W(x => LibPro.parseItunes(x), ITUNES);
@@ -161,8 +177,8 @@ const fakeNative = saved => `
   await page.getByRole('button', { name: 'Choisir un fichier…' }).click();
   await page.waitForSelector('.lpm .xout p.ok', { timeout: 30000 });
   const imp = await W(() => { const t = LIB.tracks.find(t => t.path === '/musique/Testeur - Kick 120.wav'); const pl = LIB.playlists.find(p => p.name === 'Club / Samedi');
-    return { ok: !!t, rating: t && t.rating, color: t && t.color, bpm: t && t.bpm, grid: t && t.grid, cue: t && t.cue, hot0: t && t.hot[0], mem: t && t.mem, key: t && keyInfo(t.key).code, inPl: !!(pl && t && pl.ids.includes(t.id)), missing: Desktop.missing.map(m => m.title), txt: document.querySelector('.lpm .xout').textContent }; });
-  check(imp.ok && imp.rating === 4 && imp.color === 2 && imp.bpm === 120 && imp.grid === 0.05 && imp.cue === 0.05 && imp.hot0 === 2.05 && imp.key === '8A' && imp.mem.length === 1, 'import appli : morceau ouvert avec note, couleur, grille, cues et tonalité de rekordbox', JSON.stringify(imp));
+    return { ok: !!t, rating: t && t.rating, color: t && t.color, bpm: t && t.bpm, grid: t && t.grid, cue: t && t.cue, hot0: t && t.hot[0], mem: t && t.memCues.filter(m => !m.type), hm0: t && t.hotMeta[0], key: t && keyInfo(t.key).code, inPl: !!(pl && t && pl.ids.includes(t.id)), missing: Desktop.missing.map(m => m.title), txt: document.querySelector('.lpm .xout').textContent }; });
+  check(imp.ok && imp.rating === 4 && imp.color === 2 && imp.bpm === 120 && imp.grid === 0.05 && imp.cue === 0.05 && imp.hot0 === 2.05 && imp.key === '8A' && imp.mem.length === 1 && imp.mem[0].label === 'Break' && imp.hm0 && imp.hm0.name === 'Drop' && imp.hm0.color === '#28e214', 'import appli : morceau ouvert avec note, couleur, grille, cues et tonalité de rekordbox', JSON.stringify(imp));
   check(imp.inPl && imp.missing.join() === 'Absent,Néons' && /2 introuvables/.test(imp.txt), 'import appli : playlist créée, introuvables listés', imp.txt);
   await page.getByRole('button', { name: 'Relocaliser les introuvables…' }).click();
   await page.getByRole('button', { name: 'Chercher dans un dossier…' }).click();
@@ -229,6 +245,14 @@ const fakeNative = saved => `
   await W(() => { const a = LIB.tracks.find(t => t.title === 'Kick 120'), b = LIB.tracks.find(t => t.title === 'Absent'), t0 = Date.now() - 600000;
     LIB.history.push({ track: a, time: new Date(t0), deck: 'A' }, { track: b, time: new Date(t0 + 210000), deck: 'B' }); a.lastPlayed = new Date(); renderSide(); });
 
+  // Les cues importés de rekordbox se voient sur la platine : nom du pad, cue mémoire sur la waveform.
+  const onDeck = await W(() => { const t = LIB.tracks.find(t => t.title === 'Kick 120'), d = decks[2]; d.load(t); d.padMode = 'hot'; renderPads(d);
+    return { pad: d.ui.pads[0].textContent, hc: d.ui.pads[0].style.getPropertyValue('--hc'), mem: (d.track.memCues || []).map(m => m.label).join() }; });
+  check(/Drop/.test(onDeck.pad) && onDeck.mem.includes('Break'), 'platine : hot cue nommé et cue mémoire venus de rekordbox', JSON.stringify(onDeck));
+  // Ajouts faits sur la platine : couleur de hot cue, cue mémoire coloré, boucle gardée.
+  await W(() => { const t = LIB.tracks.find(t => t.title === 'Kick 120'); t.hotMeta[1] = { name: 'Voix', color: '#2fa8ff' }; t.hot[1] = 3.05;
+    t.memCues.push({ t: 5.05, label: 'Pont', color: '#ff4d5e' }); t.memCues.sort((a, b) => a.t - b.t); t.loops = [{ start: 1.05, end: 3.05, label: 'Boucle 1' }]; });
+
   // Sauvegarde puis relance : tout revient.
   await W(() => Desktop.save());
   const saved = await W(() => window.__saved);
@@ -242,8 +266,8 @@ const fakeNative = saved => `
   await page.waitForFunction(() => LIB.tracks.filter(t => t.path).length >= 2, null, { timeout: 60000 });
   await page.waitForTimeout(300);
   const back = await page.evaluate(() => { const t = LIB.tracks.find(t => t.title === 'Kick 120'), a = LIB.tracks.find(t => t.title === 'Absent'), pl = LIB.playlists.find(p => p.name === 'Club / Samedi');
-    return { rating: t.rating, color: t.color, eu: t.energyUser, tags: t.tags.join(), comment: t.comment, mem: t.mem && t.mem[0].name, hotName: t.hotName && t.hotName[0], last: !!t.lastPlayed, aPath: a && a.path, inPl: !!(pl && a && pl.ids.includes(a.id) && pl.ids.includes(t.id)), crates: LibPro.crates.map(c => c.name).join(), missing: Desktop.missing.map(m => m.title).join(), sets: LibPro.sets.length, setItems: LibPro.sets[0] && LibPro.sets[0].items.length }; });
-  check(back.rating === 5 && back.color === 5 && back.eu === 8 && back.tags === 'peak,vocal' && back.comment === 'À garder pour le closing' && back.mem === 'Break' && back.hotName === 'Drop' && back.last, 'relance : note, couleur, énergie, tags, commentaire, cues nommés', JSON.stringify(back));
+    return { rating: t.rating, color: t.color, eu: t.energyUser, tags: t.tags.join(), comment: t.comment, mem: t.memCues.filter(m => !m.type).map(m => m.label + m.color).join(), hotName: t.hotMeta[0] && t.hotMeta[0].name, hm1: t.hotMeta[1], loops: JSON.stringify(t.loops), last: !!t.lastPlayed, aPath: a && a.path, inPl: !!(pl && a && pl.ids.includes(a.id) && pl.ids.includes(t.id)), crates: LibPro.crates.map(c => c.name).join(), missing: Desktop.missing.map(m => m.title).join(), sets: LibPro.sets.length, setItems: LibPro.sets[0] && LibPro.sets[0].items.length }; });
+  check(back.rating === 5 && back.color === 5 && back.eu === 8 && back.tags === 'peak,vocal' && back.comment === 'À garder pour le closing' && back.mem === 'Break#ffffff,Pont#ff4d5e' && back.hotName === 'Drop' && back.hm1 && back.hm1.color === '#2fa8ff' && back.loops === '[{"start":1.05,"end":3.05,"label":"Boucle 1"}]' && back.last, 'relance : note, couleur, énergie, tags, commentaire, hot cues nommés et colorés, cues mémoire, boucles', JSON.stringify(back));
   check(back.aPath === '/nouveau/Fantôme - Absent.mp3' && back.inPl && back.crates === 'Peak notés' && back.missing === 'Néons' && back.sets === 1 && back.setItems === 2, 'relance : morceau relocalisé, playlist, crate, manquant et set précédent conservés', JSON.stringify(back));
 
   // Tracklist du set précédent.
@@ -269,12 +293,16 @@ const fakeNative = saved => `
       if (x.title !== t.title || x.artist !== t.artist || x.genre !== t.genre || x.path !== t.path) diff.push('texte ' + i);
       if (!same(x.bpm, t.bpm, .006) || !same(x.grid, t.grid) || !same(x.cue, t.cue)) diff.push('tempo ' + i + ' ' + [x.bpm, t.bpm, x.grid, t.grid, x.cue, t.cue]);
       if (keyInfo(x.key)?.code !== keyInfo(t.key)?.code || x.rating !== (t.rating || 0) || x.color !== (t.color || 0) || x.comment !== (t.comment || '')) diff.push('infos ' + i);
-      if (t.hot.some((h, n) => !same(x.hot[n], h)) || JSON.stringify((t.mem || []).map(m => m.name)) !== JSON.stringify(x.mem.map(m => m.name))) diff.push('cues ' + i);
+      const um = t.memCues.filter(m => !m.type), hm = n => t.hotMeta[n] ? [t.hotMeta[n].name, t.hotMeta[n].color] : null;
+      if (t.hot.some((h, n) => !same(x.hot[n], h)) || JSON.stringify(um.map(m => [m.label, m.color])) !== JSON.stringify(x.memCues.map(m => [m.label, m.color])) || um.some((m, k) => !same(m.t, x.memCues[k].t))) diff.push('cues ' + i + ' ' + JSON.stringify([um, x.memCues]));
+      if (t.hot.some((h, n) => h != null && t.hotMeta[n] && JSON.stringify(hm(n)) !== JSON.stringify([x.hotMeta[n].name, x.hotMeta[n].color]))) diff.push('hot cues nommés ' + i + ' ' + JSON.stringify(x.hotMeta));
+      if (JSON.stringify((t.loops || []).map(l => [l.start, l.end, l.label])) !== JSON.stringify(x.loops.map(l => [l.start, l.end, l.label]))) diff.push('boucles ' + i + ' ' + JSON.stringify(x.loops));
     });
     if (JSON.stringify(r.playlists) !== JSON.stringify([{ name: 'Aller-retour', items: ts.map((_, i) => i).reverse() }])) diff.push('playlist ' + JSON.stringify(r.playlists));
     return { diff, n: r.tracks.length, xml };
   });
-  check(rt.n === 2 && !rt.diff.length, 'export rekordbox XML puis relecture : identique', rt.diff.join(' | '));
+  check(rt.n === 2 && !rt.diff.length, 'export rekordbox XML puis relecture : identique (hot cues nommés et colorés, cues mémoire, boucles)', rt.diff.join(' | '));
+  check(rt.xml.includes('<POSITION_MARK Name="Voix" Type="0" Start="3.050" Num="1" Red="47" Green="168" Blue="255"/>') && rt.xml.includes('<POSITION_MARK Name="Pont" Type="0" Start="5.050" Num="-1" Red="255" Green="77" Blue="94"/>') && rt.xml.includes('<POSITION_MARK Name="Boucle 1" Type="4" Start="1.050" End="3.050" Num="-1"/>'), 'export rekordbox : couleur de hot cue choisie dans Mixlab, cue mémoire coloré, boucle gardée');
   check(rt.xml.includes('Location="file://localhost/nouveau/Fant%C3%B4me%20-%20Absent.mp3"') && rt.xml.includes('Colour="0x00FF00"') && rt.xml.includes('Rating="255"'), 'export rekordbox : emplacement encodé, couleur, note');
   const m3 = await W(() => LibPro.toM3U(LIB.tracks.filter(t => t.path), 'Set'));
   check(m3.startsWith('#EXTM3U\n#PLAYLIST:Set\n#EXTINF:8,Testeur - Kick 120\n/musique/Testeur - Kick 120.wav\n'), 'export M3U8', JSON.stringify(m3.slice(0, 90)));
@@ -431,7 +459,8 @@ const fakeNative = saved => `
   const br = await W(() => { const t = LIB.tracks.find(t => t.title === 'Néons'); return { rating: t.rating, color: t.color, txt: document.querySelector('.lpm .xout').textContent, pls: LIB.playlists.map(p => p.name) }; });
   check(br.rating === 3 && br.color === 8 && /1 retrouvé dans/.test(br.txt) && /2 introuvables/.test(br.txt), 'navigateur : infos rekordbox appliquées au morceau déjà là', br.txt);
   await page.keyboard.press('Escape');
-  await W(() => { const t = LIB.tracks.find(t => t.title === 'Quai 9'); t.rating = 2; t.tags = ['warm-up']; t.hot[3] = 12.5; t.cue = 4; LibPro.edit(t); });
+  await W(() => { const t = LIB.tracks.find(t => t.title === 'Quai 9'); t.rating = 2; t.tags = ['warm-up']; t.hot[3] = 12.5; t.cue = 4;
+    t.hotMeta[3] = { name: 'Voix', color: '#2fa8ff' }; t.memCues.push({ t: 6.5, label: 'Pont', color: '#ff4d5e' }); t.loops = [{ start: 2, end: 4, label: 'Boucle 1' }]; LibPro.edit(t); });
   await page.click('.lpe .sw[title="Bleu"]');
   await page.keyboard.press('Escape');
   await W(() => LibPro.saveCrate({ id: 'cb', name: 'Warm-up', match: 'all', rules: [{ f: 'tag', a: 'warm-up' }] }));
@@ -445,10 +474,11 @@ const fakeNative = saved => `
   await page.waitForFunction(() => LIB.tracks.length >= 4 && LibPro.state, null, { timeout: 60000 });
   await page.waitForTimeout(500);
   const br2 = await W(() => { const t = LIB.tracks.find(t => t.title === 'Quai 9'), p = LIB.playlists.find(p => p.id === 'warm');
-    return { rating: t.rating, color: t.color, tags: (t.tags || []).join(), hot: t.hot[3], cue: t.cue, crates: LibPro.crates.map(c => c.name).join(), n: LibPro.crateTracks(LibPro.crates[0]).length,
+    return { rating: t.rating, color: t.color, tags: (t.tags || []).join(), hot: t.hot[3], cue: t.cue, hm: t.hotMeta[3], mem: t.memCues.filter(m => !m.type).map(m => m.label + '@' + m.t + m.color).join(), auto: t.memCues.filter(m => m.type).length, loops: JSON.stringify(t.loops), crates: LibPro.crates.map(c => c.name).join(), n: LibPro.crateTracks(LibPro.crates[0]).length,
       pls: LIB.playlists.map(p => p.name).join(), warm: p && p.ids.map(i => LIB.tracks.find(t => t.id === i).title).join(), missing: LibPro.missingList().map(m => m.file).join(),
       side: [...document.querySelectorAll('#lib-side .it')].find(b => b.textContent.startsWith('Fichiers manquants')).textContent }; });
   check(br2.color === 7 && br2.rating === 2 && br2.tags === 'warm-up' && br2.hot === 12.5 && br2.cue === 4 && br2.crates === 'Warm-up' && br2.n === 1, 'navigateur : infos, cues et crates gardées après rechargement (IndexedDB)', JSON.stringify(br2));
+  check(br2.hm && br2.hm.name === 'Voix' && br2.hm.color === '#2fa8ff' && br2.mem === 'Pont@6.5#ff4d5e' && br2.loops === '[{"start":2,"end":4,"label":"Boucle 1"}]', 'navigateur : nom et couleur des hot cues, cues mémoire et boucles gardés après rechargement', JSON.stringify(br2));
   check(br2.pls.includes('Mon warm-up') && !br2.pls.includes('Peak time') && br2.warm === 'Quai 9' && br2.missing === 'Testeur - Kick 120.wav' && br2.side === 'Fichiers manquants1', 'navigateur : playlists gardées, fichier à réimporter signalé', JSON.stringify(br2));
   await page.click('#lib-side .it:has-text("Fichiers manquants")');
   check((await page.textContent('.lpm')).includes('Réimporte ces fichiers'), 'navigateur : la fenêtre explique qu’il faut réimporter');

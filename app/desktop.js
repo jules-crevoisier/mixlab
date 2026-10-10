@@ -93,8 +93,8 @@ window.Desktop=(()=>{
   function importButtons(){
     if(!N)return null;
     return[
-      h('button',{class:'tb',type:'button',title:'Ajouter des morceaux',onclick:async()=>{const fs=await N.pickFiles();if(fs.length)importFiles(fs.map(fromPath),null);}},'Fichiers'),
-      h('button',{class:'tb',type:'button',title:'Ajouter un dossier entier (sous-dossiers compris)',onclick:async()=>{const fs=await N.pickFolder();if(!fs.length){return;}toast(fs.length+' morceaux trouvés, analyse en cours','ok');importFiles(fs.map(fromPath),null);}},'Dossier'),
+      h('button',{class:'tb imp',type:'button',title:'Ajouter des morceaux',onclick:async()=>{const fs=await N.pickFiles();if(fs.length)importFiles(fs.map(fromPath),null);}},'Fichiers'),
+      h('button',{class:'tb imp',type:'button',title:'Ajouter un dossier entier (sous-dossiers compris)',onclick:async()=>{const fs=await N.pickFolder();if(!fs.length){return;}toast(fs.length+' morceaux trouvés, analyse en cours','ok');importFiles(fs.map(fromPath),null);}},'Dossier'),
     ];
   }
 
@@ -102,7 +102,7 @@ window.Desktop=(()=>{
      Les morceaux introuvables au démarrage (disque débranché, fichier déplacé) restent
      dans la sauvegarde avec leurs playlists : on peut les relocaliser plus tard. */
   A.missing=[];
-  const rec=t=>({path:t.path,title:t.title,artist:t.artist,genre:t.genre,bpm:t.bpm,grid:t.grid,key:t.key,cue:t.cue,hot:t.hot,hotMeta:t.hotMeta,memCues:t.memCues,loops:t.loops,plays:t.plays,added:t.added,...(window.LibPro?LibPro.metaOut(t):{})});
+  const rec=t=>({path:t.path,title:t.title,artist:t.artist,genre:t.genre,bpm:t.bpm,grid:t.grid,key:t.key,cue:t.cue,hot:t.hot,plays:t.plays,added:t.added,...(window.LibPro?LibPro.metaOut(t):{})});
   function snapshot(){
     const tracks=LIB.tracks.filter(t=>t.path).map(rec).concat(A.missing.map(m=>{const{pls,...r}=m;return r;}));
     const byId=new Map(LIB.tracks.map(t=>[t.id,t.path]));
@@ -121,10 +121,8 @@ window.Desktop=(()=>{
     const tr=addTrack(buf,{title:t.title,artist:t.artist,genre:t.genre,file:t.path.split(/[\\/]/).pop(),path:t.path,...(pre?pre.meta:{}),key:t.key||(pre&&pre.meta.key)||null});
     if(t.bpm)tr.bpm=t.bpm;if(t.grid!=null)tr.grid=t.grid;tr.cue=t.cue??tr.grid;
     if(Array.isArray(t.hot))tr.hot=t.hot.slice(0,8).concat(Array(8).fill(null)).slice(0,8);
-    if(Array.isArray(t.hotMeta))tr.hotMeta=t.hotMeta.slice(0,8).concat(Array(8).fill(null)).slice(0,8);
-    if(Array.isArray(t.memCues))tr.memCues=t.memCues;if(Array.isArray(t.loops))tr.loops=t.loops;
     tr.plays=t.plays||0;if(t.added)tr.added=new Date(t.added);
-    window.LibPro&&LibPro.metaIn(tr,t);
+    window.LibPro&&LibPro.metaIn(tr,t);   // notes, tags, hotMeta, cues mémoire et boucles (avec conversion des anciennes sauvegardes)
     if(pre)Persist.post(tr,pre); // tags tout de suite, cache écrit en fond
     return tr;
   }
