@@ -472,11 +472,13 @@ class Deck{
     this.stopSource(when);
     const s=ctx.createBufferSource(),sg=ctx.createGain();
     const dur=this.track.duration;pos=clamp(pos,0,dur-.001);
+    // stems (stems.js) : un seul tampon à 8 canaux, joué par la même source, séparé après coup
+    const stm=!this.reverse&&this.stems&&this.stems.buf;
     if(this.reverse){s.buffer=revBuffer(this.track);}
-    else{s.buffer=this.track.buffer;if(this.loop.on){s.loop=true;s.loopStart=this.loop.start;s.loopEnd=this.loop.end;}}
+    else{s.buffer=stm||this.track.buffer;if(this.loop.on){s.loop=true;s.loopStart=this.loop.start;s.loopEnd=this.loop.end;}}
     s.playbackRate.value=this.rate;
     sg.gain.setValueAtTime(0,when);sg.gain.linearRampToValueAtTime(1,when+.004);
-    s.connect(sg);sg.connect(this.srcBus);
+    s.connect(sg);sg.connect(stm?this.stems.input:this.srcBus);
     s.start(when,this.reverse?clamp(dur-pos,0,dur-.001):pos);
     s.onended=()=>{if(this.src===s){this.src=null;this.srcGain=null;this.playing=false;this.anchorPos=this.reverse?0:dur;}};
     this.src=s;this.srcGain=sg;this.anchorPos=pos;this.anchorTime=when;this.playing=true;
@@ -675,9 +677,10 @@ class Deck{
     if(!this.scratching||!this.track)return;
     const p=clamp(this.anchorPos+sec,0,this.track.duration-.01),dp=p-this.anchorPos;this.anchorPos=p;if(Math.abs(dp)<1e-4)return;
     const t=ctx.currentTime,L=.035,s=ctx.createBufferSource(),g=ctx.createGain(),rev=dp<0;
-    s.buffer=rev?revBuffer(this.track):this.track.buffer;s.playbackRate.value=clamp(Math.abs(dp)/L,.05,4);
+    const stm=!rev&&this.stems&&this.stems.buf;
+    s.buffer=rev?revBuffer(this.track):stm||this.track.buffer;s.playbackRate.value=clamp(Math.abs(dp)/L,.05,4);
     g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(1,t+.004);g.gain.setValueAtTime(1,t+L-.006);g.gain.linearRampToValueAtTime(0,t+L);
-    s.connect(g);g.connect(this.srcBus);s.start(t,rev?clamp(this.track.duration-p+dp,0,this.track.duration-.001):clamp(p-dp,0,this.track.duration-.001));s.stop(t+L+.01);
+    s.connect(g);g.connect(stm?this.stems.input:this.srcBus);s.start(t,rev?clamp(this.track.duration-p+dp,0,this.track.duration-.001):clamp(p-dp,0,this.track.duration-.001));s.stop(t+L+.01);
     s.onended=()=>{try{g.disconnect();}catch(e){}};
   }
   scratchEnd(){const s=this.scratching;if(!s)return;this.scratching=null;if(s.was&&this.track)this.startSource(this.anchorPos,ctx.currentTime);}

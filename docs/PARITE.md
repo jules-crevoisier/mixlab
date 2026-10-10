@@ -158,7 +158,7 @@
 | Pads Key Shift | RB, VDJ, ENG | **Partiel** : le mode Pitch transpose en rejouant le hot cue ; pas de pads qui transposent sans sauter | P2 | S |
 | Pads de beat loop | RB, ENG | **Manque** | P3 | S |
 | Pads d'effets (Pad FX, Roll FX) | RB *(Pad FX)*, S *(Stems Pad FX)* | **Fait** : mode Pad FX, 8 pads (écho, reverb, trans, filtre LFO, bitcrusher, répétition…) actifs tant qu'on maintient, effet et durée au choix par pad ; ils empruntent une unité FX et lui rendent ses réglages | P2 | M |
-| Pads de stems | S, RB, VDJ, DJAY, ENG | **Manque** | P2 | M |
+| Pads de stems | S, RB, VDJ, DJAY, ENG | **Fait** : mode de pads Stems (`app/stems.js`), pads 1 à 4 coupent ou rendent voix, batterie, basse, mélodie, pads 5 à 8 font un écho out ; clic droit : panneau des stems | P2 | M |
 | Freeze ou Flux mode | TR | **Partiel** : Slip (le Flux) et Slicer (proche du Freeze) | P3 | S |
 | Hot cue maintenu puis verrouillé en lecture (« play latch ») | MX 2.6, CDJ | **Fait** : à l'arrêt, le hot cue joue tant qu'il est maintenu ; Play pendant l'appui verrouille la lecture (réglable : déplacer seulement, maintien, lecture) | P3 | S |
 | Gate cue / hot cue en mode « maintien » | VDJ, MX | **Fait** : à l'arrêt, maintien et retour au cue au relâchement ; en lecture avec slip, retour là où le morceau en serait | P3 | S |
@@ -274,7 +274,7 @@
 | Paramètres avancés d'effet (feedback, X-pad, temps en ms) | tous | **Partiel** : deux réglages par effet (retour, tonalité, largeur…) et durée en temps ; pas de temps en ms ni de X-pad | P2 | S |
 | Effet déclenché quantisé (Beat FX on sur le temps) | RB, S | **Fait** : avec Quantize, l'unité démarre sur le temps suivant | P2 | S |
 | Post-fader / pré-fader au choix (queue d'écho après la coupe) | RB, TR, MX | **Partiel** : l'effet est avant le fader, mais une queue existe pour l'écho | P2 | S |
-| Effets par stem | S *(Stems FX)*, RB, VDJ, MX 2.6 | **Manque** | P2 | M |
+| Effets par stem | S *(Stems FX)*, RB, VDJ, MX 2.6 | **Fait** : chaque stem peut passer seul dans FX1 ou FX2 (cible « A:voc » des unités, au tempo de sa platine) et a son écho out calé sur le temps | P2 | M |
 | Réglages des effets gardés d'une session à l'autre | tous | **Fait** : type, durée, dosage, réglages, mode et cibles rendus au démarrage (l'unité reste coupée) | P2 | S |
 | Banques ou favoris d'effets | VDJ 2026, TR | **Manque** | P3 | S |
 | Effets en plugin (VST/AU) | VDJ, MX (LV2), DJS | **Manque** | P3 | L |
@@ -302,15 +302,15 @@
 
 | Fonction | Où on la trouve | Mixlab | Priorité | Effort |
 |---|---|---|---|---|
-| Séparation en temps réel ou à l'analyse (voix, batterie, basse, mélodie) | S, RB *(stems dans les plans)*, TR 4, VDJ, DJAY (Neural Mix), ENG 5 | **Manque** : le ROADMAP prévoit HT-Demucs en ONNX | P1 | L |
-| Mute ou volume par stem | idem | **Manque** | P1 | M |
-| Acapella / instrumental en un bouton | S, RB, VDJ, DJAY | **Manque** | P1 | S |
-| Effets par stem (Stems FX, echo out sur la voix) | S, RB, VDJ, MX | **Manque** | P2 | M |
-| Pré-calcul et cache des stems | S, ENG 5, VDJ | **Manque** | P2 | M |
-| Lecture de fichiers .stem.mp4 (NI STEMS) | TR, MX 2.6 | **Manque** | P3 | M |
-| Transitions de stems (« Neural Mix », swap voix/batterie) | DJAY, VDJ | **Manque** | P3 | M |
+| Séparation en temps réel ou à l'analyse (voix, batterie, basse, mélodie) | S, RB *(stems dans les plans)*, TR 4, VDJ, DJAY (Neural Mix), ENG 5 | **Partiel** : séparation « rapide » par DSP dans un Web Worker (`app/stems-worker.js` : STFT, séparation harmonique/percussive par médianes, queue de grosse caisse gardée à la batterie, basse = harmonique sous 200 Hz, voix = harmonique au centre de l'image qui bouge, mélodie = le reste exact), environ 10 à 20 s de calcul pour un morceau de 5 minutes, progression affichée. Sur le morceau de test : voix 12 dB, batterie 8 dB, basse 7 dB, mélodie 5 dB de SDR. Loin d'un modèle : un lead au centre part avec la voix, les sifflantes avec la batterie. Le moteur HT-Demucs (ONNX, côté Rust) se branchera par `Stems.registerBackend('haute', {available, separate})` sans toucher au reste | P1 | L |
+| Mute ou volume par stem | idem | **Fait** : rangée Stems de la platine (dans Pro), pads Stems et panneau (volume 0 à 150 %) ; les 4 stems forment un seul tampon à 8 canaux joué par la source de la platine : même transport, vitesse, boucles, key lock et scratch. En lecture arrière (Rev, Censor, backspin), c'est le mix entier qui joue | P1 | M |
+| Acapella / instrumental en un bouton | S, RB, VDJ, DJAY | **Fait** : boutons A cap. et Instru (mappables), un second appui rend tout | P1 | S |
+| Effets par stem (Stems FX, echo out sur la voix) | S, RB, VDJ, MX | **Fait** : écho out par stem (l'écho prend le stem, il se coupe sur le temps suivant, la queue continue) et envoi d'un stem seul dans FX1 ou FX2 | P2 | M |
+| Pré-calcul et cache des stems | S, ENG 5, VDJ | **Fait** : cache IndexedDB sous l'empreinte du fichier (celle de `persist.js`), 3 stems en 16 bits (la mélodie est recalculée), 8 morceaux gardés ; réglage « Stems au chargement » : à la demande, si déjà calculés, ou toujours | P2 | M |
+| Lecture de fichiers .stem.mp4 (NI STEMS) | TR, MX 2.6 | **Partiel** : démultiplexage MP4 en JS (pistes, esds, dOps, dfLa, alac, liste d'édition, noms des stems du bloc « stem »), chaque piste décodée par WebCodecs (AAC, Opus, FLAC, ALAC selon le moteur web). Sans décodeur (WebKitGTK sous Linux, Chromium sans AAC) : piste master seule, message clair, stems calculés à la place | P3 | M |
+| Transitions de stems (« Neural Mix », swap voix/batterie) | DJAY, VDJ | **Fait** : swap de stems entre deux platines sur 4 à 32 temps, calé sur le temps suivant (voix, batterie, voix et batterie, basse, mélodie) | P3 | M |
 | Stems à 5 voies ou plus (piano, guitare…) | DJAY, VDJ | **Manque** | P3 | L |
-| Qualité de séparation en option (rapide ou haute qualité) | VDJ, S | **Manque** | P3 | M |
+| Qualité de séparation en option (rapide ou haute qualité) | VDJ, S | **Partiel** : le choix existe (panneau Stems et Préférences) ; seule « rapide » est disponible, « haute qualité » (HT-Demucs) attend le moteur Rust | P3 | M |
 
 ## 9. Bibliothèque et préparation
 
