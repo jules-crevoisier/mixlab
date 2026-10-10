@@ -389,13 +389,14 @@ window.Stems=(()=>{
   function instrumental(d){const st=stOf(d);setAll(d,isInst(st)?[false,false,false,false]:[true,false,false,false]);}
   function reset(d){const st=stOf(d);st.vol=[1,1,1,1];setAll(d,[false,false,false,false]);}
   /* prochain temps de la platine (avec Quantize), sinon tout de suite */
-  function nextBeat(d){const now=ctx.currentTime;if(!S.quantize||!d.track||!d.playing||d.reverse)return now+.01;const bp=d.beatPos();return now+(Math.ceil(bp+1e-3)-bp)*d.beatLen/d.rate;}
+  // lead : si le temps suivant est trop proche pour être programmé, on prend celui d'après (jamais hors grille)
+  function nextBeat(d,lead){const now=ctx.currentTime;if(!S.quantize||!d.track||!d.playing||d.reverse)return now+(lead||.01);const bp=d.beatPos(),bl=d.beatLen/d.rate;let k=Math.ceil(bp+1e-3);while(now+(k-bp)*bl<now+(lead||0))k++;return now+(k-bp)*bl;}
   /* Écho out : l'écho prend le stem, puis sur le temps suivant le stem se coupe et seule la queue reste.
      Sur un stem déjà coupé : il revient sur le temps. */
   async function echoOut(d,i){
     const st=stOf(d);if(!d.track)return;
     if(!ready(d)){await prepare(d);if(!ready(d))return;}
-    const t=Math.max(nextBeat(d),ctx.currentTime+.08),G=graph(d);
+    const t=Math.max(nextBeat(d,.08),ctx.currentTime+.08),G=graph(d);
     if(st.mute[i]){
       st.mute[i]=false;st.lock[i]=t+.05;const p=G.mg[i].gain;holdP(p,ctx.currentTime);p.setTargetAtTime(1,t,.01);
       setTimeout(()=>{st.lock[i]=0;applyGains(d);refresh(d);},Math.max(0,(t-ctx.currentTime)*1000)+60);refresh(d);return;
@@ -423,7 +424,7 @@ window.Stems=(()=>{
     await Promise.all([prepare(from),prepare(to)]);
     if(!ready(from)||!ready(to))return null;
     const ref=from.playing?from:to.playing?to:from,spb=ref.track?ref.beatLen/ref.rate:.5;
-    const t0=Math.max(nextBeat(ref),ctx.currentTime+.05),t1=t0+beats*spb,now=ctx.currentTime;
+    const t0=Math.max(nextBeat(ref,.05),ctx.currentTime+.05),t1=t0+beats*spb,now=ctx.currentTime;
     const sf=stOf(from),stt=stOf(to),Gf=graph(from),Gt=graph(to);
     ids.forEach(i=>{
       const a=Gf.mg[i].gain,b=Gt.mg[i].gain;
