@@ -140,7 +140,7 @@
 | Mode « saved loop » sur les pads | S, RB, TR | **Fait** : mode de pads Boucles | P2 | S |
 | Cue automatique sur le premier son | RB, S, ENG, MX | **Partiel** : le cue se pose sur le premier temps de la grille | P1 | S |
 | Hot cues automatiques (sur la structure ou les phrases) | RB *(Creative)*, ENG, DJAY | **Partiel** : cues mémoire posés sur la structure (intro, drop, break, outro) ; ils ne remplissent pas les pads | P2 | M |
-| Transfert des cues entre logiciels (import et export) | RB, S, TR, ENG, DJS | **Partiel** : rekordbox XML en import et en export ; pas Serato ni Traktor | P1 | L |
+| Transfert des cues entre logiciels (import et export) | RB, S, TR, ENG, DJS | **Partiel** : rekordbox XML en import et en export ; Serato (tags GEOB des MP3, WAV, AIFF et atomes des MP4 : hot cues, boucles, couleur, grille) et Traktor NML en import seulement | P1 | L |
 | Boucle auto de 1/32 à 32 temps | tous | **Fait** | P1 | S |
 | Boucle manuelle In / Out | tous | **Fait** | P1 | S |
 | Reloop et sortie de boucle | tous | **Fait** | P1 | S |
@@ -173,18 +173,18 @@
 | Grille de temps et premier temps | tous | **Fait** | P1 | S |
 | Tap tempo | tous | **Fait** | P2 | S |
 | BPM ÷2 / ×2 | tous | **Fait** | P1 | S |
-| Décaler la grille | tous | **Fait** : pas de 10 ms | P1 | S |
+| Décaler la grille | tous | **Fait** : pas de 10 ms, ou de 1 à 20 ms dans l'éditeur Grille… | P1 | S |
 | « 1 ici » (premier temps de mesure ou de phrase) | tous | **Fait** | P1 | S |
-| Édition fine de la grille (étirer, grille sur deux points, réglage au ms) | RB, TR, S | **Manque** | P2 | M |
+| Édition fine de la grille (étirer, grille sur deux points, réglage au ms) | RB, TR, S | **Fait** : éditeur Grille… par platine : BPM exact, étirer de 0,01 ou 0,1, décalage au ms, points A et B, temps fort ici (`app/grid.js`) | P2 | M |
 | Verrou de grille ou de BPM (« lock ») | RB, TR, MX | **Fait** : bouton Verrou par platine, gardé avec le morceau | P2 | S |
-| Grille dynamique (tempo variable) | RB, TR 4 *(Flexible Beatgrid)*, DJAY, MX, DJS, VDJ 2026 | **Manque** | P2 | L |
+| Grille dynamique (tempo variable) | RB, TR 4 *(Flexible Beatgrid)*, DJAY, MX, DJS, VDJ 2026 | **Fait** : carte de tempo à plusieurs repères, posée par « Analyser le tempo » (suivi des attaques) ou à la main ; sync, quantize et numéros de temps la suivent ; lue depuis Traktor et Serato. Export rekordbox : BPM moyen seulement | P2 | L |
 | Métronome sur la grille | RB, TR | **Fait** : bouton Métro, clics au casque calés sur la grille, temps fort marqué | P3 | S |
 | Sync tempo | tous | **Fait** | P1 | S |
 | Sync de phase (calage sur le temps) | tous | **Fait** : le départ attend le temps suivant de la platine suivie | P1 | S |
 | Sync de mesure ou de phrase (Bar / Phrase sync) | RB, TR, ENG | **Fait** : réglage « Sync calée sur » le temps, la mesure ou la phrase de 8 mesures | P2 | M |
 | Smart Sync / Sync à états (tempo seul, ou tempo et phase) | S *(Pro)*, MX | **Partiel** : un seul mode | P3 | S |
 | Platine maître automatique | tous | **Fait** : la première platine lancée devient maître | P1 | S |
-| Tempo maître interne (horloge sans platine) | TR, RB, MX | **Manque** | P3 | S |
+| Tempo maître interne (horloge sans platine) | TR, RB, MX | **Fait** : bouton Horloge, les platines en Sync suivent son tempo et sa phase ; tap et reprise du maître | P3 | S |
 | Quantize (cues, boucles, sauts) | tous | **Fait** : bouton Q global | P1 | S |
 | Plage de pitch élargie automatiquement par Sync | MX, TR | **Fait** : avec un avertissement | P3 | S |
 | Sync double ou moitié de tempo (ex. 87 sur 174) | TR, MX, RB | **Fait** : `matchTempo` teste ×2 et ÷2 | P2 | S |
@@ -214,7 +214,7 @@
 | Fonction | Où on la trouve | Mixlab | Priorité | Effort |
 |---|---|---|---|---|
 | Gain / trim par voie | tous | **Fait** : ±12 dB | P1 | S |
-| Gain automatique | tous | **Partiel** : RMS ; le passage en LUFS ou ReplayGain est prévu | P1 | S |
+| Gain automatique | tous | **Fait** : RMS, ou LUFS façon ReplayGain (cible réglable, -14 LUFS par défaut) | P1 | S |
 | EQ 3 bandes | tous | **Fait** : shelf et peak, de kill à +6 dB | P1 | S |
 | Kill par bande | tous | **Fait** | P1 | S |
 | EQ 4 bandes | TR, RB (DJM), VDJ | **Manque** | P3 | S |
@@ -334,20 +334,20 @@
 | Compteur de lectures et date de dernière lecture | tous | **Fait** : colonnes Joué et Dernière lecture | P2 | S |
 | Playlists / crates | tous | **Fait** : création, ajout et glisser-déposer | P1 | S |
 | Renommer, supprimer et réordonner les playlists et leurs morceaux | tous | **Fait** : clic droit sur une playlist, glisser dans la liste | P1 | S |
-| Dossiers de playlists, sous-crates | tous | **Manque** | P2 | S |
+| Dossiers de playlists, sous-crates | tous | **Fait** : groupes imbriqués et sous-crates par glisser-déposer ; une crate montre aussi les morceaux de ses sous-crates (réglable) | P2 | S |
 | Smart crates / playlists intelligentes à règles | S *(Pro)*, RB, TR, VDJ, ENG, MX | **Fait** : règles ET / OU, mises à jour en direct | P1 | M |
-| Couleur, favoris et tri des crates | S 4.0 | **Manque** | P3 | S |
+| Couleur, favoris et tri des crates | S 4.0 | **Fait** : couleur, section Favoris, tri manuel, par nom ou par nombre de morceaux | P3 | S |
 | Historique des sets | tous | **Fait** : sets gardés d'une session à l'autre (bibliothèque de l'appli, IndexedDB dans le navigateur), listés par date dans la barre latérale | P1 | S |
 | Export de la tracklist (texte, CSV) | tous | **Fait** : texte, CSV et M3U8 pour chaque set | P2 | S |
 | File d'attente / Prepare / Sidelist | S, VDJ, RB, TR | **Fait** : file de l'auto-mix (glisser, remplir depuis une playlist) et playlist Préparation | P1 | S |
 | Afficher dans quelles playlists se trouve une piste | S 4.0, RB | **Fait** : coches dans le menu clic droit du morceau | P3 | S |
 | Doublons | RB, VDJ, MX | **Fait** : vue Doublons | P2 | S |
 | Fichiers manquants et relocalisation | tous | **Fait** : fenêtre Fichiers manquants, relocalisation | P1 | M |
-| Dossiers surveillés (import automatique) | RB, ENG, MX, DJAY | **Manque** | P2 | M |
-| Navigateur de fichiers (onglet Files) | S, TR, MX | **Manque** | P2 | S |
+| Dossiers surveillés (import automatique) | RB, ENG, MX, DJAY | **Fait** : appli : relecture des dossiers choisis côté Rust (`src-tauri/src/watch.rs`), toutes les 30 s par défaut ; navigateur : File System Access (Chrome, Edge), pas de surveillance ailleurs | P2 | M |
+| Navigateur de fichiers (onglet Files) | S, TR, MX | **Fait** : vue Fichiers, dossiers choisis, chargement direct sur une platine | P2 | S |
 | Import de la collection rekordbox (XML) avec cues et grilles | S, TR, VDJ, ENG, MX, DJS | **Fait** : cues, grille, note, couleur et playlists | P1 | M |
-| Import Serato (crates, cues dans les tags) | RB, VDJ, ENG, MX | **Manque** | P1 | M |
-| Import Traktor (NML) | RB, VDJ, ENG, MX | **Manque** | P2 | M |
+| Import Serato (crates, cues dans les tags) | RB, VDJ, ENG, MX | **Fait** : crates et sous-crates du dossier _Serato_, database V2 ; cues, boucles, couleur et grille lus dans les tags au chargement du fichier. Les crates intelligentes Serato ne sont pas lues | P1 | M |
+| Import Traktor (NML) | RB, VDJ, ENG, MX | **Fait** : cues, boucles, grille (une ou plusieurs ancres), note, couleur, tonalité et playlists dans leurs dossiers. Pas d'export NML | P2 | M |
 | Import iTunes / Musique (XML) | tous | **Fait** | P2 | S |
 | Import et export M3U / M3U8 / PLS | tous | **Partiel** : M3U et M3U8 ; pas de PLS | P1 | S |
 | Export rekordbox XML | DJS, MX, ENG | **Fait** | P2 | M |
@@ -357,7 +357,7 @@
 | Mode hors ligne du streaming | S, RB, TR, ENG | **Manque** | P3 | L |
 | Import de playlists de streaming en métadonnées et correspondance avec la collection | aucun | **Fait** : liste ou CSV Spotify, Deezer… retrouvé dans la collection, liens d'achat pour le reste | P3 | M |
 | Fiche détaillée d'une piste (onglet Info) | tous | **Partiel** : panneau Infos pour éditer ; pas d'onglet d'informations complet | P2 | S |
-| Mini-waveform dans la liste | MX 2.6, ENG, RB | **Manque** | P3 | S |
+| Mini-waveform dans la liste | MX 2.6, ENG, RB | **Fait** : colonne Forme, vignette tirée de la waveform déjà calculée | P3 | S |
 | Écran de préparation (une grande platine) | RB *(Export)*, S *(Prepare)*, ENG | **Manque** : voir le preset Export (§17) | P2 | M |
 
 ## 10. Analyse automatique
@@ -367,13 +367,13 @@
 | BPM, grille, tonalité, volume | tous | **Fait** | P1 | S |
 | Waveform 3 bandes | tous | **Fait** | P1 | S |
 | Analyse de phrases et structure (intro, couplet, refrain, montée, drop, outro) | RB *(Phrase)*, DJAY (Automix AI), VDJ, ENG, DJS | **Fait** : intro, couplet, break, montée, drop, outro par phrases de 8 mesures, en tâche de fond | P1 | L |
-| Détection des passages vocaux | RB *(Creative : Vocal position)*, VDJ, S | **Manque** | P2 | M |
+| Détection des passages vocaux | RB *(Creative : Vocal position)*, VDJ, S | **Partiel** : estimation sans modèle (voix périodique dont la hauteur bouge), montrée sur la vue d'ensemble et la waveform ; une lead de synthé très modulée peut passer pour une voix | P2 | M |
 | Énergie de la piste (1 à 10) | Mixed In Key, DJS, VDJ, ENG | **Fait** : estimée à l'analyse, modifiable | P2 | M |
 | Détection du genre et de l'ambiance (IA) | DJAY, VDJ, RB (Track Suggestion) | **Manque** | P3 | L |
 | Intro et outro pour l'auto-mix | MX, VDJ, DJAY | **Fait** | P2 | M |
 | Silence en début et en fin | tous | **Partiel** : premier son pour la grille, fin de la musique repérée pour l'auto-mix | P2 | S |
-| Loudness LUFS / ReplayGain | MX, VDJ, ENG | **Manque** : RMS | P2 | S |
-| Nouvelle analyse forcée et analyse partielle (seulement ce qui manque) | tous | **Manque** | P2 | S |
+| Loudness LUFS / ReplayGain | MX, VDJ, ENG | **Fait** : LUFS intégrée (BS.1770, portes absolue et relative), colonne LUFS, gain auto en LUFS au choix | P2 | S |
+| Nouvelle analyse forcée et analyse partielle (seulement ce qui manque) | tous | **Fait** : clic droit sur un morceau, ou « Compléter l’analyse » pour la vue affichée ; une grille verrouillée est gardée | P2 | S |
 | Paroles générées par IA | VDJ 2026, RB *(Creative : Lyric via service)* | **Manque** | P3 | L |
 
 ## 11. Auto-mix et suggestions
@@ -462,7 +462,7 @@
 | Schémas de couleur : 3 bandes, RGB, mono, daltonien | tous | **Fait** | P2 | S |
 | Zoom des waveforms | tous | **Fait** | P1 | S |
 | Vue d'ensemble avec partie jouée, cues et boucle | tous | **Fait** | P1 | S |
-| Repères de minutes sur la vue d'ensemble | MX 2.6 | **Manque** | P3 | S |
+| Repères de minutes sur la vue d'ensemble | MX 2.6 | **Fait** | P3 | S |
 | Marqueurs de mesure et de phrase sur la waveform | tous | **Fait** : trait par mesure, bande de phrase de 32 temps | P1 | S |
 | Bande de structure colorée (intro, drop…) | RB, ENG | **Fait** : sur les waveforms et la vue d'ensemble | P2 | M |
 | Vue « beatgrid » comparée (deux pistes alignées) | VDJ, RB | **Manque** | P3 | M |
@@ -473,13 +473,13 @@
 | Afficher ou masquer les panneaux | tous | **Fait** : effets, waveforms, mixer, bibliothèque | P1 | S |
 | Tailles de platine (mini, compacte, complète) | TR, MX | **Manque** | P2 | M |
 | Mise en page personnalisée et sauvegardée | VDJ (skins), MX, TR | **Manque** : 5 presets fixes | P3 | L |
-| Barre globale (horloge, CPU, REC, MIDI) | tous | **Partiel** : horloge, REC, MIDI, audio et BPM maître ; pas de CPU | P2 | S |
-| Indicateur de charge CPU ou audio | tous | **Manque** | P2 | S |
+| Barre globale (horloge, CPU, REC, MIDI) | tous | **Fait** : horloge, REC, MIDI, audio, BPM maître et charge | P2 | S |
+| Indicateur de charge CPU ou audio | tous | **Partiel** : charge du fil principal (dessin, calculs, retards) et décrochages audio quand le navigateur les compte ; pas la charge du moteur audio lui-même | P2 | S |
 | Préférences regroupées (fenêtre de réglages) | tous | **Partiel** : fenêtre Réglages de jeu (platines, mixer, casque, enregistrement) ; audio, contrôleur et affichage restent à part | P1 | M |
 | Info-bulles sur les commandes | S, TR, MX | **Fait** : `title` sur toutes les commandes | P2 | S |
 | Langues de l'interface | tous | **Partiel** : français seulement | P2 | M |
 | Accessibilité (clavier, lecteur d'écran, contraste) | MX, DJAY | **Partiel** : ARIA sur les boutons et curseurs | P2 | M |
-| Annuler la dernière action (cue, grille, chargement) | S, TR | **Manque** | P3 | M |
+| Annuler la dernière action (cue, grille, chargement) | S, TR | **Fait** : Ctrl+Z, 60 actions : point de cue, hot cues, grille, chargement (refusé si la platine est à l'antenne) | P3 | M |
 
 ## 16. Apprentissage
 

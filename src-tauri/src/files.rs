@@ -18,7 +18,7 @@ const AUDIO_EXT: &[&str] = &["mp3", "wav", "aif", "aiff", "flac", "ogg", "m4a", 
 const MAX_FILE: u64 = 400 * 1024 * 1024;
 const MAX_LIBRARY: usize = 50_000_000;
 /// Collections d'autres logiciels et listes de lecture qu'on sait relire.
-const LIBRARY_EXT: &[&str] = &["xml", "m3u", "m3u8", "csv", "txt"];
+const LIBRARY_EXT: &[&str] = &["xml", "nml", "m3u", "m3u8", "csv", "txt"];
 const MAX_IMPORT: u64 = 100 * 1024 * 1024;
 const MAX_EXPORT: usize = 100_000_000;
 /// Deux heures de mix en WAV 24 bits stéréo à 48 kHz.
@@ -30,7 +30,7 @@ const SHOP_PREFIX: &[&str] = &["https://bandcamp.com/search?", "https://www.beat
 pub struct Allowed(Mutex<HashSet<PathBuf>>);
 
 impl Allowed {
-    fn add(&self, p: &Path) {
+    pub(crate) fn add(&self, p: &Path) {
         self.0.lock().unwrap().insert(p.to_path_buf());
     }
     pub(crate) fn has(&self, p: &Path) -> bool {
@@ -72,7 +72,7 @@ pub fn walk(dir: &Path, out: &mut Vec<PathBuf>, depth: u32) {
     }
 }
 
-fn describe(allowed: &Allowed, paths: Vec<PathBuf>) -> Vec<Picked> {
+pub(crate) fn describe(allowed: &Allowed, paths: Vec<PathBuf>) -> Vec<Picked> {
     paths
         .into_iter()
         .map(|p| {

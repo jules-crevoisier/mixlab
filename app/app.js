@@ -479,7 +479,7 @@ function renderSide(){
   const dropTo=pl=>b=>{b.addEventListener('dragover',e=>{e.preventDefault();b.classList.add('drop');});b.addEventListener('dragleave',()=>b.classList.remove('drop'));b.addEventListener('drop',e=>{e.preventDefault();b.classList.remove('drop');const id=+e.dataTransfer.getData('text/mixlab-track');if(id&&!pl.ids.includes(id)){pl.ids.push(id);renderSide();toast('Ajouté à « '+pl.name+' »','ok');}});};
   s.append(h('div',{class:'sec lbl'},'Collection'),it('all','Tous les morceaux',LIB.tracks.length),it('demo','Démos',LIB.tracks.filter(t=>t.demo).length),it('imported','Importés',LIB.tracks.filter(t=>!t.demo).length));
   s.append(h('div',{class:'sec lbl'},'Playlists'));
-  LIB.playlists.forEach(pl=>s.append(it('pl:'+pl.id,pl.name,pl.ids.length,b=>{dropTo(pl)(b);window.LibPro&&LibPro.plItem(b,pl);})));
+  if(!(window.LibPlus&&LibPlus.sidePl(s,it,dropTo)))LIB.playlists.forEach(pl=>s.append(it('pl:'+pl.id,pl.name,pl.ids.length,b=>{dropTo(pl)(b);window.LibPro&&LibPro.plItem(b,pl);})));
   s.append(h('button',{class:'it',type:'button',style:'color:var(--mu)',onclick:()=>{const n=LIB.playlists.length+1;LIB.playlists.push({id:'p'+Date.now(),name:'Playlist '+n,ids:[]});renderSide();}},'+ Nouvelle playlist'));
   window.LibPro&&LibPro.side(s,it,'crates');
   s.append(h('div',{class:'sec lbl'},'Historique'),it('hist','Ce set',LIB.history.length));
@@ -496,7 +496,7 @@ function trackRows(){
   else{
     let ts=LIB.tracks;
     if(lib.view==='demo')ts=ts.filter(t=>t.demo);else if(lib.view==='imported')ts=ts.filter(t=>!t.demo);
-    else if(lib.view.startsWith('pl:')){const ix=new Map(LIB.tracks.map(t=>[t.id,t])),pl=LIB.playlists.find(p=>'pl:'+p.id===lib.view);ts=pl?pl.ids.map(id=>ix.get(id)).filter(Boolean):[];}
+    else if(lib.view.startsWith('pl:')){const ix=new Map(LIB.tracks.map(t=>[t.id,t])),pl=LIB.playlists.find(p=>'pl:'+p.id===lib.view);ts=pl?(window.LibPlus?LibPlus.plIds(pl):pl.ids).map(id=>ix.get(id)).filter(Boolean):[];}
     else if(window.LibPro&&LibPro.owns(lib.view))ts=LibPro.viewTracks(lib.view);
     rows=ts.map((t,i)=>({t,n:i+1}));
   }
@@ -767,7 +767,7 @@ function drawOverview(d){
       const g=c.getContext('2d');g.fillStyle=TK['wave-bg'];g.fillRect(0,0,W,H);if(!tr)continue;
       const n=tr.wf.l.length,b=bandFor(d);
       bandsInto(g,tr.wf,past?b.past:b.cols,b.a,b.op,0,W,H,x=>{const i0=Math.floor(x/W*n);return[i0,Math.max(i0+1,Math.floor((x+1)/W*n))];});
-      g.fillStyle=rgba(TK['text-hi'],.22);for(let k=0;;k+=32){const t=tr.grid+k*60/tr.bpm;if(t>tr.duration)break;g.fillRect(Math.round(t/tr.duration*W),0,1,H);}
+      g.fillStyle=rgba(TK['text-hi'],.22);for(let k=0;;k+=32){const t=window.Grid?Grid.timeOf(tr,k):tr.grid+k*60/tr.bpm;if(t>tr.duration)break;g.fillRect(Math.round(t/tr.duration*W),0,1,H);}
       window.Structure&&Structure.drawOv(g,tr,W,H);
       if(d.loop.on){g.fillStyle=rgba(TK['state-ok'],.35);g.fillRect(d.loop.start/tr.duration*W,0,Math.max(2,(d.loop.end-d.loop.start)/tr.duration*W),H);}
       tr.hot.forEach((t,i)=>{if(t!=null){g.fillStyle=hotColor(tr,i);g.fillRect(Math.round(t/tr.duration*W)-1,0,3,Math.ceil(H*.32));}});
