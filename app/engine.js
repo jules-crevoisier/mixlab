@@ -13,7 +13,7 @@ const ctx=new AC({latencyHint:'interactive'});
 function resumeAudio(){if(ctx.state!=='running')ctx.resume().catch(()=>{});}
 
 const S={quantize:true,autoGain:true,xf:.5,curve:'mix',numDecks:2,split:false,hpDevice:null,cueMix:.0,cueVol:.8,masterVol:.8,master:null,samplerVol:.7,
-  bpmRange:[87.5,175],eqMode:'iso',colorFx:'filter'};
+  bpmRange:[87.5,175],eqMode:'iso',colorFx:'filter',filterQ:1.4};
 
 /* ---------- bus master, casque (split cue), enregistrement ---------- */
 const bus={};
@@ -439,7 +439,7 @@ class Deck{
   timeOfBeat(b){return this.track.grid+b*this.beatLen;}
   beatPos(){return this.beatIdx(this.position());}
   snap(t){return S.quantize&&this.track?this.timeOfBeat(Math.round(this.beatIdx(t))):t;}
-  keyNow(){if(!this.track||!this.track.key)return null;return transposeKey(this.track.key,this.keyShift+(this.keyLock?0:12*Math.log2(1+this.pitch)));}
+  keyNow(){if(!this.track||!this.track.key)return null;return transposeKey(this.track.key,this.keyShift+(this.keyFine||0)/100+(this.keyLock?0:12*Math.log2(1+this.pitch)));}
   position(){
     if(!this.track)return 0;if(!this.playing)return this.anchorPos;
     const now=ctx.currentTime,sp=this.spinSt;
@@ -455,7 +455,7 @@ class Deck{
   reanchor(){if(this.spinSt)return;if(this.playing&&ctx.currentTime>this.anchorTime){this.anchorPos=this.position();this.anchorTime=ctx.currentTime;}}
   applyRate(){
     const t=ctx.currentTime;if(this.src&&!this.spinSt)this.src.playbackRate.setValueAtTime(this.rate,t);
-    const f=Math.pow(2,this.keyShift/12)/(this.keyLock?this.rate:1),wet=Math.abs(f-1)>.0015;
+    const f=Math.pow(2,(this.keyShift+(this.keyFine||0)/100)/12)/(this.keyLock?this.rate:1),wet=Math.abs(f-1)>.0015;
     if(wet)this.shifter.set(f);
     this.klDry.gain.setTargetAtTime(wet?0:1,t,.005);this.klWet.gain.setTargetAtTime(wet?1:0,t,.005);
   }
@@ -719,11 +719,13 @@ function applyMix(d){
   const f=S.colorFx==='echo'||S.colorFx==='space'?.5:p.filter;
   d.lp.frequency.setTargetAtTime(f<.47?20000*Math.pow(200/20000,(.47-f)/.47):22000,t,tc);
   d.hp.frequency.setTargetAtTime(f>.53?20*Math.pow(6000/20,(f-.53)/.47):10,t,tc);
-  d.lp.Q.setTargetAtTime(f<.47?1.4:.7,t,tc);d.hp.Q.setTargetAtTime(f>.53?1.4:.7,t,tc);
-  d.fader.gain.setTargetAtTime(p.fader*p.fader,t,tc);
+  d.lp.Q.setTargetAtTime(f<.47?S.filterQ:.7,t,tc);d.hp.Q.setTargetAtTime(f>.53?S.filterQ:.7,t,tc);
+  d.fader.gain.setTargetAtTime(faderGain(p.fader),t,tc);
   d.cueSend.gain.setTargetAtTime(d.cueOn?1:0,t,tc);
   applyColor(d);
 }
+/* courbe du fader de voie (deck-pro.js la rend réglable) */
+function faderGain(v){return v*v;}
 function xfGains(x){
   if(S.curve==='cut')return[x<.96?1:(1-x)/.04,x>.04?1:x/.04];
   if(S.curve==='smooth')return[Math.cos(x*Math.PI/2),Math.sin(x*Math.PI/2)];

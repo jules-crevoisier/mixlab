@@ -327,7 +327,10 @@ window.View=(()=>{
       }
       if(e.key==='Escape'&&V.libFull&&!(midi&&midi.learn)){toggleLib(false);}
     });
-    new ResizeObserver(()=>{if(V.rq)return;V.rq=requestAnimationFrame(()=>{V.rq=0;fit();});}).observe(A);
+    const refit=()=>{if(V.rq)return;V.rq=requestAnimationFrame(()=>{V.rq=0;fit();});};
+    new ResizeObserver(refit).observe(A);
+    // une rangée ajoutée ou retirée dans une platine (modules chargés après coup) : on répartit à nouveau
+    const mo=new MutationObserver(refit);decks.forEach(d=>mo.observe(panel(d),{childList:true}));
     document.fonts&&document.fonts.ready.then(()=>fit());
   }
   return{build,layout:layoutHook,fit,tick,setZoom,setStage,setSize,toggleLib,toggleFs,cycle,state:V,get zoom(){return V.zoom;},get libFull(){return V.libFull;}};

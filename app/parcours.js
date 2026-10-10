@@ -124,7 +124,7 @@ window.Parcours=(()=>{
     [8,'.xf,.xfa'],[8,'#coach-direct','hide'],
     [9,'.dk-loop,[data-ctl$=".filter"]'],
     [10,'.dk-stat.k,.dk-ctr .r:nth-child(2)'],
-    [11,'.dk-pads,.dk-ctr .r:nth-child(3),.dk-grid,[data-ctl="samplervol"]'],
+    [11,'.dk-pads,.dk-ctr .r:nth-child(3),.dk-grid,.dk-pro,[data-ctl="samplervol"]'],
     [13,'#rec-btn,#presets,#ndecks,details.menu,#q-btn,#ag-btn'],
   ];
   const PANELS_AT={fx:9};
@@ -553,7 +553,7 @@ window.Parcours=(()=>{
       s.trs.length?h('div',{},lbl('Transitions'),h('div',{class:'pc-trs'},s.trs.map(t=>h('div',{class:'pc-tr'},h('span',{class:'sc '+(t.score>=75?'ok':t.score>=50?'warn':'bad')},String(t.score)),h('span',{},`${t.from} → ${t.to} · ${t.title}`))))):h('p',{class:'pc-sub'},'Aucune transition notée : la prochaine fois, laisse une seule piste jouer 2 secondes à la fin de chaque transition.'),
       s.good.length&&h('div',{},lbl('Points forts','ok'),h('ul',{class:'pc-ul g'},s.good.map(x=>h('li',{},x)))),
       s.tips.length&&h('div',{},lbl('À travailler','warn'),h('ul',{class:'pc-ul'},s.tips.map(x=>h('li',{},x)))),
-      h('div',{class:'pc-btns'},h('button',{class:'go',type:'button',id:'pc-copy',onclick:()=>copy(txt)},'Copier le résumé'),REC.url&&h('a',{class:'b',href:REC.url,download:'mon-premier-set.webm'},'Télécharger l’enregistrement')));
+      h('div',{class:'pc-btns'},h('button',{class:'go',type:'button',id:'pc-copy',onclick:()=>copy(txt)},'Copier le résumé'),REC.url&&h('a',{class:'b',href:REC.url,download:'mon-premier-set.'+(REC.ext||'webm')},'Télécharger l’enregistrement')));
     return card;
   }
   function copy(txt){

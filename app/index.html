@@ -932,6 +932,12 @@ body:has(.split.drag){cursor:row-resize;user-select:none}
 .sz-compact .dk-mid{display:contents}
 .sz-compact>.dk-head{grid-area:head}.sz-compact>.dk-ov{grid-area:ov}.sz-compact>.dk-wave{grid-area:dw}.sz-compact .dk-ctr{grid-area:ctr}
 .sz-compact>.dk-pads{grid-area:pads}.sz-compact>.dk-loop{grid-area:loop}
+/* rangée « pro » (Cue Play, Doubler, Key sync, ton fin, verrou, métronome) : en platine complète seulement */
+.sz-compact>.dk-pro,.sz-mini>.dk-pro{display:none}
+/* sauf sur le grand lecteur de Préparation : verrou de grille et métronome servent à préparer */
+.prep-mode .deck.big.sz-compact{grid-template-areas:"head head" "ov ov" "dw dw" "ctr pitch" "pads pitch" "loop pitch" "pro pro"}
+.prep-mode .deck.big.sz-compact.right{grid-template-areas:"head head" "ov ov" "dw dw" "pitch ctr" "pitch pads" "pitch loop" "pro pro"}
+.prep-mode .deck.big.sz-compact>.dk-pro{display:flex;grid-area:pro}
 /* boucles : Reloop a la place de son mot, /2 et ×2 en chiffres lisibles */
 .dk-loop>[data-ctl$=".reloop"]{flex:1.5 1 0;letter-spacing:0;min-width:max-content}
 .dk-loop>[data-ctl$=".loophalf"],.dk-loop>[data-ctl$=".loopdbl"]{font-family:var(--num);font-size:12px;letter-spacing:0}
@@ -1166,6 +1172,7 @@ html.stage .lt tbody tr:nth-child(even){background:#0c0d10}
 <script src="controllers.js"></script>
 <script src="perf.js"></script>
 <script src="view.js"></script>
+<script src="deck-pro.js"></script>
 <script src="learn.js"></script>
 <script src="coach-live.js"></script>
 <script src="structure.js"></script>

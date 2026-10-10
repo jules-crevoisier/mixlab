@@ -20,6 +20,8 @@ const MAX_LIBRARY: usize = 50_000_000;
 const LIBRARY_EXT: &[&str] = &["xml", "m3u", "m3u8", "csv", "txt"];
 const MAX_IMPORT: u64 = 100 * 1024 * 1024;
 const MAX_EXPORT: usize = 100_000_000;
+/// Deux heures de mix en WAV 24 bits stéréo à 48 kHz.
+const MAX_RECORDING: u64 = 2_100_000_000;
 /// Liens d'achat qu'on accepte d'ouvrir dans le navigateur du système.
 const SHOP_PREFIX: &[&str] = &["https://bandcamp.com/search?", "https://www.beatport.com/search?"];
 
@@ -276,6 +278,44 @@ pub async fn save_export(app: AppHandle, name: String, text: String) -> Result<O
     Ok(Some(p.to_string_lossy().into_owned()))
 }
 
+/// Nom proposé pour un enregistrement : le dernier segment, sans caractères interdits,
+/// avec l'extension .wav imposée.
+pub fn safe_wav_name(raw: &str) -> String {
+    let base = raw.rsplit(['/', '\\']).next().unwrap_or("");
+    let clean: String = base.chars().filter(|c| !c.is_control() && !":*?\"<>|".contains(*c)).collect();
+    let stem = clean.trim().trim_end_matches(".wav").trim_end_matches(".WAV").trim();
+    format!("{}.wav", if stem.is_empty() { "mixlab-mix" } else { stem })
+}
+
+/// Enregistre le mix en WAV là où l'utilisateur le choisit. Le son arrive en binaire
+/// brut (pas en JSON) : une heure de mix pèse plusieurs centaines de Mo.
+#[tauri::command]
+pub async fn save_binary(app: AppHandle, request: tauri::ipc::Request<'_>) -> Result<Option<String>, String> {
+    let tauri::ipc::InvokeBody::Raw(bytes) = request.body() else {
+        return Err("Données binaires attendues".into());
+    };
+    if bytes.len() < 44 || &bytes[0..4] != b"RIFF" || &bytes[8..12] != b"WAVE" {
+        return Err("Ce n'est pas un fichier WAV".into());
+    }
+    if bytes.len() as u64 > MAX_RECORDING {
+        return Err("Enregistrement trop gros".into());
+    }
+    let raw = request.headers().get("x-mixlab-name").and_then(|v| v.to_str().ok()).unwrap_or("");
+    let name = safe_wav_name(&percent_decode(raw));
+    let Some(p) = app
+        .dialog()
+        .file()
+        .set_file_name(&name)
+        .add_filter("WAV", &["wav"])
+        .blocking_save_file()
+        .and_then(|f| f.into_path().ok())
+    else {
+        return Ok(None);
+    };
+    std::fs::write(&p, bytes).map_err(|e| e.to_string())?;
+    Ok(Some(p.to_string_lossy().into_owned()))
+}
+
 pub fn is_shop_link(url: &str) -> bool {
     SHOP_PREFIX.iter().any(|p| url.starts_with(p)) && !url.chars().any(|c| c.is_whitespace() || c == '"' || c == '\\')
 }
@@ -298,6 +338,14 @@ pub async fn open_shop(url: String) -> Result<bool, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn recording_names_are_cleaned_and_end_in_wav() {
+        assert_eq!(safe_wav_name("mixlab-mix-2026-10-10.wav"), "mixlab-mix-2026-10-10.wav");
+        assert_eq!(safe_wav_name("../../etc/passwd"), "passwd.wav");
+        assert_eq!(safe_wav_name("C:\\x\\Mon mix?.WAV"), "Mon mix.wav");
+        assert_eq!(safe_wav_name(""), "mixlab-mix.wav");
+    }
 
     #[test]
     fn location_decodes_rekordbox_itunes_and_windows_uris() {

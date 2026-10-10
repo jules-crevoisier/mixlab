@@ -17,7 +17,7 @@ window.MixCoach=(()=>{
   /* ---------- mesures ---------- */
   function meter(an){an.getFloatTimeDomainData(buf);let s=0,pk=0;for(let i=0;i<buf.length;i++){const v=buf[i];s+=v*v;const a=Math.abs(v);if(a>pk)pk=a;}return{db:10*Math.log10(s/buf.length+1e-12),pk};}
   const ema=(old,v,dt,tau)=>old+(v-old)*Math.min(1,dt/tau);
-  const gainOf=d=>d.p.fader*d.p.fader*xfGainOf(d);
+  const gainOf=d=>faderGain(d.p.fader)*xfGainOf(d);
   const on=d=>d.active&&d.track&&d.playing&&gainOf(d)>.05;
   const flat=d=>['low','mid','high'].every(b=>!d.p.kill[b]&&Math.abs(d.p[b]-.5)<.15)&&Math.abs(d.p.filter-.5)<.05;
   const remaining=d=>d.track?(d.track.duration-d.position())/Math.max(.01,d.rate):0;
@@ -134,7 +134,7 @@ window.MixCoach=(()=>{
     for(const d of decks){
       const L=C.lv[d.id]||(C.lv[d.id]={post:-90,pre:-90,pk:0});if(!d.active)continue;
       const r=meter(d.an);L.pk=r.pk;L.post=ema(L.post,r.db,dt,.4);
-      const g=d.p.fader*d.p.fader;if(g>.05&&d.playing)L.pre=ema(L.pre,r.db-20*Math.log10(g),dt,1.5);
+      const g=faderGain(d.p.fader);if(g>.05&&d.playing)L.pre=ema(L.pre,r.db-20*Math.log10(g),dt,1.5);
     }
   }
   // La piste principale est celle qui joue au public depuis le plus longtemps ;

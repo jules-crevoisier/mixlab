@@ -25,6 +25,8 @@
     pickLibraryFile:()=>inv('pick_library_file'),
     allowPaths:paths=>inv('allow_paths',{paths}),
     saveText:(name,text)=>inv('save_export',{name,text}),
+    // Enregistrement WAV : envoyé en binaire brut, le nom passe dans un en-tête.
+    saveBinary:(name,bytes)=>inv('save_binary',bytes,{headers:{'x-mixlab-name':encodeURIComponent(name)}}),
     openShop:url=>inv('open_shop',{url}),
   };
 
