@@ -918,6 +918,6 @@ window.LibPro=(()=>{
 
   return{COLORS,parseKey,parseRekordbox,parseItunes,parseM3U,parseCSV,parseList,parseAny,locToPath,pathToLoc,normTitle,matchList,
     importCollection,toRekordbox,toM3U,tracklistText,tracklistCSV,setTracks,duplicates,crateTracks,saveCrate,deleteCrate,crateEditor,search,filter,
-    hidden,bar,side,owns,keepOrder,viewTracks,empty,edit,closeEdit,row,plItem,autoLoad,liveView,menu,rowMenu,plMenu,renamePl,deletePl,missingList,saveBrowser:browserSave,get hasSaved(){return B.saved;},metaOut,metaIn,extraOut,extraIn,exchange,exchangeList,historyModal,missingModal,relocateFrom,saveFile,
+    hidden,bar,side,owns,keepOrder,viewTracks,empty,edit,closeEdit,row,plItem,autoLoad,liveView,menu,selectBy,rowMenu,plMenu,renamePl,deletePl,missingList,saveBrowser:browserSave,get hasSaved(){return B.saved;},metaOut,metaIn,extraOut,extraIn,exchange,exchangeList,historyModal,missingModal,relocateFrom,saveFile,
     get crates(){return S.crates;},get sets(){return allSets();},state:S};
 })();
