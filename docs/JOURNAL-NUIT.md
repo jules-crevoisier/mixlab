@@ -98,3 +98,15 @@ Lancé ensuite : l'interface live (zoom, tailles de platine, séparateurs, bibli
 Lancé ensuite :
 - l'Académie, avec les cours, les quiz et les exercices ;
 - la lecture des tags (MP3, M4A, FLAC, pochettes), le cache d'analyse, l'historique gardé et les réglages d'effets gardés.
+
+## 03:00 · Assemblé : l'Académie
+
+L'Académie s'ouvre depuis le bouton Coach, juste sous le parcours débutant.
+
+- **4 modules, 12 cours** : construire un set, lire le public, trouver sa musique, la scène. Chaque cours a ses points clés, un quiz avec explication à chaque réponse et un exercice. La progression est gardée.
+- **Courbe d'énergie** : tu dessines la courbe de ton set, elle est comparée à un modèle (warm-up, peak time, closing, mariage, bar, anniversaire). Tu peux partir d'une playlist : chaque point est un morceau, et sa note d'énergie est enregistrée dans la bibliothèque.
+- **Assistant de plan de set** : choisis un modèle et une durée, il remplit des créneaux de 5 minutes avec tes morceaux (énergie, BPM, tonalité compatible). Les trous sont marqués « À trouver ». Le plan s'enregistre en playlist.
+- **Lire la salle** : trois situations (club à 1 h, mariage à 23 h, bar à 21 h). Tu choisis le morceau suivant et la piste réagit.
+- **Ranger ses morceaux** : créer une crate intelligente et taguer ses morceaux par moment du set.
+- **Glossaire** de 65 mots, avec recherche. Les mots en gras des cours ouvrent leur définition.
+- **Vérifié** : les 8 suites de tests passent.
