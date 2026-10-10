@@ -134,8 +134,11 @@ const measure = page => page.evaluate(() => {
   check(Math.abs(z.z - 1.2) < 0.01 && z.sh <= z.ih, 'Ctrl + : zoom 120 %, toujours sans défilement', JSON.stringify(z));
   check((await measure(page)).plays.every(Boolean), 'Zoom 120 % : les Play restent visibles');
   await page.screenshot({ path: SHOTS + 'zoom-120-1366x768.png' });
+  // le zoom doit être écrit avant de recharger (sinon on teste la course, pas la sauvegarde)
+  await page.waitForFunction(() => localStorage.getItem('mixlab2.uiZoom') === '1.2', null, { timeout: 3000 }).catch(() => {});
   await page.reload(); await ready(page);
-  check(Math.abs((await page.evaluate(() => View.zoom)) - 1.2) < 0.01, 'Zoom retenu après rechargement');
+  const zr = await page.evaluate(() => ({ zoom: View.zoom, stored: localStorage.getItem('mixlab2.uiZoom') }));
+  check(Math.abs(zr.zoom - 1.2) < 0.01, 'Zoom retenu après rechargement', JSON.stringify(zr));
   const crisp = await page.evaluate(() => { const c = decks[0].ui.lane, r = c.getBoundingClientRect(); return [c.width, Math.round(r.width * devicePixelRatio)]; });
   check(Math.abs(crisp[0] - crisp[1]) <= 1, 'Canvas net au zoom : 1 pixel du canvas par pixel de l’écran', crisp.join(' / '));
   await page.keyboard.press('Control+Digit0'); await sleep(150);
