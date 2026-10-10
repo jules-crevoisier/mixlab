@@ -133,3 +133,18 @@ L'Académie s'ouvre depuis le bouton Coach, juste sous le parcours débutant.
 - **Enregistrement WAV** 16 ou 24 bits, enregistré par la fenêtre native dans l'appli.
 - **Inventaire de parité revérifié ligne par ligne** : 176 fonctions faites sur 335 (53 %), 53 partielles, 106 manquantes. Les plus gros manques : stems, mappings validés sur de vrais contrôleurs, moteur audio natif.
 - **Vérifié** : les 10 suites de tests passent, et les tests Rust aussi.
+
+## 04:45 · Assemblé : interface live pour portable
+
+- **Tout tient à l'écran** en 1280×800, 1366×768 et 1600×950, avec 2 ou 4 platines, dans les 5 presets, sans défilement. Les platines choisissent leur taille (grande, compacte, mini) selon la place.
+- **Séparateurs** entre waveforms, platines et bibliothèque : on les glisse, chaque preset garde ses tailles, double-clic pour revenir par défaut.
+- **Taille de chaque platine** : clic sur son en-tête.
+- **Bibliothèque plein écran** : Tab ou le bouton Biblio, Échap pour revenir.
+- **Zoom de l'interface** (Ctrl + / Ctrl −) qui reste net, zoom des waveforms (Ctrl + molette).
+- **Mode scène** : textes plus gros et plus contrastés, BPM et temps restant agrandis, pour une cabine sombre.
+- **Plein écran** dans l'appli.
+- **Polices embarquées** : plus aucun appel à Internet au lancement.
+- **Contraste** relevé partout (au moins 5,4:1 pour les étiquettes).
+- **Presets plus proches des logiciels connus** : panneau Préparation (grande platine et liste) façon Export, barre latérale en Mix, compteur de temps et de phrase.
+- **Plus fluide** : les waveforms sont dessinées par tuiles réutilisées. Le temps de calcul par image passe d'environ 6 ms à 4 ms avec 4 platines.
+- **Vérifié** : les 11 suites de tests passent ensemble.
