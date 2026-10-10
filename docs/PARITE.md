@@ -110,7 +110,7 @@
 | Reverse | tous | **Fait** | P2 | S |
 | Censor (reverse avec slip) | S, RB, VDJ | **Fait** | P2 | S |
 | Slip mode | tous | **Fait** : hot cue maintenu, roll et censor, avec position fantôme affichée | P1 | S |
-| Temps de relâchement du slip (« Slip Release ») | S 4.0 | **Manque** | P3 | S |
+| Temps de relâchement du slip (« Slip Release ») | S 4.0 | **Fait** : retour en fondu de 20 à 500 ms (outils ⋯ de la platine, onglet Boucle) | P3 | S |
 | Chargement par glisser-déposer et par bouton | tous | **Fait** | P1 | S |
 | Garde-fou « platine à l'antenne » au chargement | RB, TR, MX | **Fait** : refus si la platine est audible | P2 | S |
 | Clone de platine (instant doubles) | S, RB, TR, ENG, MX | **Fait** : bouton Doubler (morceau, position, tempo, ton et boucle) | P2 | S |
@@ -128,7 +128,7 @@
 | Fonction | Où on la trouve | Mixlab | Priorité | Effort |
 |---|---|---|---|---|
 | 8 hot cues par piste | tous *(S Lite : 4 ; RB et MX : jusqu'à 16 ou 36)* | **Fait** | P1 | S |
-| 16 hot cues ou plus (banques A/B) | RB, MX, VDJ | **Manque** | P3 | S |
+| 16 hot cues ou plus (banques A/B) | RB, MX, VDJ | **Fait** : 16 par morceau, bouton de banque 1-8 / 9-16 près des onglets ; les cues 9 à 16 sont gardés dans le stockage local de l'appli (pas encore dans `library.json` ni dans les exports) | P3 | S |
 | Hot cues colorés, couleur choisie par cue | tous | **Fait** : 12 couleurs au choix (clic droit sur le pad) | P1 | S |
 | Hot cues nommés | tous | **Fait** : nom sur le pad et sur la waveform | P1 | S |
 | Hot cues sauvegardés par piste | tous | **Fait** : `library.json` dans l'appli (avec noms, couleurs, cues mémoire et boucles) ; positions seulement dans le navigateur | P1 | S |
@@ -145,24 +145,24 @@
 | Boucle manuelle In / Out | tous | **Fait** | P1 | S |
 | Reloop et sortie de boucle | tous | **Fait** | P1 | S |
 | Boucle ×2 / ÷2 | tous | **Fait** | P1 | S |
-| Réglage fin du début et de la fin de boucle | RB, TR, S, MX | **Manque** | P2 | S |
-| Déplacer une boucle (loop move) | TR, RB, MX | **Partiel** : un beat jump pendant une boucle la déplace | P2 | S |
-| Boucle active (« active loop ») ou boucle à venir | RB, MX | **Manque** | P3 | S |
+| Réglage fin du début et de la fin de boucle | RB, TR, S, MX | **Fait** : début, fin ou toute la boucle par pas de 1 ms, 10 ms, 1/16, 1/4 ou 1 temps ; ½ et ×2 depuis le début ou depuis la fin ; commandes MIDI | P2 | S |
+| Déplacer une boucle (loop move) | TR, RB, MX | **Fait** : beat jump pendant une boucle, ou déplacement fin de toute la boucle (outils ⋯, onglet Boucle) | P2 | S |
+| Boucle active (« active loop ») ou boucle à venir | RB, MX | **Fait** : une boucle gardée marquée active s'enclenche quand la tête de lecture arrive dessus ; dessinée sous la waveform avec le nombre de temps avant la prochaine | P3 | S |
 | Loop roll (pads 1/16 à 8) | tous | **Fait** | P1 | S |
 | Beat jump avec un pas réglable | tous | **Fait** : 1 à 32 temps | P1 | S |
 | Pads de beat jump | S, RB, TR | **Fait** | P2 | S |
 | Saut de phrase ou de mesure (16 et 32 temps et plus) | RB, TR | **Partiel** : 32 temps au plus | P3 | S |
-| Onglets de mode des pads | tous | **Fait** : Hot cue, Roll, Saut, Sampler | P1 | S |
+| Onglets de mode des pads | tous | **Fait** : Hot cue, Roll, Saut, Slicer, Boucles, Pitch, Sampler, Loop (boucle auto), Pad FX | P1 | S |
 | Pads Slicer | S, RB, VDJ, TR (Freeze) | **Fait** : 8 tranches d'un temps, reprise façon slip | P2 | M |
 | Pads Keyboard / Pitch Play (hot cue rejoué à d'autres hauteurs) | S *(Pitch Play, payant : Pitch 'n Time DJ)*, RB | **Fait** : mode Pitch, −5 à +5 demi-tons depuis le dernier hot cue | P2 | M |
 | Pads Key Shift | RB, VDJ, ENG | **Partiel** : le mode Pitch transpose en rejouant le hot cue ; pas de pads qui transposent sans sauter | P2 | S |
 | Pads de beat loop | RB, ENG | **Manque** | P3 | S |
-| Pads d'effets (Pad FX, Roll FX) | RB *(Pad FX)*, S *(Stems Pad FX)* | **Manque** | P2 | M |
+| Pads d'effets (Pad FX, Roll FX) | RB *(Pad FX)*, S *(Stems Pad FX)* | **Fait** : mode Pad FX, 8 pads (écho, reverb, trans, filtre LFO, bitcrusher, répétition…) actifs tant qu'on maintient, effet et durée au choix par pad ; ils empruntent une unité FX et lui rendent ses réglages | P2 | M |
 | Pads de stems | S, RB, VDJ, DJAY, ENG | **Manque** | P2 | M |
 | Freeze ou Flux mode | TR | **Partiel** : Slip (le Flux) et Slicer (proche du Freeze) | P3 | S |
-| Hot cue maintenu puis verrouillé en lecture (« play latch ») | MX 2.6, CDJ | **Manque** | P3 | S |
-| Gate cue / hot cue en mode « maintien » | VDJ, MX | **Partiel** : le hot cue maintenu avec slip revient au relâchement | P3 | S |
-| Séquences de cues enregistrées (Serato Flip) | S *(Flip, extension autrefois payante, intégrée à Pro)* | **Manque** | P3 | M |
+| Hot cue maintenu puis verrouillé en lecture (« play latch ») | MX 2.6, CDJ | **Fait** : à l'arrêt, le hot cue joue tant qu'il est maintenu ; Play pendant l'appui verrouille la lecture (réglable : déplacer seulement, maintien, lecture) | P3 | S |
+| Gate cue / hot cue en mode « maintien » | VDJ, MX | **Fait** : à l'arrêt, maintien et retour au cue au relâchement ; en lecture avec slip, retour là où le morceau en serait | P3 | S |
+| Séquences de cues enregistrées (Serato Flip) | S *(Flip, extension autrefois payante, intégrée à Pro)* | **Fait** : enregistrement des appuis sur les hot cues avec leur rythme (en temps, donc elles suivent le tempo), gardées par morceau, rejouées une fois ou en boucle, sauts calés à l'échantillon ; pas d'export vers d'autres logiciels | P3 | M |
 
 ## 3. Tempo, grille et sync
 
@@ -245,7 +245,7 @@
 | Mixer interne ou mixer externe (mode table) | tous | **Partiel** : le mixer peut être masqué, mais il n'y a pas de sorties par platine | P1 | L |
 | Sorties séparées par platine (mixer externe) | tous | **Manque** | P2 | L |
 | Entrée micro avec talkover / ducking | VDJ, RB, S, MX | **Manque** | P2 | M |
-| Pré-écoute du sampler au casque | S, RB, MX | **Manque** | P3 | S |
+| Pré-écoute du sampler au casque | S, RB, MX | **Fait** : bouton Casque d'un son (casque seul), et option « sampler aussi au casque » | P3 | S |
 
 ## 6. Effets
 
@@ -286,17 +286,17 @@
 |---|---|---|---|---|
 | Sampler à 8 slots | tous *(S Lite : 4 ; Pro : 32)* | **Fait** : 8 pads, sons intégrés ou les tiens | P1 | S |
 | Charger ses propres sons dans le sampler | tous | **Fait** : gardés d'une session à l'autre | P1 | S |
-| Banques de sampler (4×8 et plus) | S, RB, VDJ, MX | **Manque** | P2 | S |
+| Banques de sampler (4×8 et plus) | S, RB, VDJ, MX | **Fait** : 4 banques de 8 (sons, kit de batterie, percussions et notes, 8 slots libres pour tes sons et tes captures) | P2 | S |
 | Modes de lecture (one-shot, gate, loop, toggle) | S, RB, VDJ, MX | **Fait** : un coup, boucle calée, maintien | P2 | S |
-| Sampler synchronisé au tempo (boucles calées) | RB, S, TR, MX | **Fait** : mode Boucle calée sur la platine maître, départ sur le temps | P2 | M |
+| Sampler synchronisé au tempo (boucles calées) | RB, S, TR, MX | **Fait** : mode Boucle calée sur la platine maître, départ sur le temps et à la bonne phase de la mesure, la vitesse suit les changements de tempo (sans key lock) | P2 | M |
 | Volume du sampler | tous | **Fait** | P1 | S |
-| Sampler routé dans une voie (EQ, crossfader) | RB, TR, MX | **Manque** | P3 | S |
-| Capture d'une boucle de la platine vers le sampler | RB, TR (Remix decks), VDJ | **Manque** | P3 | M |
-| Séquenceur de sampler (16 pas) | RB *(séquenceur ; sauvegarde payante Core)*, DJAY | **Manque** | P3 | M |
-| Pattern Player (boîte à rythmes, kits) | TR 4 | **Manque** | P3 | L |
-| Remix decks, Loop recorder | TR, VDJ | **Manque** | P3 | L |
-| Looper par piste (djay Looper) | DJAY | **Manque** | P3 | M |
-| Packs de sons fournis | S *(Sound Packs)*, RB, VDJ | **Partiel** : 8 sons maison | P3 | S |
+| Sampler routé dans une voie (EQ, crossfader) | RB, TR, MX | **Fait** : sortie Master ou voie A à D (gain, EQ, filtre, FX, fader, crossfader) | P3 | S |
+| Capture d'une boucle de la platine vers le sampler | RB, TR (Remix decks), VDJ | **Fait** : la boucle en cours copiée à l'échantillon près dans un slot, en boucle calée, gardée d'une session à l'autre | P3 | M |
+| Séquenceur de sampler (16 pas) | RB *(séquenceur ; sauvegarde payante Core)*, DJAY | **Fait** : 8 sons d'une banque × 16 pas, calé sur la grille de la platine maître (tempo interne sinon), grille gardée ; pas de vélocité ni de swing | P3 | M |
+| Pattern Player (boîte à rythmes, kits) | TR 4 | **Partiel** : kit synthétisé et 9 styles (house, techno, tech house, hip-hop, trap, drum and bass, breakbeat, reggaeton, afro house) joués par le séquenceur ; un seul kit, pas de variations ni de remplissages automatiques | P3 | L |
+| Remix decks, Loop recorder | TR, VDJ | **Partiel** : le looper sert d'enregistreur de boucles (master ou platine, overdub, vers le sampler) ; pas de remix decks | P3 | L |
+| Looper par piste (djay Looper) | DJAY | **Fait** : un looper par platine et un sur le master, 1 à 8 mesures calées sur la mesure, overdub, volume, copie vers le sampler ; la boucle est perdue à la fermeture sauf si tu la copies dans le sampler | P3 | M |
+| Packs de sons fournis | S *(Sound Packs)*, RB, VDJ | **Partiel** : 24 sons maison synthétisés (effets, kit de batterie, percussions et notes) | P3 | S |
 
 ## 8. Stems
 
