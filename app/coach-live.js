@@ -122,6 +122,7 @@ window.MixCoach=(()=>{
     if(bars<2){score-=5;tips.push('Transition très courte : bien pour une coupe franche, sinon laisse les deux pistes cohabiter 4 à 16 mesures.');}
     score=clamp(score,0,100);
     const r={from:t.from.id,to:t.to.id,title:t.to.track?t.to.track.title:'',bars,score,good,tips,at:new Date()};
+    window.Planner&&Planner.onTransition(r,t); // relecture des gestes de la transition
     C.hist.unshift(r);C.hist.length=Math.min(C.hist.length,6);
     // le bilan s'affiche dans le panneau Coach ; panneau fermé, une notification le signale
     if(C.level!=='off'&&!panelOpen())toast(`Transition ${r.from} → ${r.to} : ${score}/100`,score>=75?'ok':'');
@@ -160,7 +161,7 @@ window.MixCoach=(()=>{
       else if((C.tr.single=(C.tr.single||0)+dt)>2)trEnd(x.aud[0]||null);
     }
     for(const r of RULES){
-      const s=state[r.id];let res=null;
+      const s=state[r.id]||(state[r.id]={held:0,clear:0,res:null});let res=null;
       if(C.level!=='off'&&!C.muted.has(r.id))try{res=r.test(x);}catch(e){res=null;}
       if(res){s.held+=dt;s.clear=0;s.res=res;}
       else{s.clear+=dt;if(s.clear>.6){s.held=0;s.res=null;}}
@@ -208,7 +209,7 @@ window.MixCoach=(()=>{
     if(!C.hist.length){H.append(h('div',{class:'cl-ok'},'Aucune transition notée pour l’instant.'));return;}
     C.hist.forEach((r,i)=>H.append(h('details',{class:'trcard',open:i===0},
       h('summary',{},h('span',{class:'sc '+(r.score>=75?'ok':r.score>=50?'warn':'bad')},String(r.score)),` ${r.from} → ${r.to} · ${r.bars.toFixed(0)} mesures`),
-      h('ul',{},r.good.map(g=>h('li',{class:'g'},g)),r.tips.map(t=>h('li',{class:'t'},t))))));
+      h('ul',{},r.good.map(g=>h('li',{class:'g'},g)),r.tips.map(t=>h('li',{class:'t'},t))),window.Planner&&Planner.replayEl(r))));
   }
   function setLevel(l){C.level=l;store.set('coachLevel',l);C.el.lvl.value=l;const dt=$('#coachlive-dot');dt&&dt.classList.toggle('on',l!=='off');const cb=$('#coach-btn');cb&&cb.setAttribute('title',l==='off'?'Coach et leçons (conseils en direct coupés)':'Coach et leçons · conseils en direct : '+LEVELS[l]);lastKey='x';renderPanel(true);}
   function build(){

@@ -252,7 +252,7 @@ window.View=(()=>{
   function wh(dir){const s=start();sp().lane=clamp(s.lane+dir*6,LANEMIN,220);store.set('splits',V.splits);fit();}
   function resetLayout(){delete V.splits[key()];delete V.sizes[key()];store.set('splits',V.splits);store.set('deckSizes',V.sizes);fit();toast('Disposition « '+PR().name+' » remise par défaut');}
   function closeMenus(){$$('#top details[open]').forEach(x=>{x.open=false;});}
-  const COLLAPSE=['#ag-btn','#q-btn','#audio-btn','#midi-btn','#fs-btn','#pc-btn','#am-btn','#lib-btn','#prefs-btn','#rec-btn','#ndecks'];
+  const COLLAPSE=['#ag-btn','#q-btn','#audio-btn','#midi-btn','#fs-btn','#pc-btn','#am-btn','#set-btn','#lib-btn','#prefs-btn','#rec-btn','#ndecks'];
   const overTop=t=>t.scrollWidth>t.clientWidth+1;
   // La barre du haut ne déborde jamais : les boutons les moins urgents passent dans « ⋯ », dans cet ordre.
   function fitTop(){

@@ -1011,6 +1011,7 @@ async function boot(){
   window.MixCoach&&MixCoach.build();
   window.Structure&&Structure.build();
   window.AutoMix&&AutoMix.build();
+  window.Planner&&Planner.build();
   requestAnimationFrame(frame);
   for(let i=0;i<DEMOS.length;i++){
     await new Promise(r=>setTimeout(r,20));
