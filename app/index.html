@@ -452,6 +452,39 @@ select.sel{background:#181b20;border:1px solid #262a31;border-radius:6px;height:
 .trcard .sc.ok{background:var(--ok)}.trcard .sc.warn{background:var(--warn)}.trcard .sc.bad{background:var(--bad)}
 .trcard ul{margin:5px 0 0;padding-left:16px;display:grid;gap:3px}.trcard li.g{color:var(--ok)}.trcard li.t{color:var(--tx)}
 @media (max-width:700px){.coach-hud{top:auto;bottom:12px}}
+/* ---------- auto-mix, suggestions, énergie ---------- */
+.am-panel{position:fixed;right:10px;top:46px;z-index:45;width:min(350px,calc(100vw - 20px));max-height:calc(100vh - 60px);overflow:auto;background:#0f1115;border:1px solid var(--ln2);border-radius:9px;box-shadow:0 18px 50px rgba(0,0,0,.6);padding:10px 12px;display:grid;gap:8px;font:12px/1.35 var(--ui);color:var(--tx)}
+.am-panel[hidden]{display:none}
+.am-panel h2{margin:0;display:flex;align-items:center;gap:8px;font:700 11px var(--ui);letter-spacing:.18em;text-transform:uppercase;color:var(--white)}
+.am-panel h2 .am-go{margin-left:auto}
+.am-go.on{--dc:var(--ok)}
+.am-box{display:grid;gap:5px;padding:8px 9px;border-radius:7px;background:var(--s1);border:1px solid var(--ln);border-left:3px solid var(--ln2)}
+.am-box.on{border-left-color:var(--ok)}.am-box.take{border-left-color:var(--warn)}
+.am-st{color:var(--white);font-weight:600;font-size:12.5px;font-variant-numeric:tabular-nums}
+.am-why{color:var(--mu);font-size:11.5px}.am-why:empty{display:none}
+.am-prog{height:3px;background:var(--ln);border-radius:2px;overflow:hidden}.am-prog i{display:block;height:100%;width:0;background:var(--ok);transition:width .25s linear}
+.am-row{display:flex;gap:6px;align-items:center}.am-row .sel{flex:1;min-width:0}
+.am-sec{display:flex;gap:6px;align-items:center;justify-content:space-between;margin-top:2px;flex-wrap:wrap}
+.am-acts{display:flex;gap:4px;align-items:center}.am-acts .sel{max-width:110px}
+.am-ref{color:var(--dim);font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.am-q,.am-sug{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.am-q li,.am-sug li{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:6px;align-items:center;padding:4px 6px;border-radius:5px;background:#111317}
+.am-q li .b,.am-sug li .b{height:20px;min-width:20px;padding:0 5px}
+.am-q li.cur{background:#152019;box-shadow:inset 2px 0 0 var(--ok)}
+.am-q li .n{font:600 10px var(--num);color:var(--dim);text-align:center}
+.am-q li.cur .n{color:var(--ok)}
+.am-q li .t,.am-sug li .t{color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.am-meta{display:flex;gap:6px;align-items:center;color:var(--mu);font:500 10px var(--num);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.am-meta .kchip{min-width:24px;font-size:9.5px;padding:0 3px}
+.am-sug .am-meta{display:block;font-family:var(--ui);font-size:10.5px}
+.am-tag{font:600 9px var(--ui);letter-spacing:.1em;text-transform:uppercase;color:var(--ok)}
+.am-q li.empty,.am-sug li.empty{display:block;background:none;color:var(--mu);font-size:11px;padding:4px 2px}
+.am-sug .sc{font:700 10px var(--num);border-radius:3px;padding:2px 0;color:#05070a;background:var(--dim);text-align:center}
+.am-sug .sc.ok{background:var(--ok)}.am-sug .sc.warn{background:var(--warn)}
+.am-fill{display:flex;gap:6px;align-items:center;color:var(--mu);font-size:11px;cursor:pointer}
+.am-leg{display:flex;flex-wrap:wrap;gap:3px 10px;font-size:10.5px;color:var(--mu);padding-top:6px;border-top:1px solid var(--ln)}
+.am-leg span::before{content:"";display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--c);margin-right:4px;vertical-align:-1px}
+.lt td.en i{display:inline-block;width:26px;height:4px;margin-left:6px;border-radius:2px;vertical-align:2px;background:linear-gradient(var(--ec),var(--ec)) 0 0/var(--e) 100% no-repeat,#262a32}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><radialGradient id="capg" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#4a505c"/><stop offset="1" stop-color="#16181d"/></radialGradient></defs></svg>
@@ -539,3 +572,5 @@ select.sel{background:#181b20;border:1px solid #262a31;border-radius:6px;height:
 <script src="app.js"></script>
 <script src="learn.js"></script>
 <script src="coach-live.js"></script>
+<script src="structure.js"></script>
+<script src="automix.js"></script>
