@@ -25,6 +25,7 @@ pub fn run() {
             files::pick_library_file,
             files::allow_paths,
             files::save_export,
+            files::save_binary,
             files::open_shop,
             midi::midi_open,
             midi::midi_signature,
