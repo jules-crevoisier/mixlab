@@ -8,7 +8,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "web": "npx --yes http-server app -p 8080 -c-1",
-    "test": "node test/smoke.js && node test/coach.js && node test/automix.js && node test/library.js && node test/controllers.js && node test/parcours.js && node test/perf.js && node test/academie.js && node test/tags.js && node test/deckpro.js && node test/layout.js",
+    "test": "node test/smoke.js && node test/coach.js && node test/automix.js && node test/library.js && node test/controllers.js && node test/parcours.js && node test/perf.js && node test/academie.js && node test/tags.js && node test/deckpro.js && node test/mappings.js && node test/layout.js",
     "dist": "electron-builder --publish never",
     "dist:win": "electron-builder --win --publish never",
     "dist:mac": "electron-builder --mac --publish never",

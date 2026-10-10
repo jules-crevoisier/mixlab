@@ -422,8 +422,8 @@
 | MIDI Learn | tous *(S : MIDI mapping à partir de Pro ; RB Free : non)* | **Fait** | P1 | S |
 | Retour des LED | tous | **Fait** : play, sync, cue, pads, boucle, FX et coach clignotant | P1 | S |
 | MIDI natif sur macOS et Linux (sans Web MIDI) | tous | **Fait** : `midir` et `tauri-bridge.js` | P1 | S |
-| Mappings fournis pour les contrôleurs du marché (100+ chez les autres) | S, RB, TR, VDJ, DJAY, MX | **Partiel** : un mapping générique fourni et une bibliothèque de mappings à partager ; aucun mapping validé par modèle | P1 | L |
-| Détection automatique du contrôleur et chargement du mapping | tous | **Fait** : mapping proposé au branchement | P1 | M |
+| Mappings fournis pour les contrôleurs du marché (100+ chez les autres) | S, RB, TR, VDJ, DJAY, MX | **Partiel** : 6 mappings relevés dans la documentation MIDI officielle (Pioneer DDJ-FLX4, DDJ-400, DDJ-FLX6, DDJ-SB3 ; Hercules Inpulse 200 et 300), source et version dans chaque fichier, **non vérifiés sur le matériel** (affiché dans l'appli), écran « Tester ma table » pour les contrôler. Pas de mapping pour Numark (Mixtrack Pro FX, Platinum FX, Party Mix) ni Denon MC7000 : aucune liste MIDI publiée ; Reloop Ready et Buddy : aucune liste trouvée ; Inpulse 500 : la mise en page du document ne permet pas d'en relever les commandes de platine ; Starlight et Traktor S2 MK3 (mode MIDI) : aucune liste publiée | P1 | L |
+| Détection automatique du contrôleur et chargement du mapping | tous | **Fait** : reconnu au nom du port MIDI, mapping livré chargé tout seul avec un toast (OK, Tester ma table, Annuler) ; un mapping personnel n'est jamais remplacé sans demander ; réglage pour couper | P1 | M |
 | Format de mapping partageable (import et export) | TR (TSI), MX (XML+JS), VDJ (XML) | **Fait** : JSON Mixlab | P2 | S |
 | Mapping avancé : Shift, modificateurs, banques et pages | tous | **Fait** : calque Shift et bascule de platine A/C et B/D | P1 | M |
 | Encodeurs relatifs (sens, accélération) et jog en 14 bits | tous | **Fait** : 3 codages relatifs, paires 14 bits | P1 | M |
@@ -431,7 +431,7 @@
 | Jog : toucher du plateau (scratch) et anneau de lecture | tous | **Fait** : toucher = scratch, sinon pitch bend | P1 | M |
 | Pitch fader 14 bits (MSB et LSB) | tous | **Fait** | P2 | S |
 | Afficheurs des contrôleurs (écrans dans les jogs, texte) | S, RB, TR, MX 2.6, VDJ | **Manque** | P3 | L |
-| Couleur RGB des pads selon la couleur du cue | tous | **Manque** : LED allumée ou éteinte | P2 | M |
+| Couleur RGB des pads selon la couleur du cue | tous | **Partiel** : option de voyant `rgb` (octet 0RRGGGBB d'après la table de couleurs Hercules, ou palette à index), la couleur suit celle du hot cue ; aucun mapping livré ne l'utilise encore, les documents lus ne donnent que allumé/éteint pour les pads | P2 | M |
 | Scripts de mapping (VDJScript, JS) | VDJ, MX | **Manque** | P2 | L |
 | HID (jogs haute résolution, Traktor Kontrol, DDJ) | S, RB, TR, VDJ, MX | **Manque** | P2 | L |
 | Carte son intégrée au contrôleur (4 canaux, casque en 3-4) | tous | **Partiel** : moteur Rust, pas branché | P1 | L |
@@ -498,7 +498,7 @@
 | Bac à sable / essai au casque | VDJ (Sandbox) | **Manque** | P2 | M |
 | Morceaux d'entraînement libres de droits | aucun | **Partiel** : 4 démos synthétisées | P2 | M |
 | Tutoriels vidéo et visite guidée | DJAY, TR (Play) | **Manque** | P3 | M |
-| Leçons qui s'adaptent au contrôleur branché | aucun | **Manque** | P3 | M |
+| Leçons qui s'adaptent au contrôleur branché | aucun | **Fait** : le parcours et les leçons affichent « Sur ta table : PLAY/PAUSE, platine gauche » d'après le mapping actif | P3 | M |
 
 ---
 
