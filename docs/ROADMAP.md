@@ -54,6 +54,17 @@ Un mode dédié, séparé des leçons isolées. On le choisit au premier lanceme
 
 ---
 
+## Chantier 1 bis · L'Académie : devenir un vrai DJ
+
+Le parcours apprend les gestes. L'Académie apprend le métier, avec des cours courts, des exercices notés et des outils dans l'appli.
+- **Construire un set** : warm-up, montée, peak time et closing ; la courbe d'énergie ; les enchaînements par tonalité et tempo ; préparer plus de morceaux que nécessaire.
+- **Lire le public** : mariage, bar, club (ouverture ou peak time), anniversaire. Quoi regarder (la piste, le bar, l'heure, les réactions) et comment réagir quand la piste se vide.
+- **Trouver sa musique** : Bandcamp, Beatport, labels, promos, SoundCloud, radios et mixes d'autres DJ, disquaires. Organiser sa collection par énergie, moment et public.
+- **Outils** : un assistant de trame de set (public + durée → structure et morceaux proposés depuis la collection), la courbe d'énergie d'une playlist avec des conseils, un débrief après chaque set enregistré.
+- **Exercices notés** : « une montée de 20 minutes », « 3 morceaux compatibles d'affilée », « relancer une piste qui se vide » (simulation de public).
+
+---
+
 ## Chantier 2 · Les automatismes des logiciels payants
 
 | Fonction | Chez les autres | Plan Mixlab |
@@ -147,7 +158,8 @@ En soirée, on joue souvent sur un portable de 13 à 15 pouces, dans le noir. To
 ## Ordre de travail de la nuit (branche `nuit`)
 
 1. Parcours « De zéro à ton premier set » : moteur de parcours, interface qui grandit, chapitres 1 à 14, sauvegarde et glossaire.
-2. Analyse de structure, cues automatiques et auto-mix.
+2. L'Académie (construire un set, lire le public, trouver sa musique), bâtie sur le moteur du parcours.
+3. Analyse de structure, cues automatiques et auto-mix.
 3. Bibliothèque : tags, notes, couleurs, crates intelligentes, import et export rekordbox XML, M3U, iTunes.
 4. Performance : cues mémoire nommés, slicer, effets supplémentaires, suggestion du morceau suivant.
 5. Import de playlists externes (métadonnées) et correspondance avec la collection.
