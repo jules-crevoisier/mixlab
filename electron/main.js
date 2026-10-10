@@ -4,7 +4,7 @@ const { app, BrowserWindow, ipcMain, dialog, session, Menu, shell } = require('e
 const path = require('path');
 const fs = require('fs/promises');
 
-const AUDIO_EXT = /\.(mp3|wav|aiff?|flac|ogg|m4a|aac|opus)$/i;
+const AUDIO_EXT = /\.(mp3|wav|aiff?|flac|ogg|m4a|aac|opus|mp4|m4v|webm|mov)$/i;
 const MAX_FILE = 400 * 1024 * 1024; // un mix d'une heure en WAV tient dedans
 const libFile = () => path.join(app.getPath('userData'), 'library.json');
 
@@ -62,7 +62,7 @@ app.whenReady().then(() => {
   ]));
 
   ipcMain.handle('pick-files', async () => {
-    const r = await dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'], filters: [{ name: 'Audio', extensions: ['mp3', 'wav', 'aif', 'aiff', 'flac', 'ogg', 'm4a', 'aac', 'opus'] }] });
+    const r = await dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'], filters: [{ name: 'Audio', extensions: ['mp3', 'wav', 'aif', 'aiff', 'flac', 'ogg', 'm4a', 'aac', 'opus', 'mp4', 'm4v', 'webm', 'mov'] }] });
     if (r.canceled) return [];
     r.filePaths.forEach(p => allowed.add(p));
     return r.filePaths.map(describe);

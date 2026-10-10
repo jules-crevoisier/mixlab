@@ -250,12 +250,18 @@ const fakeMidi = () => {
   check(await W(() => decks[0].playing), 'AZERTY : la touche A (place du Q) lance Play A');
   await kev('KeyQ', 'a'); const x0 = await W(() => S.xf); await kev('KeyW', 'z'); const x1 = await W(() => S.xf); await kev('KeyZ', 'w'); const x2 = await W(() => S.xf);
   check(await W(() => !decks[0].playing) && x1 === x0 && x2 < x0, 'AZERTY : Z (place du W) = Cue, W (place du Z) = crossfader', [x0, x1, x2].join(' / '));
+  // Les raccourcis vivent dans Préférences › Contrôleurs et clavier ; la fenêtre Contrôleur y renvoie.
   await W(() => { document.querySelector('#midi-modal').hidden = false; });
-  check(await W(() => document.querySelectorAll('#key-list li').length === 22 && /Bibliothèque plein écran/.test(document.querySelector('#key-list li[data-code="F2"]').textContent) && /Mode scène/.test(document.querySelector('#key-list li[data-code="F9"]').textContent)), 'Fenêtre Contrôleur : liste des raccourcis clavier (dont F2 bibliothèque plein écran et F9 mode scène)', await W(() => [...document.querySelectorAll('#key-list li')].map(l => l.dataset.code).join()));
+  await page.click('#midi-keys-prefs');
+  check(await W(() => document.querySelector('#midi-modal').hidden && !document.querySelector('#prefs').hidden && Prefs.tab === 'controleurs'), 'Fenêtre Contrôleur › Raccourcis clavier : ouvre Préférences sur l’onglet Contrôleurs et clavier');
+  check(await W(() => document.querySelectorAll('#key-list li').length === 22 && /Bibliothèque plein écran/.test(document.querySelector('#key-list li[data-code="F2"]').textContent) && /Mode scène/.test(document.querySelector('#key-list li[data-code="F9"]').textContent)), 'Préférences : liste des raccourcis clavier (dont F2 bibliothèque plein écran et F9 mode scène)', await W(() => [...document.querySelectorAll('#key-list li')].map(l => l.dataset.code).join()));
   await page.click('#key-list li[data-code="KeyQ"] button.opt');
   await page.keyboard.press('KeyM');
   check(await W(() => KEYS.KeyM === 'A.play' && !KEYS.KeyQ && JSON.parse(localStorage.getItem('mixlab2.keys')).KeyM === 'A.play'), 'Raccourci modifié et enregistré (Play A sur M)');
   await page.screenshot({ path: '/tmp/mixlab-clavier.png' });
+  await page.keyboard.press('Escape');
+  check(await W(() => document.querySelector('#prefs').hidden), 'Échap ferme les Préférences');
+  await W(() => { document.querySelector('#midi-modal').hidden = false; });
   await page.keyboard.press('Escape');
   check(await W(() => document.querySelector('#midi-modal').hidden), 'Échap ferme la fenêtre Contrôleur');
   await W(() => { const m = document.querySelector('#audio-modal'); if (m) m.hidden = false; });
@@ -272,7 +278,7 @@ const fakeMidi = () => {
     await pk.addInitScript(() => { Object.defineProperty(Navigator.prototype, 'keyboard', { get: () => undefined, configurable: true }); });
     await pk.goto(url);
     await pk.waitForFunction(() => typeof LIB !== 'undefined' && LIB.tracks.length >= 4 && window.Controllers, null, { timeout: 30000 });
-    await pk.evaluate(() => { document.querySelector('#midi-modal').hidden = false; });
+    await pk.evaluate(() => Prefs.open('controleurs'));
     const names = await pk.evaluate(() => ({ kb: !!navigator.keyboard, has: Controllers.hasLayoutMap(), keys: ['KeyQ', 'KeyW', 'KeyZ', 'KeyA'].map(Controllers.keyName), kbd: (document.querySelector('#key-list li[data-code="KeyQ"] kbd') || {}).textContent, row: !document.querySelector('#kb-layout-row').hidden, opt: document.querySelector('#kb-layout').selectedOptions[0].textContent }));
     check(!names.kb && !names.has && JSON.stringify(names.keys) === JSON.stringify(want) && names.kbd === want[0] && names.row, `Sans getLayoutMap, ${locale} : touches affichées en ${locale === 'fr-FR' ? 'AZERTY' : 'QWERTZ'} et choix du clavier proposé`, JSON.stringify(names));
     if (locale === 'fr-FR') {

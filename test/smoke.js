@@ -57,8 +57,9 @@ const fakeNative = saved => `
   if (await page.evaluate(() => LIB.tracks.filter(t => t.path).length) !== 1) fail('doublon importé');
 
   // Fenêtre Audio et routage casque sur une deuxième sortie.
+  // Le bouton Audio ouvre Préférences › Audio : sorties master et casque
   await page.click('#audio-btn');
-  if (!(await page.isVisible('#audio-modal'))) fail('fenêtre Audio absente');
+  if (!(await page.isVisible('#prefs')) || !(await page.isVisible('#prefs select[aria-label="Sortie master"]')) || !(await page.isVisible('#prefs select[aria-label="Sortie casque"]'))) fail('Préférences › Audio absent');
   const route = await page.evaluate(async () => {
     const ok = await Desktop.setHeadphones('default');
     const r1 = { ok, hp: S.hpDevice, split: S.split, dest: !!bus.hpDest };

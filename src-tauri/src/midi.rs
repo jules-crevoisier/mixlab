@@ -78,7 +78,8 @@ pub fn midi_open(app: AppHandle, midi: State<'_, Midi>) -> Ports {
         let named = ids(ports.iter().map(|p| probe.port_name(p).unwrap_or_default()).collect());
         for (port, info) in ports.iter().zip(named) {
             let Ok(mut mi) = MidiInput::new("Mixlab") else { continue };
-            mi.ignore(midir::Ignore::SysexAndTime);
+            // l'horloge MIDI (0xF8, Start, Stop) passe : Mixlab peut suivre un tempo externe
+            mi.ignore(midir::Ignore::SysexAndActiveSense);
             let (app, id) = (app.clone(), info.id.clone());
             let cb = move |_ts: u64, data: &[u8], _: &mut ()| {
                 let _ = app.emit("midi", MidiEvent { port: id.clone(), data: data.to_vec() });

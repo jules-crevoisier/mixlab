@@ -1,0 +1,420 @@
+{
+ "format": "mixlab-mapping",
+ "version": 2,
+ "name": "Pioneer DJ DDJ-SB3",
+ "device": "/DDJ-SB3/",
+ "unverified": true,
+ "decks": 2,
+ "source": {
+  "url": "https://downloads.support.alphatheta.com/software_info/dj-controllers/DDJ-SB3/ddj-sb3_midi_message_list_e2.pdf",
+  "doc": "DDJ-SB3 List of MIDI messages",
+  "version": "ver. 1.01 (© 2020 AlphaTheta)"
+ },
+ "notes": "Platines 1 et 2 sur les canaux 1 et 2, mixer et navigation sur le canal 7, pads sur les canaux 8 (platine 1) et 9 (platine 2), Shift + pad = note + 8. Seul le mode HOT CUE des pads est repris : la documentation ne relie pas clairement les autres modes à leurs notes. Non vérifié sur le matériel : relevé dans la documentation MIDI officielle, jamais essayé sur la vraie table. Si une commande ne répond pas, corrige-la avec MIDI Learn et signale-le.",
+ "map": {
+  "n0.11": {
+   "id": "A.play",
+   "hw": "PLAY/PAUSE"
+  },
+  "n0.71": {
+   "id": "A.rev",
+   "hw": "SHIFT + PLAY/PAUSE",
+   "led": false
+  },
+  "n0.12": {
+   "id": "A.cue",
+   "hw": "CUE"
+  },
+  "n0.88": {
+   "id": "A.sync",
+   "hw": "BEAT SYNC"
+  },
+  "n0.92": {
+   "id": "A.master",
+   "hw": "SHIFT + BEAT SYNC"
+  },
+  "n0.63": {
+   "type": "shift",
+   "hw": "SHIFT"
+  },
+  "n0.54": {
+   "id": "A.jog",
+   "type": "touch",
+   "hw": "JOG (dessus, toucher)"
+  },
+  "c0.34": {
+   "id": "A.jog",
+   "type": "jog",
+   "mode": "64",
+   "hw": "JOG (dessus, mode vinyle)"
+  },
+  "c0.35": {
+   "id": "A.jog",
+   "type": "jog",
+   "mode": "64",
+   "hw": "JOG (dessus, vinyle coupé)"
+  },
+  "c0.33": {
+   "id": "A.jog",
+   "type": "jog",
+   "mode": "64",
+   "hw": "JOG (bord)"
+  },
+  "c0.0": {
+   "id": "A.pitch",
+   "hi": true,
+   "invert": true,
+   "hw": "TEMPO"
+  },
+  "n0.20": {
+   "id": "A.loop",
+   "hw": "AUTO LOOP"
+  },
+  "n0.80": {
+   "id": "A.reloop",
+   "hw": "SHIFT + AUTO LOOP"
+  },
+  "n0.18": {
+   "id": "A.loophalf",
+   "hw": "LOOP 1/2X"
+  },
+  "n0.97": {
+   "id": "A.loopin",
+   "hw": "SHIFT + LOOP 1/2X (LOOP IN)"
+  },
+  "n0.19": {
+   "id": "A.loopdbl",
+   "hw": "LOOP 2X"
+  },
+  "n0.98": {
+   "id": "A.loopout",
+   "hw": "SHIFT + LOOP 2X (LOOP OUT)"
+  },
+  "n0.84": {
+   "id": "A.cuech",
+   "hw": "CUE casque"
+  },
+  "c0.4": {
+   "id": "A.trim",
+   "hi": true,
+   "hw": "TRIM"
+  },
+  "c0.7": {
+   "id": "A.high",
+   "hi": true,
+   "hw": "EQ HI"
+  },
+  "c0.11": {
+   "id": "A.mid",
+   "hi": true,
+   "hw": "EQ MID"
+  },
+  "c0.15": {
+   "id": "A.low",
+   "hi": true,
+   "hw": "EQ LOW"
+  },
+  "c0.19": {
+   "id": "A.fader",
+   "hi": true,
+   "hw": "fader de voie"
+  },
+  "n7.0": {
+   "id": "A.pad.hot.1",
+   "hw": "pad 1 (mode HOT CUE)"
+  },
+  "n7.1": {
+   "id": "A.pad.hot.2",
+   "hw": "pad 2 (mode HOT CUE)"
+  },
+  "n7.2": {
+   "id": "A.pad.hot.3",
+   "hw": "pad 3 (mode HOT CUE)"
+  },
+  "n7.3": {
+   "id": "A.pad.hot.4",
+   "hw": "pad 4 (mode HOT CUE)"
+  },
+  "n7.4": {
+   "id": "A.pad.hot.5",
+   "hw": "pad 5 (mode HOT CUE)"
+  },
+  "n7.5": {
+   "id": "A.pad.hot.6",
+   "hw": "pad 6 (mode HOT CUE)"
+  },
+  "n7.6": {
+   "id": "A.pad.hot.7",
+   "hw": "pad 7 (mode HOT CUE)"
+  },
+  "n7.7": {
+   "id": "A.pad.hot.8",
+   "hw": "pad 8 (mode HOT CUE)"
+  },
+  "n7.8": {
+   "id": "A.hotdel1",
+   "hw": "SHIFT + pad 1 (mode HOT CUE)",
+   "led": false
+  },
+  "n7.9": {
+   "id": "A.hotdel2",
+   "hw": "SHIFT + pad 2 (mode HOT CUE)",
+   "led": false
+  },
+  "n7.10": {
+   "id": "A.hotdel3",
+   "hw": "SHIFT + pad 3 (mode HOT CUE)",
+   "led": false
+  },
+  "n7.11": {
+   "id": "A.hotdel4",
+   "hw": "SHIFT + pad 4 (mode HOT CUE)",
+   "led": false
+  },
+  "n7.12": {
+   "id": "A.hotdel5",
+   "hw": "SHIFT + pad 5 (mode HOT CUE)",
+   "led": false
+  },
+  "n7.13": {
+   "id": "A.hotdel6",
+   "hw": "SHIFT + pad 6 (mode HOT CUE)",
+   "led": false
+  },
+  "n7.14": {
+   "id": "A.hotdel7",
+   "hw": "SHIFT + pad 7 (mode HOT CUE)",
+   "led": false
+  },
+  "n7.15": {
+   "id": "A.hotdel8",
+   "hw": "SHIFT + pad 8 (mode HOT CUE)",
+   "led": false
+  },
+  "n1.11": {
+   "id": "B.play",
+   "hw": "PLAY/PAUSE"
+  },
+  "n1.71": {
+   "id": "B.rev",
+   "hw": "SHIFT + PLAY/PAUSE",
+   "led": false
+  },
+  "n1.12": {
+   "id": "B.cue",
+   "hw": "CUE"
+  },
+  "n1.88": {
+   "id": "B.sync",
+   "hw": "BEAT SYNC"
+  },
+  "n1.92": {
+   "id": "B.master",
+   "hw": "SHIFT + BEAT SYNC"
+  },
+  "n1.63": {
+   "type": "shift",
+   "hw": "SHIFT"
+  },
+  "n1.54": {
+   "id": "B.jog",
+   "type": "touch",
+   "hw": "JOG (dessus, toucher)"
+  },
+  "c1.34": {
+   "id": "B.jog",
+   "type": "jog",
+   "mode": "64",
+   "hw": "JOG (dessus, mode vinyle)"
+  },
+  "c1.35": {
+   "id": "B.jog",
+   "type": "jog",
+   "mode": "64",
+   "hw": "JOG (dessus, vinyle coupé)"
+  },
+  "c1.33": {
+   "id": "B.jog",
+   "type": "jog",
+   "mode": "64",
+   "hw": "JOG (bord)"
+  },
+  "c1.0": {
+   "id": "B.pitch",
+   "hi": true,
+   "invert": true,
+   "hw": "TEMPO"
+  },
+  "n1.20": {
+   "id": "B.loop",
+   "hw": "AUTO LOOP"
+  },
+  "n1.80": {
+   "id": "B.reloop",
+   "hw": "SHIFT + AUTO LOOP"
+  },
+  "n1.18": {
+   "id": "B.loophalf",
+   "hw": "LOOP 1/2X"
+  },
+  "n1.97": {
+   "id": "B.loopin",
+   "hw": "SHIFT + LOOP 1/2X (LOOP IN)"
+  },
+  "n1.19": {
+   "id": "B.loopdbl",
+   "hw": "LOOP 2X"
+  },
+  "n1.98": {
+   "id": "B.loopout",
+   "hw": "SHIFT + LOOP 2X (LOOP OUT)"
+  },
+  "n1.84": {
+   "id": "B.cuech",
+   "hw": "CUE casque"
+  },
+  "c1.4": {
+   "id": "B.trim",
+   "hi": true,
+   "hw": "TRIM"
+  },
+  "c1.7": {
+   "id": "B.high",
+   "hi": true,
+   "hw": "EQ HI"
+  },
+  "c1.11": {
+   "id": "B.mid",
+   "hi": true,
+   "hw": "EQ MID"
+  },
+  "c1.15": {
+   "id": "B.low",
+   "hi": true,
+   "hw": "EQ LOW"
+  },
+  "c1.19": {
+   "id": "B.fader",
+   "hi": true,
+   "hw": "fader de voie"
+  },
+  "n8.0": {
+   "id": "B.pad.hot.1",
+   "hw": "pad 1 (mode HOT CUE)"
+  },
+  "n8.1": {
+   "id": "B.pad.hot.2",
+   "hw": "pad 2 (mode HOT CUE)"
+  },
+  "n8.2": {
+   "id": "B.pad.hot.3",
+   "hw": "pad 3 (mode HOT CUE)"
+  },
+  "n8.3": {
+   "id": "B.pad.hot.4",
+   "hw": "pad 4 (mode HOT CUE)"
+  },
+  "n8.4": {
+   "id": "B.pad.hot.5",
+   "hw": "pad 5 (mode HOT CUE)"
+  },
+  "n8.5": {
+   "id": "B.pad.hot.6",
+   "hw": "pad 6 (mode HOT CUE)"
+  },
+  "n8.6": {
+   "id": "B.pad.hot.7",
+   "hw": "pad 7 (mode HOT CUE)"
+  },
+  "n8.7": {
+   "id": "B.pad.hot.8",
+   "hw": "pad 8 (mode HOT CUE)"
+  },
+  "n8.8": {
+   "id": "B.hotdel1",
+   "hw": "SHIFT + pad 1 (mode HOT CUE)",
+   "led": false
+  },
+  "n8.9": {
+   "id": "B.hotdel2",
+   "hw": "SHIFT + pad 2 (mode HOT CUE)",
+   "led": false
+  },
+  "n8.10": {
+   "id": "B.hotdel3",
+   "hw": "SHIFT + pad 3 (mode HOT CUE)",
+   "led": false
+  },
+  "n8.11": {
+   "id": "B.hotdel4",
+   "hw": "SHIFT + pad 4 (mode HOT CUE)",
+   "led": false
+  },
+  "n8.12": {
+   "id": "B.hotdel5",
+   "hw": "SHIFT + pad 5 (mode HOT CUE)",
+   "led": false
+  },
+  "n8.13": {
+   "id": "B.hotdel6",
+   "hw": "SHIFT + pad 6 (mode HOT CUE)",
+   "led": false
+  },
+  "n8.14": {
+   "id": "B.hotdel7",
+   "hw": "SHIFT + pad 7 (mode HOT CUE)",
+   "led": false
+  },
+  "n8.15": {
+   "id": "B.hotdel8",
+   "hw": "SHIFT + pad 8 (mode HOT CUE)",
+   "led": false
+  },
+  "c6.23": {
+   "id": "A.filter",
+   "hi": true,
+   "hw": "CFX / FILTER"
+  },
+  "c6.24": {
+   "id": "B.filter",
+   "hi": true,
+   "hw": "CFX / FILTER"
+  },
+  "c6.31": {
+   "id": "xf",
+   "hi": true,
+   "hw": "crossfader"
+  },
+  "c6.8": {
+   "id": "master",
+   "hi": true,
+   "hw": "MASTER LEVEL"
+  },
+  "c6.13": {
+   "id": "cuevol",
+   "hi": true,
+   "hw": "HEADPHONES LEVEL"
+  },
+  "c6.64": {
+   "id": "lib.browse",
+   "type": "rel",
+   "mode": "2c",
+   "hw": "BROWSE (tourner)"
+  },
+  "c6.100": {
+   "id": "lib.browse",
+   "type": "rel",
+   "mode": "2c",
+   "speed": 8,
+   "hw": "SHIFT + BROWSE (défilement rapide)"
+  },
+  "n6.70": {
+   "id": "A.load",
+   "hw": "LOAD"
+  },
+  "n6.71": {
+   "id": "B.load",
+   "hw": "LOAD"
+  }
+ }
+}

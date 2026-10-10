@@ -101,6 +101,8 @@ const measure = page => page.evaluate(() => {
   check(lane1 > lane0, 'Séparateur des waveforms : les waveforms grandissent', `${lane0} → ${lane1} px`);
   const h2 = await libH();
   await page.reload(); await ready(page);
+  // les modules chargés en dernier peuvent encore ajuster la mise en page : on attend qu'elle soit stable
+  for (let i = 0, last = -1; i < 15; i++) { const v = await libH(); if (v === last) break; last = v; await sleep(250); }
   const h3 = await libH(), lane2 = await page.evaluate(() => Math.round(document.querySelector('#lane-A').getBoundingClientRect().height));
   check(Math.abs(h3 - h2) <= 6 && Math.abs(lane2 - lane1) <= 3, 'Tailles retenues après rechargement', `biblio ${h2} → ${h3} px, waveform ${lane1} → ${lane2} px`);
   await page.click('#presets button[data-p=studio]'); await sleep(200);
@@ -249,10 +251,10 @@ const measure = page => page.evaluate(() => {
   for (const [w, h] of SIZES) {
     page = await open(browser, w, h, { preset: 'perf', decks: 2 });
     await page.click('#top details.menu > summary'); await sleep(200);
-    const vis = await hitOk('#dp-open');
-    if (vis) { await page.click('#dp-open'); await sleep(200); }
-    const modal = await page.evaluate(() => { const m = document.querySelector('#dp-modal'); if (!m || m.hidden) return false; const r = m.getBoundingClientRect(); return r.width > 0 && r.height > 0; });
-    check(vis && modal, `Menu Affichage à ${w}×${h} : « Réglages de jeu… » visible et cliquable`, `visible ${Number(vis)}, fenêtre ${Number(modal)}`);
+    const vis = await hitOk('#prefs-menu');
+    if (vis) { await page.click('#prefs-menu'); await sleep(200); }
+    const modal = await page.evaluate(() => { const m = document.querySelector('#prefs'); if (!m || m.hidden) return false; const r = m.querySelector('.mbox').getBoundingClientRect(); return r.width > 0 && r.height > 0 && r.bottom <= innerHeight + .5 && r.right <= innerWidth + .5; });
+    check(vis && modal, `Menu Affichage à ${w}×${h} : « Préférences… » visible et cliquable, la fenêtre tient à l’écran`, `visible ${Number(vis)}, fenêtre ${Number(modal)}`);
     await page.context().close();
   }
 

@@ -25,9 +25,9 @@
 
 | État | Nombre | Part |
 |---|---|---|
-| Fait | 176 | 53 % |
-| Partiel | 53 | 16 % |
-| Manque | 106 | 32 % |
+| Fait | 237 | 71 % |
+| Partiel | 67 | 20 % |
+| Manque | 31 | 9 % |
 
 **Ce qui est solide.**
 - Le cœur du jeu : platines, cues nommés, cues mémoire, boucles gardées, pads (slicer, pitch play, sampler), sync à la mesure ou à la phrase et mixer réglable.
@@ -36,12 +36,12 @@
 - La structure des morceaux, l'auto-mix et les suggestions.
 - Le coach, le parcours débutant et l'Académie, qui n'ont pas d'équivalent sur le marché.
 
-**Les trois grands manques.**
-1. Les stems.
-2. Les mappings validés sur les contrôleurs du marché.
-3. Le moteur natif, pour la latence, le key lock de qualité et le casque en 4 canaux.
+**Les grands manques restants.**
+1. Le moteur natif, pour la latence, le key lock de qualité, les sorties multicanal et les plug-ins VST/AU.
+2. La validation sur du vrai matériel : les six mappings fournis (Pioneer DDJ-FLX4, DDJ-400, DDJ-FLX6, DDJ-SB3, Hercules Inpulse 200 et 300) viennent des documents officiels et ne sont pas encore essayés. Numark, Denon, Reloop et les autres n'ont pas de liste MIDI publiée.
+3. La séparation des stems par un vrai modèle : celle de Mixlab est du traitement du signal, utile mais loin d'un modèle entraîné.
 
-**Les fonctions payantes ailleurs** (stems, vidéo, DVS, lyrics, cloud) sont toutes à faire.
+**Les fonctions payantes ailleurs** (stems, vidéo, paroles, diffusion, planificateur de set) sont maintenant dans Mixlab, avec les limites notées ligne par ligne. Restent le DVS (vinyle de contrôle), le cloud et la synchronisation entre machines.
 
 ## Légende
 
@@ -110,17 +110,17 @@
 | Reverse | tous | **Fait** | P2 | S |
 | Censor (reverse avec slip) | S, RB, VDJ | **Fait** | P2 | S |
 | Slip mode | tous | **Fait** : hot cue maintenu, roll et censor, avec position fantôme affichée | P1 | S |
-| Temps de relâchement du slip (« Slip Release ») | S 4.0 | **Manque** | P3 | S |
+| Temps de relâchement du slip (« Slip Release ») | S 4.0 | **Fait** : retour en fondu de 20 à 500 ms (outils ⋯ de la platine, onglet Boucle) | P3 | S |
 | Chargement par glisser-déposer et par bouton | tous | **Fait** | P1 | S |
 | Garde-fou « platine à l'antenne » au chargement | RB, TR, MX | **Fait** : refus si la platine est audible | P2 | S |
 | Clone de platine (instant doubles) | S, RB, TR, ENG, MX | **Fait** : bouton Doubler (morceau, position, tempo, ton et boucle) | P2 | S |
 | Platine de pré-écoute dans la bibliothèque | RB, TR, VDJ, ENG, MX | **Fait** : lecteur au casque dans la barre de la bibliothèque, waveform cliquable, platines intactes | P1 | M |
 | Lecture du morceau suivant de la file (auto-chargement) | VDJ, DJAY, RB | **Fait** : option des Réglages de jeu (file de l'auto-mix, sinon la liste affichée) | P2 | S |
-| Platines d'entrée ligne ou micro (« Live Input ») | TR, VDJ, MX, RB | **Manque** | P2 | M |
+| Platines d'entrée ligne ou micro (« Live Input ») | TR, VDJ, MX, RB | **Fait** : une entrée de la carte son dans la voie d'une platine (gain, EQ, filtre, effets, fader), choix de l'entrée dans Entrées et sorties (io.js) | P2 | M |
 | Mode entraînement sans matériel (« Practice Mode ») | S | **Fait** : Mixlab marche sans matériel | P2 | S |
 | Platine principale ou maître (Master) | tous | **Fait** : bouton Master | P1 | S |
 | Formats MP3, AAC/M4A, WAV, AIFF, FLAC, OGG | tous | **Fait** : décodage du navigateur ; symphonia dans le moteur Rust | P1 | S |
-| Formats ALAC, Opus, WMA, fichiers vidéo (MP4) | S, RB, VDJ | **Partiel** : Opus est accepté par l'import ; ALAC et vidéo dépendent de la WebView | P3 | M |
+| Formats ALAC, Opus, WMA, fichiers vidéo (MP4) | S, RB, VDJ | **Partiel** : Opus et clips vidéo (MP4, M4V, WebM, MOV) acceptés à l'import, image jouée par `app/video.js` ; ALAC, WMA et les codecs vidéo dépendent de la WebView | P3 | M |
 | Chargement rapide de gros fichiers (décodage en flux, mémoire) | tous | **Partiel** : tout le fichier est décodé en mémoire, 400 Mo au plus | P2 | L |
 
 ## 2. Cues, boucles et pads
@@ -128,7 +128,7 @@
 | Fonction | Où on la trouve | Mixlab | Priorité | Effort |
 |---|---|---|---|---|
 | 8 hot cues par piste | tous *(S Lite : 4 ; RB et MX : jusqu'à 16 ou 36)* | **Fait** | P1 | S |
-| 16 hot cues ou plus (banques A/B) | RB, MX, VDJ | **Manque** | P3 | S |
+| 16 hot cues ou plus (banques A/B) | RB, MX, VDJ | **Fait** : 16 par morceau, bouton de banque 1-8 / 9-16 près des onglets ; les cues 9 à 16 sont gardés dans le stockage local de l'appli (pas encore dans `library.json` ni dans les exports) | P3 | S |
 | Hot cues colorés, couleur choisie par cue | tous | **Fait** : 12 couleurs au choix (clic droit sur le pad) | P1 | S |
 | Hot cues nommés | tous | **Fait** : nom sur le pad et sur la waveform | P1 | S |
 | Hot cues sauvegardés par piste | tous | **Fait** : `library.json` dans l'appli (avec noms, couleurs, cues mémoire et boucles) ; positions seulement dans le navigateur | P1 | S |
@@ -140,29 +140,29 @@
 | Mode « saved loop » sur les pads | S, RB, TR | **Fait** : mode de pads Boucles | P2 | S |
 | Cue automatique sur le premier son | RB, S, ENG, MX | **Partiel** : le cue se pose sur le premier temps de la grille | P1 | S |
 | Hot cues automatiques (sur la structure ou les phrases) | RB *(Creative)*, ENG, DJAY | **Partiel** : cues mémoire posés sur la structure (intro, drop, break, outro) ; ils ne remplissent pas les pads | P2 | M |
-| Transfert des cues entre logiciels (import et export) | RB, S, TR, ENG, DJS | **Partiel** : rekordbox XML en import et en export ; pas Serato ni Traktor | P1 | L |
+| Transfert des cues entre logiciels (import et export) | RB, S, TR, ENG, DJS | **Partiel** : rekordbox XML en import et en export ; Serato (tags GEOB des MP3, WAV, AIFF et atomes des MP4 : hot cues, boucles, couleur, grille) et Traktor NML en import seulement | P1 | L |
 | Boucle auto de 1/32 à 32 temps | tous | **Fait** | P1 | S |
 | Boucle manuelle In / Out | tous | **Fait** | P1 | S |
 | Reloop et sortie de boucle | tous | **Fait** | P1 | S |
 | Boucle ×2 / ÷2 | tous | **Fait** | P1 | S |
-| Réglage fin du début et de la fin de boucle | RB, TR, S, MX | **Manque** | P2 | S |
-| Déplacer une boucle (loop move) | TR, RB, MX | **Partiel** : un beat jump pendant une boucle la déplace | P2 | S |
-| Boucle active (« active loop ») ou boucle à venir | RB, MX | **Manque** | P3 | S |
+| Réglage fin du début et de la fin de boucle | RB, TR, S, MX | **Fait** : début, fin ou toute la boucle par pas de 1 ms, 10 ms, 1/16, 1/4 ou 1 temps ; ½ et ×2 depuis le début ou depuis la fin ; commandes MIDI | P2 | S |
+| Déplacer une boucle (loop move) | TR, RB, MX | **Fait** : beat jump pendant une boucle, ou déplacement fin de toute la boucle (outils ⋯, onglet Boucle) | P2 | S |
+| Boucle active (« active loop ») ou boucle à venir | RB, MX | **Fait** : une boucle gardée marquée active s'enclenche quand la tête de lecture arrive dessus ; dessinée sous la waveform avec le nombre de temps avant la prochaine | P3 | S |
 | Loop roll (pads 1/16 à 8) | tous | **Fait** | P1 | S |
 | Beat jump avec un pas réglable | tous | **Fait** : 1 à 32 temps | P1 | S |
 | Pads de beat jump | S, RB, TR | **Fait** | P2 | S |
 | Saut de phrase ou de mesure (16 et 32 temps et plus) | RB, TR | **Partiel** : 32 temps au plus | P3 | S |
-| Onglets de mode des pads | tous | **Fait** : Hot cue, Roll, Saut, Sampler | P1 | S |
+| Onglets de mode des pads | tous | **Fait** : Hot cue, Roll, Saut, Slicer, Boucles, Pitch, Sampler, Loop (boucle auto), Pad FX | P1 | S |
 | Pads Slicer | S, RB, VDJ, TR (Freeze) | **Fait** : 8 tranches d'un temps, reprise façon slip | P2 | M |
 | Pads Keyboard / Pitch Play (hot cue rejoué à d'autres hauteurs) | S *(Pitch Play, payant : Pitch 'n Time DJ)*, RB | **Fait** : mode Pitch, −5 à +5 demi-tons depuis le dernier hot cue | P2 | M |
 | Pads Key Shift | RB, VDJ, ENG | **Partiel** : le mode Pitch transpose en rejouant le hot cue ; pas de pads qui transposent sans sauter | P2 | S |
 | Pads de beat loop | RB, ENG | **Manque** | P3 | S |
-| Pads d'effets (Pad FX, Roll FX) | RB *(Pad FX)*, S *(Stems Pad FX)* | **Manque** | P2 | M |
-| Pads de stems | S, RB, VDJ, DJAY, ENG | **Manque** | P2 | M |
+| Pads d'effets (Pad FX, Roll FX) | RB *(Pad FX)*, S *(Stems Pad FX)* | **Fait** : mode Pad FX, 8 pads (écho, reverb, trans, filtre LFO, bitcrusher, répétition…) actifs tant qu'on maintient, effet et durée au choix par pad ; ils empruntent une unité FX et lui rendent ses réglages | P2 | M |
+| Pads de stems | S, RB, VDJ, DJAY, ENG | **Fait** : mode de pads Stems (`app/stems.js`), pads 1 à 4 coupent ou rendent voix, batterie, basse, mélodie, pads 5 à 8 font un écho out ; clic droit : panneau des stems | P2 | M |
 | Freeze ou Flux mode | TR | **Partiel** : Slip (le Flux) et Slicer (proche du Freeze) | P3 | S |
-| Hot cue maintenu puis verrouillé en lecture (« play latch ») | MX 2.6, CDJ | **Manque** | P3 | S |
-| Gate cue / hot cue en mode « maintien » | VDJ, MX | **Partiel** : le hot cue maintenu avec slip revient au relâchement | P3 | S |
-| Séquences de cues enregistrées (Serato Flip) | S *(Flip, extension autrefois payante, intégrée à Pro)* | **Manque** | P3 | M |
+| Hot cue maintenu puis verrouillé en lecture (« play latch ») | MX 2.6, CDJ | **Fait** : à l'arrêt, le hot cue joue tant qu'il est maintenu ; Play pendant l'appui verrouille la lecture (réglable : déplacer seulement, maintien, lecture) | P3 | S |
+| Gate cue / hot cue en mode « maintien » | VDJ, MX | **Fait** : à l'arrêt, maintien et retour au cue au relâchement ; en lecture avec slip, retour là où le morceau en serait | P3 | S |
+| Séquences de cues enregistrées (Serato Flip) | S *(Flip, extension autrefois payante, intégrée à Pro)* | **Fait** : enregistrement des appuis sur les hot cues avec leur rythme (en temps, donc elles suivent le tempo), gardées par morceau, rejouées une fois ou en boucle, sauts calés à l'échantillon ; pas d'export vers d'autres logiciels | P3 | M |
 
 ## 3. Tempo, grille et sync
 
@@ -173,18 +173,18 @@
 | Grille de temps et premier temps | tous | **Fait** | P1 | S |
 | Tap tempo | tous | **Fait** | P2 | S |
 | BPM ÷2 / ×2 | tous | **Fait** | P1 | S |
-| Décaler la grille | tous | **Fait** : pas de 10 ms | P1 | S |
+| Décaler la grille | tous | **Fait** : pas de 10 ms, ou de 1 à 20 ms dans l'éditeur Grille… | P1 | S |
 | « 1 ici » (premier temps de mesure ou de phrase) | tous | **Fait** | P1 | S |
-| Édition fine de la grille (étirer, grille sur deux points, réglage au ms) | RB, TR, S | **Manque** | P2 | M |
+| Édition fine de la grille (étirer, grille sur deux points, réglage au ms) | RB, TR, S | **Fait** : éditeur Grille… par platine : BPM exact, étirer de 0,01 ou 0,1, décalage au ms, points A et B, temps fort ici (`app/grid.js`) | P2 | M |
 | Verrou de grille ou de BPM (« lock ») | RB, TR, MX | **Fait** : bouton Verrou par platine, gardé avec le morceau | P2 | S |
-| Grille dynamique (tempo variable) | RB, TR 4 *(Flexible Beatgrid)*, DJAY, MX, DJS, VDJ 2026 | **Manque** | P2 | L |
+| Grille dynamique (tempo variable) | RB, TR 4 *(Flexible Beatgrid)*, DJAY, MX, DJS, VDJ 2026 | **Fait** : carte de tempo à plusieurs repères, posée par « Analyser le tempo » (suivi des attaques) ou à la main ; sync, quantize et numéros de temps la suivent ; lue depuis Traktor et Serato. Export rekordbox : BPM moyen seulement | P2 | L |
 | Métronome sur la grille | RB, TR | **Fait** : bouton Métro, clics au casque calés sur la grille, temps fort marqué | P3 | S |
 | Sync tempo | tous | **Fait** | P1 | S |
 | Sync de phase (calage sur le temps) | tous | **Fait** : le départ attend le temps suivant de la platine suivie | P1 | S |
 | Sync de mesure ou de phrase (Bar / Phrase sync) | RB, TR, ENG | **Fait** : réglage « Sync calée sur » le temps, la mesure ou la phrase de 8 mesures | P2 | M |
 | Smart Sync / Sync à états (tempo seul, ou tempo et phase) | S *(Pro)*, MX | **Partiel** : un seul mode | P3 | S |
 | Platine maître automatique | tous | **Fait** : la première platine lancée devient maître | P1 | S |
-| Tempo maître interne (horloge sans platine) | TR, RB, MX | **Manque** | P3 | S |
+| Tempo maître interne (horloge sans platine) | TR, RB, MX | **Fait** : bouton Horloge, les platines en Sync suivent son tempo et sa phase ; tap et reprise du maître | P3 | S |
 | Quantize (cues, boucles, sauts) | tous | **Fait** : bouton Q global | P1 | S |
 | Plage de pitch élargie automatiquement par Sync | MX, TR | **Fait** : avec un avertissement | P3 | S |
 | Sync double ou moitié de tempo (ex. 87 sur 174) | TR, MX, RB | **Fait** : `matchTempo` teste ×2 et ÷2 | P2 | S |
@@ -214,10 +214,10 @@
 | Fonction | Où on la trouve | Mixlab | Priorité | Effort |
 |---|---|---|---|---|
 | Gain / trim par voie | tous | **Fait** : ±12 dB | P1 | S |
-| Gain automatique | tous | **Partiel** : RMS ; le passage en LUFS ou ReplayGain est prévu | P1 | S |
+| Gain automatique | tous | **Fait** : RMS, ou LUFS façon ReplayGain (cible réglable, -14 LUFS par défaut) | P1 | S |
 | EQ 3 bandes | tous | **Fait** : shelf et peak, de kill à +6 dB | P1 | S |
 | Kill par bande | tous | **Fait** | P1 | S |
-| EQ 4 bandes | TR, RB (DJM), VDJ | **Manque** | P3 | S |
+| EQ 4 bandes | TR, RB (DJM), VDJ | **Fait** : mode « EQ 4 bandes » (100 Hz, 400 Hz, 2,5 kHz, 8 kHz), potard H-mid avec kill dans chaque voie | P3 | S |
 | Modèles d'EQ (isolateur, DJM, Xone, etc.) | TR, RB, MX, VDJ | **Partiel** : isolateur ou classique (plancher à −26 dB) ; pas de modèles DJM ou Xone | P2 | M |
 | Filtre bipolaire passe-bas / passe-haut | tous | **Fait** | P1 | S |
 | Résonance du filtre réglable | TR, VDJ, MX | **Fait** : réglage de 0,5 à 8 (Réglages de jeu) | P3 | S |
@@ -231,21 +231,21 @@
 | VU pré-fader | RB, TR, S | **Partiel** : le coach mesure le pré-fader, mais il n'est pas affiché | P3 | S |
 | Limiteur master | tous | **Fait** | P1 | S |
 | Indicateur de compression du limiteur | TR, RB | **Fait** : jauge et voyant LIM sur le master | P3 | S |
-| Maximiseur ou mastering de sortie | TR 4 *(Ozone Maximizer)* | **Manque** | P3 | M |
+| Maximiseur ou mastering de sortie | TR 4 *(Ozone Maximizer)* | **Fait** : 3 bandes compressées, limiteur et écrêteur doux au plafond (-0,1 à -6 dB), plafond vérifié à la mesure ; pas de lookahead ni de suréchantillonnage | P3 | M |
 | Volume master | tous | **Fait** | P1 | S |
 | Balance master | TR, MX, VDJ | **Fait** : Réglages de jeu, mappable ; l'enregistrement reste centré | P3 | S |
-| Sortie booth (volume à part) | RB, TR, VDJ, MX | **Manque** | P2 | M |
+| Sortie booth (volume à part) | RB, TR, VDJ, MX | **Fait** : copie du mix avant le volume master, son volume et son limiteur, vers une autre carte son ou les canaux 3-4 d'une carte multicanal | P2 | M |
 | Cue casque par voie | tous | **Fait** | P1 | S |
 | Mix cue/master et volume casque | tous | **Fait** | P1 | S |
 | Split cue (casque en mono sur un canal, master sur l'autre) | tous | **Fait** | P1 | S |
 | Casque sur une deuxième carte son | tous | **Fait** : `setSinkId` | P1 | S |
 | Casque sur une carte 4 canaux (sorties 3-4) | tous | **Partiel** : existe dans le moteur Rust, qui n'est pas branché | P1 | L |
 | ASIO, CoreAudio, faible latence (3 à 10 ms) | tous | **Partiel** : Web Audio en mode interactif ; le moteur `cpal` est prêt mais pas branché | P1 | L |
-| Réglage de la taille du buffer et de la fréquence | tous | **Manque** : la latence est seulement affichée | P2 | M |
+| Réglage de la taille du buffer et de la fréquence | tous | **Partiel** : buffer (latencyHint, de 3 à 40 ms) et fréquence choisis au démarrage, ce que le navigateur donne vraiment est affiché, mesure aller-retour par clics ; le navigateur arrondit le buffer, l'ASIO reste au moteur natif | P2 | M |
 | Mixer interne ou mixer externe (mode table) | tous | **Partiel** : le mixer peut être masqué, mais il n'y a pas de sorties par platine | P1 | L |
-| Sorties séparées par platine (mixer externe) | tous | **Manque** | P2 | L |
-| Entrée micro avec talkover / ducking | VDJ, RB, S, MX | **Manque** | P2 | M |
-| Pré-écoute du sampler au casque | S, RB, MX | **Manque** | P3 | S |
+| Sorties séparées par platine (mixer externe) | tous | **Partiel** : chaque platine (après le gain, avant l'EQ) vers une autre carte son (setSinkId) ou une paire de canaux d'une carte multicanal ; par une autre carte, 20 à 60 ms de plus et pas de correction de dérive d'horloge : pour une table, préférer une carte multicanal ou le moteur natif | P2 | L |
+| Entrée micro avec talkover / ducking | VDJ, RB, S, MX | **Fait** : voie micro (passe-haut, volume) vers master et booth, talkover à la voix ou permanent, baisse réglable de 3 à 30 dB | P2 | M |
+| Pré-écoute du sampler au casque | S, RB, MX | **Fait** : bouton Casque d'un son (casque seul), et option « sampler aussi au casque » | P3 | S |
 
 ## 6. Effets
 
@@ -264,21 +264,21 @@
 | Spiral, ping-pong, tape delay | S, RB, TR | **Partiel** : Spirale et Ping-pong ; pas de tape delay | P2 | S |
 | Noise / white noise riser | S, RB, TR | **Fait** : Bruit montant, calé sur la durée choisie | P2 | S |
 | Beatmasher, Gater, Turntable FX, Reverse FX | TR | **Partiel** : Trans / Gater, Répétition, Frein et Backspin ; pas de Reverse en effet (seulement le bouton Censor) | P3 | M |
-| Pitch / Helix / Shimmer / Mobius | RB, S *(packs payants autrefois)* | **Manque** | P3 | M |
-| Reverb Rise / Drop sur 32 temps | ENG 5, RB | **Manque** | P3 | S |
+| Pitch / Helix / Shimmer / Mobius | RB, S *(packs payants autrefois)* | **Fait** : Pitch (-12 à +12 demi-tons), Hélice, Shimmer, Möbius dans les unités FX (fx-plus.js) ; pitch shifter granulaire, moins propre qu'un vocodeur de phase | P3 | M |
+| Reverb Rise / Drop sur 32 temps | ENG 5, RB | **Fait** : Reverb montante et Reverb qui retombe sur 8, 16 ou 32 temps de la platine | P3 | S |
 | Unités d'effets assignables (2 à 4) par voie ou au master | tous | **Fait** : FX1 et FX2, chacune sur les platines A à D et le master | P1 | M |
 | Chaînage de 3 effets par unité | S, TR, MX, VDJ | **Fait** : mode Chaîne | P2 | M |
 | Effet sur le master | tous | **Fait** : cible M des unités FX1 et FX2 | P2 | S |
 | Effets par voie à un bouton (Sound Color / Mixer FX / Quick effect) | RB, TR, MX, VDJ, DJAY (Fusion) | **Fait** : Filtre, Écho, Bruit ou Espace sur le potard FILTRE | P1 | M |
-| Effets de crossfader ou de fader (Crossfader FX) | DJAY *(Crossfader Fusion)*, VDJ | **Manque** | P3 | M |
+| Effets de crossfader ou de fader (Crossfader FX) | DJAY *(Crossfader Fusion)*, VDJ | **Fait** : filtre, écho ou reverb qui monte sur la platine que le crossfader éloigne (réglages du mixer) | P3 | M |
 | Paramètres avancés d'effet (feedback, X-pad, temps en ms) | tous | **Partiel** : deux réglages par effet (retour, tonalité, largeur…) et durée en temps ; pas de temps en ms ni de X-pad | P2 | S |
 | Effet déclenché quantisé (Beat FX on sur le temps) | RB, S | **Fait** : avec Quantize, l'unité démarre sur le temps suivant | P2 | S |
 | Post-fader / pré-fader au choix (queue d'écho après la coupe) | RB, TR, MX | **Partiel** : l'effet est avant le fader, mais une queue existe pour l'écho | P2 | S |
-| Effets par stem | S *(Stems FX)*, RB, VDJ, MX 2.6 | **Manque** | P2 | M |
+| Effets par stem | S *(Stems FX)*, RB, VDJ, MX 2.6 | **Fait** : chaque stem peut passer seul dans FX1 ou FX2 (cible « A:voc » des unités, au tempo de sa platine) et a son écho out calé sur le temps | P2 | M |
 | Réglages des effets gardés d'une session à l'autre | tous | **Fait** : type, durée, dosage, réglages, mode et cibles rendus au démarrage (l'unité reste coupée) | P2 | S |
-| Banques ou favoris d'effets | VDJ 2026, TR | **Manque** | P3 | S |
-| Effets en plugin (VST/AU) | VDJ, MX (LV2), DJS | **Manque** | P3 | L |
-| Effets « RMX » (Build-up, Break-down, Scene) | RB *(Creative, RMX EFFECTS)* | **Manque** | P3 | M |
+| Banques ou favoris d'effets | VDJ 2026, TR | **Fait** : bouton Fav de chaque unité, chaîne gardée sous un nom (mode, durée, effets, réglages), 4 premiers rappelables en MIDI | P3 | S |
+| Effets en plugin (VST/AU) | VDJ, MX (LV2), DJS | **Manque** : impossible dans le moteur web (pas de chargement de code natif) ; à faire dans le moteur natif `engine/` une fois branché | P3 | L |
+| Effets « RMX » (Build-up, Break-down, Scene) | RB *(Creative, RMX EFFECTS)* | **Fait** : macros Montée, Descente (8, 16 ou 32 temps) et Scène (le Dosage pilote filtre, écho et reverb) | P3 | M |
 
 ## 7. Sampler, séquenceur et remix
 
@@ -286,31 +286,31 @@
 |---|---|---|---|---|
 | Sampler à 8 slots | tous *(S Lite : 4 ; Pro : 32)* | **Fait** : 8 pads, sons intégrés ou les tiens | P1 | S |
 | Charger ses propres sons dans le sampler | tous | **Fait** : gardés d'une session à l'autre | P1 | S |
-| Banques de sampler (4×8 et plus) | S, RB, VDJ, MX | **Manque** | P2 | S |
+| Banques de sampler (4×8 et plus) | S, RB, VDJ, MX | **Fait** : 4 banques de 8 (sons, kit de batterie, percussions et notes, 8 slots libres pour tes sons et tes captures) | P2 | S |
 | Modes de lecture (one-shot, gate, loop, toggle) | S, RB, VDJ, MX | **Fait** : un coup, boucle calée, maintien | P2 | S |
-| Sampler synchronisé au tempo (boucles calées) | RB, S, TR, MX | **Fait** : mode Boucle calée sur la platine maître, départ sur le temps | P2 | M |
+| Sampler synchronisé au tempo (boucles calées) | RB, S, TR, MX | **Fait** : mode Boucle calée sur la platine maître, départ sur le temps et à la bonne phase de la mesure, la vitesse suit les changements de tempo (sans key lock) | P2 | M |
 | Volume du sampler | tous | **Fait** | P1 | S |
-| Sampler routé dans une voie (EQ, crossfader) | RB, TR, MX | **Manque** | P3 | S |
-| Capture d'une boucle de la platine vers le sampler | RB, TR (Remix decks), VDJ | **Manque** | P3 | M |
-| Séquenceur de sampler (16 pas) | RB *(séquenceur ; sauvegarde payante Core)*, DJAY | **Manque** | P3 | M |
-| Pattern Player (boîte à rythmes, kits) | TR 4 | **Manque** | P3 | L |
-| Remix decks, Loop recorder | TR, VDJ | **Manque** | P3 | L |
-| Looper par piste (djay Looper) | DJAY | **Manque** | P3 | M |
-| Packs de sons fournis | S *(Sound Packs)*, RB, VDJ | **Partiel** : 8 sons maison | P3 | S |
+| Sampler routé dans une voie (EQ, crossfader) | RB, TR, MX | **Fait** : sortie Master ou voie A à D (gain, EQ, filtre, FX, fader, crossfader) | P3 | S |
+| Capture d'une boucle de la platine vers le sampler | RB, TR (Remix decks), VDJ | **Fait** : la boucle en cours copiée à l'échantillon près dans un slot, en boucle calée, gardée d'une session à l'autre | P3 | M |
+| Séquenceur de sampler (16 pas) | RB *(séquenceur ; sauvegarde payante Core)*, DJAY | **Fait** : 8 sons d'une banque × 16 pas, calé sur la grille de la platine maître (tempo interne sinon), grille gardée ; pas de vélocité ni de swing | P3 | M |
+| Pattern Player (boîte à rythmes, kits) | TR 4 | **Partiel** : kit synthétisé et 9 styles (house, techno, tech house, hip-hop, trap, drum and bass, breakbeat, reggaeton, afro house) joués par le séquenceur ; un seul kit, pas de variations ni de remplissages automatiques | P3 | L |
+| Remix decks, Loop recorder | TR, VDJ | **Partiel** : le looper sert d'enregistreur de boucles (master ou platine, overdub, vers le sampler) ; pas de remix decks | P3 | L |
+| Looper par piste (djay Looper) | DJAY | **Fait** : un looper par platine et un sur le master, 1 à 8 mesures calées sur la mesure, overdub, volume, copie vers le sampler ; la boucle est perdue à la fermeture sauf si tu la copies dans le sampler | P3 | M |
+| Packs de sons fournis | S *(Sound Packs)*, RB, VDJ | **Partiel** : 24 sons maison synthétisés (effets, kit de batterie, percussions et notes) | P3 | S |
 
 ## 8. Stems
 
 | Fonction | Où on la trouve | Mixlab | Priorité | Effort |
 |---|---|---|---|---|
-| Séparation en temps réel ou à l'analyse (voix, batterie, basse, mélodie) | S, RB *(stems dans les plans)*, TR 4, VDJ, DJAY (Neural Mix), ENG 5 | **Manque** : le ROADMAP prévoit HT-Demucs en ONNX | P1 | L |
-| Mute ou volume par stem | idem | **Manque** | P1 | M |
-| Acapella / instrumental en un bouton | S, RB, VDJ, DJAY | **Manque** | P1 | S |
-| Effets par stem (Stems FX, echo out sur la voix) | S, RB, VDJ, MX | **Manque** | P2 | M |
-| Pré-calcul et cache des stems | S, ENG 5, VDJ | **Manque** | P2 | M |
-| Lecture de fichiers .stem.mp4 (NI STEMS) | TR, MX 2.6 | **Manque** | P3 | M |
-| Transitions de stems (« Neural Mix », swap voix/batterie) | DJAY, VDJ | **Manque** | P3 | M |
+| Séparation en temps réel ou à l'analyse (voix, batterie, basse, mélodie) | S, RB *(stems dans les plans)*, TR 4, VDJ, DJAY (Neural Mix), ENG 5 | **Partiel** : séparation « rapide » par DSP dans un Web Worker (`app/stems-worker.js` : STFT, séparation harmonique/percussive par médianes, queue de grosse caisse gardée à la batterie, basse = harmonique sous 200 Hz, voix = harmonique au centre de l'image qui bouge, mélodie = le reste exact), environ 10 à 20 s de calcul pour un morceau de 5 minutes, progression affichée. Sur le morceau de test : voix 12 dB, batterie 8 dB, basse 7 dB, mélodie 5 dB de SDR. Loin d'un modèle : un lead au centre part avec la voix, les sifflantes avec la batterie. Le moteur HT-Demucs (ONNX, côté Rust) se branchera par `Stems.registerBackend('haute', {available, separate})` sans toucher au reste | P1 | L |
+| Mute ou volume par stem | idem | **Fait** : rangée Stems de la platine (dans Pro), pads Stems et panneau (volume 0 à 150 %) ; les 4 stems forment un seul tampon à 8 canaux joué par la source de la platine : même transport, vitesse, boucles, key lock et scratch. En lecture arrière (Rev, Censor, backspin), c'est le mix entier qui joue | P1 | M |
+| Acapella / instrumental en un bouton | S, RB, VDJ, DJAY | **Fait** : boutons A cap. et Instru (mappables), un second appui rend tout | P1 | S |
+| Effets par stem (Stems FX, echo out sur la voix) | S, RB, VDJ, MX | **Fait** : écho out par stem (l'écho prend le stem, il se coupe sur le temps suivant, la queue continue) et envoi d'un stem seul dans FX1 ou FX2 | P2 | M |
+| Pré-calcul et cache des stems | S, ENG 5, VDJ | **Fait** : cache IndexedDB sous l'empreinte du fichier (celle de `persist.js`), 3 stems en 16 bits (la mélodie est recalculée), 8 morceaux gardés ; réglage « Stems au chargement » : à la demande, si déjà calculés, ou toujours | P2 | M |
+| Lecture de fichiers .stem.mp4 (NI STEMS) | TR, MX 2.6 | **Partiel** : démultiplexage MP4 en JS (pistes, esds, dOps, dfLa, alac, liste d'édition, noms des stems du bloc « stem »), chaque piste décodée par WebCodecs (AAC, Opus, FLAC, ALAC selon le moteur web). Sans décodeur (WebKitGTK sous Linux, Chromium sans AAC) : piste master seule, message clair, stems calculés à la place | P3 | M |
+| Transitions de stems (« Neural Mix », swap voix/batterie) | DJAY, VDJ | **Fait** : swap de stems entre deux platines sur 4 à 32 temps, calé sur le temps suivant (voix, batterie, voix et batterie, basse, mélodie) | P3 | M |
 | Stems à 5 voies ou plus (piano, guitare…) | DJAY, VDJ | **Manque** | P3 | L |
-| Qualité de séparation en option (rapide ou haute qualité) | VDJ, S | **Manque** | P3 | M |
+| Qualité de séparation en option (rapide ou haute qualité) | VDJ, S | **Partiel** : le choix existe (panneau Stems et Préférences) ; seule « rapide » est disponible, « haute qualité » (HT-Demucs) attend le moteur Rust | P3 | M |
 
 ## 9. Bibliothèque et préparation
 
@@ -334,20 +334,20 @@
 | Compteur de lectures et date de dernière lecture | tous | **Fait** : colonnes Joué et Dernière lecture | P2 | S |
 | Playlists / crates | tous | **Fait** : création, ajout et glisser-déposer | P1 | S |
 | Renommer, supprimer et réordonner les playlists et leurs morceaux | tous | **Fait** : clic droit sur une playlist, glisser dans la liste | P1 | S |
-| Dossiers de playlists, sous-crates | tous | **Manque** | P2 | S |
+| Dossiers de playlists, sous-crates | tous | **Fait** : groupes imbriqués et sous-crates par glisser-déposer ; une crate montre aussi les morceaux de ses sous-crates (réglable) | P2 | S |
 | Smart crates / playlists intelligentes à règles | S *(Pro)*, RB, TR, VDJ, ENG, MX | **Fait** : règles ET / OU, mises à jour en direct | P1 | M |
-| Couleur, favoris et tri des crates | S 4.0 | **Manque** | P3 | S |
+| Couleur, favoris et tri des crates | S 4.0 | **Fait** : couleur, section Favoris, tri manuel, par nom ou par nombre de morceaux | P3 | S |
 | Historique des sets | tous | **Fait** : sets gardés d'une session à l'autre (bibliothèque de l'appli, IndexedDB dans le navigateur), listés par date dans la barre latérale | P1 | S |
 | Export de la tracklist (texte, CSV) | tous | **Fait** : texte, CSV et M3U8 pour chaque set | P2 | S |
 | File d'attente / Prepare / Sidelist | S, VDJ, RB, TR | **Fait** : file de l'auto-mix (glisser, remplir depuis une playlist) et playlist Préparation | P1 | S |
 | Afficher dans quelles playlists se trouve une piste | S 4.0, RB | **Fait** : coches dans le menu clic droit du morceau | P3 | S |
 | Doublons | RB, VDJ, MX | **Fait** : vue Doublons | P2 | S |
 | Fichiers manquants et relocalisation | tous | **Fait** : fenêtre Fichiers manquants, relocalisation | P1 | M |
-| Dossiers surveillés (import automatique) | RB, ENG, MX, DJAY | **Manque** | P2 | M |
-| Navigateur de fichiers (onglet Files) | S, TR, MX | **Manque** | P2 | S |
+| Dossiers surveillés (import automatique) | RB, ENG, MX, DJAY | **Fait** : appli : relecture des dossiers choisis côté Rust (`src-tauri/src/watch.rs`), toutes les 30 s par défaut ; navigateur : File System Access (Chrome, Edge), pas de surveillance ailleurs | P2 | M |
+| Navigateur de fichiers (onglet Files) | S, TR, MX | **Fait** : vue Fichiers, dossiers choisis, chargement direct sur une platine | P2 | S |
 | Import de la collection rekordbox (XML) avec cues et grilles | S, TR, VDJ, ENG, MX, DJS | **Fait** : cues, grille, note, couleur et playlists | P1 | M |
-| Import Serato (crates, cues dans les tags) | RB, VDJ, ENG, MX | **Manque** | P1 | M |
-| Import Traktor (NML) | RB, VDJ, ENG, MX | **Manque** | P2 | M |
+| Import Serato (crates, cues dans les tags) | RB, VDJ, ENG, MX | **Fait** : crates et sous-crates du dossier _Serato_, database V2 ; cues, boucles, couleur et grille lus dans les tags au chargement du fichier. Les crates intelligentes Serato ne sont pas lues | P1 | M |
+| Import Traktor (NML) | RB, VDJ, ENG, MX | **Fait** : cues, boucles, grille (une ou plusieurs ancres), note, couleur, tonalité et playlists dans leurs dossiers. Pas d'export NML | P2 | M |
 | Import iTunes / Musique (XML) | tous | **Fait** | P2 | S |
 | Import et export M3U / M3U8 / PLS | tous | **Partiel** : M3U et M3U8 ; pas de PLS | P1 | S |
 | Export rekordbox XML | DJS, MX, ENG | **Fait** | P2 | M |
@@ -357,7 +357,7 @@
 | Mode hors ligne du streaming | S, RB, TR, ENG | **Manque** | P3 | L |
 | Import de playlists de streaming en métadonnées et correspondance avec la collection | aucun | **Fait** : liste ou CSV Spotify, Deezer… retrouvé dans la collection, liens d'achat pour le reste | P3 | M |
 | Fiche détaillée d'une piste (onglet Info) | tous | **Partiel** : panneau Infos pour éditer ; pas d'onglet d'informations complet | P2 | S |
-| Mini-waveform dans la liste | MX 2.6, ENG, RB | **Manque** | P3 | S |
+| Mini-waveform dans la liste | MX 2.6, ENG, RB | **Fait** : colonne Forme, vignette tirée de la waveform déjà calculée | P3 | S |
 | Écran de préparation (une grande platine) | RB *(Export)*, S *(Prepare)*, ENG | **Manque** : voir le preset Export (§17) | P2 | M |
 
 ## 10. Analyse automatique
@@ -367,13 +367,13 @@
 | BPM, grille, tonalité, volume | tous | **Fait** | P1 | S |
 | Waveform 3 bandes | tous | **Fait** | P1 | S |
 | Analyse de phrases et structure (intro, couplet, refrain, montée, drop, outro) | RB *(Phrase)*, DJAY (Automix AI), VDJ, ENG, DJS | **Fait** : intro, couplet, break, montée, drop, outro par phrases de 8 mesures, en tâche de fond | P1 | L |
-| Détection des passages vocaux | RB *(Creative : Vocal position)*, VDJ, S | **Manque** | P2 | M |
+| Détection des passages vocaux | RB *(Creative : Vocal position)*, VDJ, S | **Partiel** : estimation sans modèle (voix périodique dont la hauteur bouge), montrée sur la vue d'ensemble et la waveform ; une lead de synthé très modulée peut passer pour une voix | P2 | M |
 | Énergie de la piste (1 à 10) | Mixed In Key, DJS, VDJ, ENG | **Fait** : estimée à l'analyse, modifiable | P2 | M |
 | Détection du genre et de l'ambiance (IA) | DJAY, VDJ, RB (Track Suggestion) | **Manque** | P3 | L |
 | Intro et outro pour l'auto-mix | MX, VDJ, DJAY | **Fait** | P2 | M |
 | Silence en début et en fin | tous | **Partiel** : premier son pour la grille, fin de la musique repérée pour l'auto-mix | P2 | S |
-| Loudness LUFS / ReplayGain | MX, VDJ, ENG | **Manque** : RMS | P2 | S |
-| Nouvelle analyse forcée et analyse partielle (seulement ce qui manque) | tous | **Manque** | P2 | S |
+| Loudness LUFS / ReplayGain | MX, VDJ, ENG | **Fait** : LUFS intégrée (BS.1770, portes absolue et relative), colonne LUFS, gain auto en LUFS au choix | P2 | S |
+| Nouvelle analyse forcée et analyse partielle (seulement ce qui manque) | tous | **Fait** : clic droit sur un morceau, ou « Compléter l’analyse » pour la vue affichée ; une grille verrouillée est gardée | P2 | S |
 | Paroles générées par IA | VDJ 2026, RB *(Creative : Lyric via service)* | **Manque** | P3 | L |
 
 ## 11. Auto-mix et suggestions
@@ -384,11 +384,11 @@
 | Auto-mix « intelligent » (phrases, EQ, effets) | DJAY *(Automix AI)*, VDJ, RB | **Fait** : départ sur les phrases, échange des basses, filtre, écho ou coupe selon les morceaux | P2 | L |
 | Réglage de la durée et du type de transition auto | VDJ, MX, DJAY | **Fait** : style et durée en mesures | P2 | S |
 | Suggestion du morceau suivant (Related / Track Suggestion / GeniusDJ) | RB, VDJ, DJAY, S, DJS | **Fait** : note sur 100 (tonalité, tempo, énergie, déjà joué) avec les raisons | P2 | M |
-| Mix Point Link (préparer la transition entre deux pistes) | RB *(Free bloqué si contrôleur)* | **Manque** | P3 | M |
-| Playlists générées par IA (requête en langage naturel) | VDJ 2026, DJAY | **Manque** | P3 | L |
-| Planificateur de set en timeline (ordre, chevauchements, automation) | DJS | **Manque** : prévu (ROADMAP) | P3 | L |
-| Rendu hors ligne d'un set planifié (MP3, WAV, vidéo) | DJS | **Manque** | P3 | L |
-| Export du set planifié vers d'autres logiciels | DJS (vers RB, S, Ableton) | **Manque** | P3 | M |
+| Mix Point Link (préparer la transition entre deux pistes) | RB *(Free bloqué si contrôleur)* | **Fait** : chaque transition du planificateur devient un point de mix (sortie, entrée, durée, style). L'auto-mix part à ce point et cale la piste entrante, une platine chargée à la main se cale sur l'entrée prévue, le coach annonce le départ. L'auto-mix rejoue le style, pas les courbes dessinées | P3 | M |
+| Playlists générées par IA (requête en langage naturel) | VDJ 2026, DJAY | **Partiel** : phrase en français analysée en local, sans service en ligne (genre, tempo, durée, nombre, énergie et sa forme, trames, tonalité, « compatible », « après tel morceau », exclusions), playlist tirée de la bibliothèque avec la note de Suggest. Pas de compréhension libre : les mots non compris sont affichés | P3 | L |
+| Planificateur de set en timeline (ordre, chevauchements, automation) | DJS | **Fait** : vue en grand, frise glissable (ordre, point de transition, point d'entrée, durée), courbes volume, EQ, filtre et écho par transition avec préréglages, compatibilité tonalité et tempo entre voisins, courbe d'énergie et trame de l'Académie, écoute au casque ou au master, lecture du set | P3 | L |
+| Rendu hors ligne d'un set planifié (MP3, WAV, vidéo) | DJS | **Partiel** : WAV 16 ou 24 bits, tempos calés (naturel ou verrouillé), courbes appliquées, limiteur, par tranches avec progression ; enregistré sur le disque (appli) ou téléchargé. Pas de MP3 ni de vidéo, pas de key lock dans le rendu (la hauteur suit le tempo) | P3 | L |
+| Export du set planifié vers d'autres logiciels | DJS (vers RB, S, Ableton) | **Partiel** : M3U8, rekordbox XML (playlist du set) et tracklist horodatée ; pas de projet Ableton ni de courbes exportées | P3 | M |
 
 ## 12. Enregistrement et diffusion
 
@@ -396,24 +396,24 @@
 |---|---|---|---|---|
 | Enregistrement du mix | tous *(RB Free : non ; S : pas avec le streaming)* | **Fait** : WAV 16 ou 24 bits sur le disque (appli) ou téléchargé (navigateur), ou WebM/Opus léger | P1 | S |
 | Enregistrement WAV, FLAC, MP3 et AIFF sur le disque | tous | **Partiel** : WAV 16 et 24 bits ; pas de FLAC, MP3 ni AIFF | P1 | M |
-| Tracklist horodatée liée à l'enregistrement (cue sheet) | RB, VDJ, TR, MX | **Manque** | P2 | S |
-| Enregistrement de l'entrée micro ou de la table | TR, VDJ, MX | **Manque** | P3 | M |
-| Diffusion Icecast / Shoutcast | TR, VDJ, MX | **Manque** | P2 | M |
+| Tracklist horodatée liée à l'enregistrement (cue sheet) | RB, VDJ, TR, MX | **Fait** : .cue et tracklist texte créées à chaque enregistrement, datées quand un morceau passe devant (fader × crossfader) | P2 | S |
+| Enregistrement de l'entrée micro ou de la table | TR, VDJ, MX | **Fait** : le micro ou une platine d'entrée enregistrés à part (WebM), rangés dans Enregistrements | P3 | M |
+| Diffusion Icecast / Shoutcast | TR, VDJ, MX | **Partiel** : dans l'appli (`src-tauri/src/net.rs`), Icecast par PUT ou SOURCE et Shoutcast v1, master encodé en Opus (WebM ou Ogg), titre envoyé au serveur, reconnexion automatique. MP3 seulement si la WebView sait l'encoder, ce qui limite Shoutcast. Pas dans le navigateur (expliqué à l'écran) | P2 | M |
 | Diffusion Twitch, YouTube, Mixcloud Live | VDJ, RB, DJS (Mixcloud) | **Manque** | P3 | L |
 | Partage du mix (Mixcloud, SoundCloud) | RB *(Core)*, S | **Manque** | P3 | M |
-| Envoi des titres joués vers un fichier ou OBS (« now playing ») | MX, VDJ, S (plugins) | **Manque** | P3 | S |
+| Envoi des titres joués vers un fichier ou OBS (« now playing ») | MX, VDJ, S (plugins) | **Fait** : morceau à l'antenne (le plus fort après un délai réglable), format libre, fichier texte et JSON (appli), page pour la source Navigateur d'OBS servie sur 127.0.0.1:7777 avec titre et paroles. Dans le navigateur : titre affiché seulement | P3 | S |
 
 ## 13. Vidéo, karaoké et paroles
 
 | Fonction | Où on la trouve | Mixlab | Priorité | Effort |
 |---|---|---|---|---|
-| Lecture de clips vidéo sur les platines | S *(payant : Serato Video)*, RB *(Creative)*, VDJ, DJAY | **Manque** | P3 | L |
-| Transitions vidéo et effets vidéo | S, RB, VDJ | **Manque** | P3 | L |
-| Sortie vidéo sur un second écran | S, RB, VDJ, DJAY | **Manque** | P3 | M |
-| Visuels générés (visualiseur audio-réactif) | VDJ, RB, DJAY, S *(Serato Visualizer)* | **Manque** | P3 | M |
-| Texte, logo et messages à l'écran | S, RB, VDJ | **Manque** | P3 | M |
-| Karaoké (CDG, file de chanteurs, second écran) | VDJ, S (extensions) | **Manque** | P3 | L |
-| Paroles synchronisées (Lyric) | RB *(Creative)*, VDJ 2026 (IA) | **Manque** | P3 | L |
+| Lecture de clips vidéo sur les platines | S *(payant : Serato Video)*, RB *(Creative)*, VDJ, DJAY | **Fait** : le son du clip passe par la platine, l'image suit sa position (pitch, sauts, boucles, scratch, pause) avec moins de 0,15 s d'écart, vignette sur la platine. Codecs selon la WebView | P3 | L |
+| Transitions vidéo et effets vidéo | S, RB, VDJ | **Partiel** : fondu, volet et coupe qui suivent faders et crossfader ; pas d'effets vidéo (flou, couleurs, rythme) | P3 | L |
+| Sortie vidéo sur un second écran | S, RB, VDJ, DJAY | **Fait** : fenêtre à part (appli et navigateur) en 1280×720, plein écran au double-clic, aperçu dans la fenêtre Live | P3 | M |
+| Visuels générés (visualiseur audio-réactif) | VDJ, RB, DJAY, S *(Serato Visualizer)* | **Fait** : barres ou cercle au spectre du master, halo sur les basses, pochette et titre, quand la platine n'a pas de vidéo | P3 | M |
+| Texte, logo et messages à l'écran | S, RB, VDJ | **Fait** : message fixe ou défilant, logo dans un coin (gardé entre deux sessions s'il est léger) | P3 | M |
+| Karaoké (CDG, file de chanteurs, second écran) | VDJ, S (extensions) | **Partiel** : file de chanteurs avec transposition par chanteur, paroles en grand qui se remplissent (mot par mot avec un LRC enrichi), chanteur au micro et suivant à l'écran. Disques CD+G non lus | P3 | L |
+| Paroles synchronisées (Lyric) | RB *(Creative)*, VDJ 2026 (IA) | **Fait** : fichier .lrc à côté du morceau (appli) ou importé avec, tags SYLT et USLT (MP3), LYRICS (FLAC, Ogg), ©lyr (MP4) ; sur la platine, la sortie vidéo et la page OBS ; décalage réglable. Pas de génération par IA | P3 | L |
 
 ## 14. Matériel
 
@@ -422,8 +422,8 @@
 | MIDI Learn | tous *(S : MIDI mapping à partir de Pro ; RB Free : non)* | **Fait** | P1 | S |
 | Retour des LED | tous | **Fait** : play, sync, cue, pads, boucle, FX et coach clignotant | P1 | S |
 | MIDI natif sur macOS et Linux (sans Web MIDI) | tous | **Fait** : `midir` et `tauri-bridge.js` | P1 | S |
-| Mappings fournis pour les contrôleurs du marché (100+ chez les autres) | S, RB, TR, VDJ, DJAY, MX | **Partiel** : un mapping générique fourni et une bibliothèque de mappings à partager ; aucun mapping validé par modèle | P1 | L |
-| Détection automatique du contrôleur et chargement du mapping | tous | **Fait** : mapping proposé au branchement | P1 | M |
+| Mappings fournis pour les contrôleurs du marché (100+ chez les autres) | S, RB, TR, VDJ, DJAY, MX | **Partiel** : 6 mappings relevés dans la documentation MIDI officielle (Pioneer DDJ-FLX4, DDJ-400, DDJ-FLX6, DDJ-SB3 ; Hercules Inpulse 200 et 300), source et version dans chaque fichier, **non vérifiés sur le matériel** (affiché dans l'appli), écran « Tester ma table » pour les contrôler. Pas de mapping pour Numark (Mixtrack Pro FX, Platinum FX, Party Mix) ni Denon MC7000 : aucune liste MIDI publiée ; Reloop Ready et Buddy : aucune liste trouvée ; Inpulse 500 : la mise en page du document ne permet pas d'en relever les commandes de platine ; Starlight et Traktor S2 MK3 (mode MIDI) : aucune liste publiée | P1 | L |
+| Détection automatique du contrôleur et chargement du mapping | tous | **Fait** : reconnu au nom du port MIDI, mapping livré chargé tout seul avec un toast (OK, Tester ma table, Annuler) ; un mapping personnel n'est jamais remplacé sans demander ; réglage pour couper | P1 | M |
 | Format de mapping partageable (import et export) | TR (TSI), MX (XML+JS), VDJ (XML) | **Fait** : JSON Mixlab | P2 | S |
 | Mapping avancé : Shift, modificateurs, banques et pages | tous | **Fait** : calque Shift et bascule de platine A/C et B/D | P1 | M |
 | Encodeurs relatifs (sens, accélération) et jog en 14 bits | tous | **Fait** : 3 codages relatifs, paires 14 bits | P1 | M |
@@ -431,7 +431,7 @@
 | Jog : toucher du plateau (scratch) et anneau de lecture | tous | **Fait** : toucher = scratch, sinon pitch bend | P1 | M |
 | Pitch fader 14 bits (MSB et LSB) | tous | **Fait** | P2 | S |
 | Afficheurs des contrôleurs (écrans dans les jogs, texte) | S, RB, TR, MX 2.6, VDJ | **Manque** | P3 | L |
-| Couleur RGB des pads selon la couleur du cue | tous | **Manque** : LED allumée ou éteinte | P2 | M |
+| Couleur RGB des pads selon la couleur du cue | tous | **Partiel** : option de voyant `rgb` (octet 0RRGGGBB d'après la table de couleurs Hercules, ou palette à index), la couleur suit celle du hot cue ; aucun mapping livré ne l'utilise encore, les documents lus ne donnent que allumé/éteint pour les pads | P2 | M |
 | Scripts de mapping (VDJScript, JS) | VDJ, MX | **Manque** | P2 | L |
 | HID (jogs haute résolution, Traktor Kontrol, DDJ) | S, RB, TR, VDJ, MX | **Manque** | P2 | L |
 | Carte son intégrée au contrôleur (4 canaux, casque en 3-4) | tous | **Partiel** : moteur Rust, pas branché | P1 | L |
@@ -440,10 +440,10 @@
 | Export sur clé USB pour CDJ et XDJ (base de données matériel) | RB *(gratuit en mode Export)*, DJS, ENG (pour ses machines) | **Manque** | P2 | L |
 | Export pour les machines Engine DJ | ENG, MX 2.6 | **Manque** | P3 | L |
 | Link avec des CDJ / Pro DJ Link (jouer la bibliothèque depuis le PC) | RB *(Link Export)* | **Manque** | P3 | L |
-| Ableton Link | TR, RB, S, VDJ, DJAY, ENG, MX | **Manque** | P2 | M |
+| Ableton Link | TR, RB, S, VDJ, DJAY, ENG, MX | **Partiel** : écoute de la session Link dans l'appli (multicast, tempo des pairs suivi par la platine maître). Suite : rejoindre la session comme pair (mesure du temps, phase, Start/Stop) pour la mener | P2 | M |
 | MIDI clock en sortie | TR, VDJ, RB, MX | **Fait** : horloge, Start et Stop vers une sortie MIDI | P2 | M |
-| MIDI clock en entrée | TR, VDJ | **Manque** | P3 | M |
-| OSC (contrôle par réseau) | VDJ, MX (expérimental), TR (non) | **Manque** | P3 | M |
+| MIDI clock en entrée | TR, VDJ | **Fait** : tempo lu sur 4 temps (stable malgré la gigue USB) et suivi par la platine maître, Start et Stop pour la lancer (option). Dans l'appli, l'horloge passe désormais par le MIDI natif | P3 | M |
+| OSC (contrôle par réseau) | VDJ, MX (expérimental), TR (non) | **Partiel** : réception OSC par UDP dans l'appli, `/mixlab/<commande>` pilote tout le registre des commandes (boutons, potards, faders) ; pas de retour d'état vers la tablette | P3 | M |
 | Lumières : DMX, SoundSwitch, Lighting mode | RB *(Lighting)*, S, VDJ, ENG (SoundSwitch) | **Manque** | P3 | L |
 | Lumières Philips Hue | RB, S, VDJ, ENG | **Manque** | P3 | M |
 | Mixer externe en Thru, avec effets du mixer | RB, S (DJM, Rane) | **Manque** | P3 | L |
@@ -462,7 +462,7 @@
 | Schémas de couleur : 3 bandes, RGB, mono, daltonien | tous | **Fait** | P2 | S |
 | Zoom des waveforms | tous | **Fait** | P1 | S |
 | Vue d'ensemble avec partie jouée, cues et boucle | tous | **Fait** | P1 | S |
-| Repères de minutes sur la vue d'ensemble | MX 2.6 | **Manque** | P3 | S |
+| Repères de minutes sur la vue d'ensemble | MX 2.6 | **Fait** | P3 | S |
 | Marqueurs de mesure et de phrase sur la waveform | tous | **Fait** : trait par mesure, bande de phrase de 32 temps | P1 | S |
 | Bande de structure colorée (intro, drop…) | RB, ENG | **Fait** : sur les waveforms et la vue d'ensemble | P2 | M |
 | Vue « beatgrid » comparée (deux pistes alignées) | VDJ, RB | **Manque** | P3 | M |
@@ -473,13 +473,13 @@
 | Afficher ou masquer les panneaux | tous | **Fait** : effets, waveforms, mixer, bibliothèque | P1 | S |
 | Tailles de platine (mini, compacte, complète) | TR, MX | **Manque** | P2 | M |
 | Mise en page personnalisée et sauvegardée | VDJ (skins), MX, TR | **Manque** : 5 presets fixes | P3 | L |
-| Barre globale (horloge, CPU, REC, MIDI) | tous | **Partiel** : horloge, REC, MIDI, audio et BPM maître ; pas de CPU | P2 | S |
-| Indicateur de charge CPU ou audio | tous | **Manque** | P2 | S |
+| Barre globale (horloge, CPU, REC, MIDI) | tous | **Fait** : horloge, REC, MIDI, audio, BPM maître et charge | P2 | S |
+| Indicateur de charge CPU ou audio | tous | **Partiel** : charge du fil principal (dessin, calculs, retards) et décrochages audio quand le navigateur les compte ; pas la charge du moteur audio lui-même | P2 | S |
 | Préférences regroupées (fenêtre de réglages) | tous | **Partiel** : fenêtre Réglages de jeu (platines, mixer, casque, enregistrement) ; audio, contrôleur et affichage restent à part | P1 | M |
 | Info-bulles sur les commandes | S, TR, MX | **Fait** : `title` sur toutes les commandes | P2 | S |
 | Langues de l'interface | tous | **Partiel** : français seulement | P2 | M |
 | Accessibilité (clavier, lecteur d'écran, contraste) | MX, DJAY | **Partiel** : ARIA sur les boutons et curseurs | P2 | M |
-| Annuler la dernière action (cue, grille, chargement) | S, TR | **Manque** | P3 | M |
+| Annuler la dernière action (cue, grille, chargement) | S, TR | **Fait** : Ctrl+Z, 60 actions : point de cue, hot cues, grille, chargement (refusé si la platine est à l'antenne) | P3 | M |
 
 ## 16. Apprentissage
 
@@ -494,11 +494,11 @@
 | Progression sauvegardée et badges | DJAY (DJ School, en vidéo) | **Fait** | P2 | M |
 | Glossaire intégré | aucun | **Fait** : mots cliquables dans le parcours et l'Académie | P2 | S |
 | Mode « à l'oreille » (waveforms et BPM masqués) | aucun | **Partiel** : dans les exercices du parcours ; pas de bouton pour tout le jeu | P2 | S |
-| Relecture d'une transition sur une mini-timeline (courbes des faders et des EQ) | DJS (hors ligne) | **Manque** | P2 | M |
+| Relecture d'une transition sur une mini-timeline (courbes des faders et des EQ) | DJS (hors ligne) | **Fait** : faders (avec le crossfader), graves et filtre enregistrés pendant chaque transition jouée, mini frise dans le bilan du coach et dans la préparation, gestes réutilisables comme courbes d'une transition du set | P2 | M |
 | Bac à sable / essai au casque | VDJ (Sandbox) | **Manque** | P2 | M |
 | Morceaux d'entraînement libres de droits | aucun | **Partiel** : 4 démos synthétisées | P2 | M |
 | Tutoriels vidéo et visite guidée | DJAY, TR (Play) | **Manque** | P3 | M |
-| Leçons qui s'adaptent au contrôleur branché | aucun | **Manque** | P3 | M |
+| Leçons qui s'adaptent au contrôleur branché | aucun | **Fait** : le parcours et les leçons affichent « Sur ta table : PLAY/PAUSE, platine gauche » d'après le mapping actif | P3 | M |
 
 ---
 

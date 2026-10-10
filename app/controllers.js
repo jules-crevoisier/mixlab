@@ -146,12 +146,12 @@ C.renderMaps=()=>{
   const ul=$('#map-list');ul.innerHTML='';
   const mapped=new Set(Object.values(midi.map).map(v=>{const e=norm(v);return e&&res(e.id);}).filter(Boolean));
   controls.forEach((c,id)=>c.el.classList.toggle('mapped',mapped.has(id)));
-  const nm=$('#map-active');if(nm)nm.textContent=C.meta.name?'Actif : '+C.meta.name+(C.meta.device?' · '+C.meta.device:''):'Actif : mapping personnel';
+  const nm=$('#map-active');if(nm)nm.textContent=C.meta.name?'Actif : '+C.meta.name+(C.meta.device&&C.meta.device[0]!=='/'?' · '+C.meta.device:'')+(C.meta.unverified?' · non vérifié sur le matériel':''):'Actif : mapping personnel';
   const ents=Object.entries(midi.map);if(!ents.length)ul.append(h('li',{style:'color:var(--mu)'},'Aucun mapping pour l’instant.'));
   for(const[k,v]of ents){
     const box=h('div',{class:'mopts',hidden:C.openKey!==k},C.openKey===k?optsRow(k):null);
     const li=h('li',{'data-key':k},h('span',{},labelOf(v)+' ← '+midiKeyText(k)+(norm(v).hi?' (+'+(keyParts(k).n+32)+')':'')),h('em',{},typeName(v)),
-      h('button',{title:'Options : type, inversion, 14 bits, Shift',class:'opt',onclick:()=>{if(box.hidden){box.innerHTML='';box.append(optsRow(k));}box.hidden=!box.hidden;C.openKey=box.hidden?null:k;}},'⚙'),
+      h('button',{title:'Options : type, inversion, 14 bits, Shift',class:'opt',onclick:()=>{if(box.hidden){box.innerHTML='';box.append(optsRow(k));}box.hidden=!box.hidden;C.openKey=box.hidden?null:k;},'aria-label':'Options'},icon('gear')),
       h('button',{title:'Supprimer',onclick:()=>{delete midi.map[k];save();C.renderMaps();}},'×'),box);
     ul.append(li);
   }
@@ -173,6 +173,7 @@ C.ledTick=()=>{
     else if(ent.type==='touch'||ent.type==='jog')st=led?C.st.touch[res(ent.id)[0]]:null;
     else st=ledState(res(C.st.shift&&ent.shift?ent.shift:ent.id));
     if(st==null)return;led=led||{};if(led.blink&&st)st=ph;
+    if(led.rgb&&C.ledColor){const v=C.ledColor(res(ent.id),led,st);if(v!=null)return send(led.out||key,v);}
     send(led.out||key,st?(led.on!=null?led.on:127):(led.off!=null?led.off:0));
   };
   for(const[key,v]of Object.entries(midi.map)){const e=norm(v);if(e)one(key,e,e.led);}
@@ -182,7 +183,7 @@ C.ledTick=()=>{
 /* ---------- bibliothèque ---------- */
 function allMaps(){return[...C.lib.map(m=>({...m,user:true})),...BUNDLED()];}
 C.load=(m,quiet)=>{
-  midi.map=clone(m.map||{});C.meta={name:m.name||'',device:m.device||'',leds:clone(m.leds||[])};
+  midi.map=clone(m.map||{});C.meta={name:m.name||'',device:m.device||'',leds:clone(m.leds||[]),...(m.unverified?{unverified:true}:{})};
   C.st.pick={};C.st.held={};C.st.shift=false;midi.last={};save();C.renderMaps();if(!quiet)toast('Mapping chargé : '+(m.name||'sans nom'),'ok');
 };
 C.addToLib=m=>{const x={format:'mixlab-mapping',version:2,name:m.name||'Mon mapping',device:m.device||'',map:clone(m.map||{}),...(m.leds?{leds:m.leds}:{})};C.lib=C.lib.filter(y=>y.name!==x.name);C.lib.push(x);store.set('mappings',C.lib);renderLib();return x;};
@@ -202,7 +203,7 @@ function renderLib(){
   const ul=$('#lib-maps');if(!ul)return;ul.innerHTML='';
   for(const m of allMaps()){
     const act=C.meta.name===m.name;
-    ul.append(h('li',{class:act?'on':''},h('div',{class:'ln'},h('b',{},m.name),h('span',{},m.template?'Modèle à adapter':m.device?'Pour : '+m.device:'Tout contrôleur'),h('span',{},Object.keys(m.map||{}).length+' commandes'+(m.user?'':' · livré avec Mixlab'))),
+    ul.append(h('li',{class:act?'on':''},h('div',{class:'ln'},h('b',{},m.name),h('span',{},m.template?'Modèle à adapter':m.unverified?'Non vérifié sur le matériel':m.device?'Pour : '+m.device:'Tout contrôleur'),h('span',{},Object.keys(m.map||{}).length+' commandes'+(m.user?'':' · livré avec Mixlab'))),
       h('div',{class:'r fixed'},h('button',{class:'b',type:'button',onclick:()=>C.load(m)},act?'Recharger':'Charger'),h('button',{class:'b',type:'button',title:'Enregistrer en fichier',onclick:()=>download(m)},'Exporter'),
         m.user?h('button',{class:'b',type:'button',title:'Supprimer de la bibliothèque',onclick:()=>{C.lib=C.lib.filter(x=>x.name!==m.name);store.set('mappings',C.lib);renderLib();}},'×'):null)));
   }
@@ -219,7 +220,12 @@ C.onDevices=()=>{
   midi.access.inputs.forEach(inp=>{
     const name=(inp.manufacturer?inp.manufacturer+' ':'')+inp.name;if(!inp.name||C.offered.has(name))return;C.offered.add(name);
     const m=allMaps().find(x=>x.device&&(nameMatch(x.device,inp.name)||nameMatch(x.device,name)));
-    if(m){if(C.meta.name===m.name)return;offer('Contrôleur reconnu : '+inp.name+'. Charger le mapping « '+m.name+' » ?',[['Charger',()=>C.load(m)],['Plus tard']]);return;}
+    if(m){if(C.meta.name===m.name)return;
+      // mapping livré : chargé tout de suite si rien de personnel n'est actif (l'ancien reste à un clic)
+      const mine=Object.keys(midi.map).length&&!BUNDLED().some(x=>x.name===C.meta.name);
+      if(!m.user&&!mine&&store.get('mapAuto',true)){const prev={name:C.meta.name,device:C.meta.device,leds:C.meta.leds,map:clone(midi.map)};C.load(m,true);
+        offer('Contrôleur reconnu : '+inp.name+'. Mapping « '+m.name+' » chargé'+(m.unverified?' (non vérifié sur le matériel)':'')+'.',[['OK'],['Tester ma table',()=>C.testOpen&&C.testOpen()],['Annuler',()=>C.load(prev,true)]]);return;}
+      offer('Contrôleur reconnu : '+inp.name+'. Charger le mapping « '+m.name+' » ?',[['Charger',()=>C.load(m)],['Plus tard']]);return;}
     if(!Object.keys(midi.map).length)offer('Nouveau contrôleur : '+inp.name+'. Aucun mapping ne le connaît encore.',[['Lancer l’assistant',()=>C.wizStart(inp.name)],['Modèle générique',()=>{const g=BUNDLED().find(x=>x.template);g&&C.load(g);}],['Plus tard']]);
   });
 };
@@ -232,7 +238,7 @@ const DECK_STEPS=[['play','Play','btn','Appuie puis relâche le bouton Play.'],[
   ['low','EQ graves','abs','Tourne le potard des graves d’un bout à l’autre.'],['filter','Filtre','abs','Tourne le filtre d’un bout à l’autre.'],['fader','Fader de voie','abs','Monte et descends le fader de voie.'],...[1,2,3,4,5,6,7,8].map(PAD)];
 const STEPS=[...DECK_STEPS.map(s=>({id:'L.'+s[0],label:s[1]+' A',deck:'A',kind:s[2],hint:s[3]})),
   {id:'xf',label:'Crossfader',kind:'abs',hint:'Fais glisser le crossfader d’un bout à l’autre.'},
-  {id:'shift',label:'Shift',kind:'shift',hint:'Appuie sur Shift. Plus tard, tu pourras donner une 2e fonction à chaque bouton (⚙ dans la liste).'},
+  {id:'shift',label:'Shift',kind:'shift',hint:'Appuie sur Shift. Plus tard, tu pourras donner une 2e fonction à chaque bouton (bouton Options de la liste).'},
   ...DECK_STEPS.map(s=>({id:'R.'+s[0],label:s[1]+' B',deck:'B',kind:s[2],hint:s[3]}))];
 C.STEPS=STEPS;
 function relMode(vs){
@@ -407,7 +413,7 @@ C.build=()=>{
   fi.addEventListener('change',()=>{const f=fi.files[0];if(!f)return;f.text().then(t=>C.importText(t,true));fi.value='';});
   grid.append(
     h('div',{class:'mlib'},h('h3',{},'Bibliothèque de mappings'),
-      h('p',{},'Les mappings livrés sont des modèles à adapter : Mixlab ne livre pas de mapping de marque tant qu’il n’a pas été vérifié sur la vraie table. Le plus sûr : l’assistant, qui apprend ta table en deux minutes.'),
+      h('p',{},'Les mappings de marque livrés sont relevés dans la documentation MIDI du fabricant, mais non vérifiés sur le matériel : si une commande ne répond pas, corrige-la avec MIDI Learn. Pour une autre table, l’assistant l’apprend en deux minutes.'),
       h('div',{class:'r fixed'},h('button',{class:'b go',type:'button',id:'wiz-btn',onclick:()=>C.wizStart()},'Assistant de mapping'),h('button',{class:'b',type:'button',onclick:()=>fi.click()},'Importer un fichier'),h('button',{class:'b',type:'button',onclick:()=>download(current())},'Exporter l’actif'),fi),
       h('ul',{class:'libl',id:'lib-maps'})),
     h('div',{},h('h3',{},'Horloge MIDI'),h('p',{},'Envoie le tempo de la platine maître (24 impulsions par temps) à une boîte à rythmes, un séquenceur ou des lumières. Start et Stop suivent la lecture.'),

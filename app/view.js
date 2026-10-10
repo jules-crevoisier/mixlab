@@ -89,7 +89,7 @@ window.View=(()=>{
     ok=ok||(sp.lib!=null&&best&&bestR>=Lp-1?{...best,L:Math.min(L0,bestR)}:fb);
     if(!ok){
       // waveforms plus basses : on garde la variante la plus riche (pads de la platine mini, effets dépliés) qui laisse sa part à la bibliothèque
-      const lns=[Math.round(lane0*.82),Math.round(lane0*.68),LANEMIN].filter(x=>x<lane0&&x>=LANEMIN);
+      const lns=[...(V.stage?[Math.round(lane0*.9)]:[]),Math.round(lane0*.82),Math.round(lane0*.68),LANEMIN].filter(x=>x<lane0&&x>=LANEMIN);
       const rich=lastVars.filter(v=>v!==last&&v.mx===last.mx&&v.j===last.j&&v.fx===last.fx);
       // en mode scène, la hauteur des waveforms passe avant les pads de la platine mini
       for(const ln of V.stage?lns.slice(0,1):lns){for(const v of rich){const r=room({...v,ln});nl++;if(r>=Lp-1){ok={...v,ln,L:Lp};break;}}if(ok)break;}
@@ -207,7 +207,6 @@ window.View=(()=>{
     V.el.size=h('select',{class:'sel wide','aria-label':'Taille des platines'},Object.entries(SNAME).map(([k,n])=>h('option',{value:k},n)));
     V.el.size.addEventListener('change',()=>setSize(V.el.size.value));
     V.el.stageCk=h('input',{type:'checkbox',onchange:e=>setStage(e.target.checked)});V.el.stageCk.checked=V.stage;
-    const wh=dir=>{const s=start();sp().lane=clamp(s.lane+dir*6,LANEMIN,220);store.set('splits',V.splits);fit();};
     pop.append(
       h('div',{class:'lbl'},'Zoom de l’interface'),
       h('div',{class:'r fixed'},mini('−','Réduire (Ctrl −)',()=>setZoom(V.zoom-.1)),V.el.zv,mini('+','Agrandir (Ctrl +)',()=>setZoom(V.zoom+.1))),
@@ -217,17 +216,18 @@ window.View=(()=>{
       h('label',{title:'Contraste renforcé, gros chiffres, textes plus grands : pour une cabine sombre (F9)'},V.el.stageCk,'Mode scène (F9)'),
       h('div',{class:'r fixed vm-acts'},mini('Bibliothèque plein écran','Touche F2, Échap pour revenir',()=>{pop.closest('details').open=false;toggleLib(!V.libFull);}),
         mini('Plein écran','Toute la place pour l’appli',()=>{pop.closest('details').open=false;toggleFs();})),
-      mini('Disposition par défaut','Remet les séparateurs et la taille des platines de ce preset',()=>{delete V.splits[key()];delete V.sizes[key()];store.set('splits',V.splits);store.set('deckSizes',V.sizes);fit();toast('Disposition « '+PR().name+' » remise par défaut');}));
+      mini('Disposition par défaut','Remet les séparateurs et la taille des platines de ce preset',resetLayout),
+      h('button',{class:'b vm-prefs',id:'prefs-menu',type:'button',title:'Tous les réglages : profil, audio, platines, mixer, clavier, coach (Ctrl+,)',onclick:()=>{closeMenus();window.Prefs&&Prefs.open('affichage');}},'Préférences…'));
     const top=$('#top'),rec=$('#rec-btn');
     V.el.libBtn=h('button',{class:'tb',id:'lib-btn',type:'button','data-ctl':'ui.libfull','aria-pressed':'false',title:'Bibliothèque plein écran (F2). Échap pour revenir aux platines.',onclick:()=>toggleLib(!V.libFull)},'Biblio');
     // Mode scène : une icône toujours visible (même à 1366 px), et la touche F9
     const ico=svgEl('svg',{viewBox:'0 0 16 16','aria-hidden':'true'});ico.append(svgEl('circle',{cx:8,cy:8,r:6.2,fill:'none',stroke:'currentColor','stroke-width':1.6}),svgEl('path',{d:'M8 1.8 A6.2 6.2 0 0 1 8 14.2 Z',fill:'currentColor'}));
     V.el.stageBtn=h('button',{class:'tb ico',id:'stage-btn',type:'button','data-ctl':'ui.stage','aria-pressed':String(V.stage),'aria-label':'Mode scène',title:'Mode scène (F9) : contraste renforcé, waveforms plus hautes, gros BPM et temps restant',onclick:()=>setStage(!V.stage)},ico);
-    V.el.fsBtn=h('button',{class:'tb ico',id:'fs-btn',type:'button',title:'Plein écran','aria-label':'Plein écran',onclick:toggleFs},'⛶');
+    V.el.fsBtn=h('button',{class:'tb ico',id:'fs-btn',type:'button',title:'Plein écran','aria-label':'Plein écran',onclick:toggleFs},icon('fs'));
     $$('#ndecks button').forEach(b=>{b.title=b.textContent;b.setAttribute('aria-label',b.textContent);b.innerHTML=b.dataset.n+'<span class="w"> platines</span>';});
     // menu « ⋯ » : reçoit les boutons qui ne tiennent plus dans la barre (au lieu de les couper)
     V.el.morePop=h('div',{class:'pop vmore',role:'menu'});
-    V.el.more=h('details',{class:'tbmore',id:'top-more',hidden:true},h('summary',{class:'tb ico',title:'Autres commandes','aria-label':'Autres commandes'},'⋯'),V.el.morePop);
+    V.el.more=h('details',{class:'tbmore',id:'top-more',hidden:true},h('summary',{class:'tb ico',title:'Autres commandes','aria-label':'Autres commandes'},icon('more')),V.el.morePop);
     V.el.morePop.addEventListener('click',e=>{if(e.target.closest('button,label.tb'))V.el.more.open=false;});
     top.insertBefore(V.el.libBtn,$('#audio-btn')||rec);top.append(V.el.stageBtn,V.el.fsBtn,V.el.more);
     regBtn('ui.libfull','Bibliothèque plein écran',V.el.libBtn,()=>toggleLib(!V.libFull));
@@ -249,8 +249,10 @@ window.View=(()=>{
     pop.style.maxHeight=Math.max(140,H-s.bottom/z-10)+'px';pop.style.overflowY='auto';
     pop.style.left=Math.max(6,Math.min(s.left/z,W-pop.offsetWidth-6))+'px';
   }
+  function wh(dir){const s=start();sp().lane=clamp(s.lane+dir*6,LANEMIN,220);store.set('splits',V.splits);fit();}
+  function resetLayout(){delete V.splits[key()];delete V.sizes[key()];store.set('splits',V.splits);store.set('deckSizes',V.sizes);fit();toast('Disposition « '+PR().name+' » remise par défaut');}
   function closeMenus(){$$('#top details[open]').forEach(x=>{x.open=false;});}
-  const COLLAPSE=['#ag-btn','#q-btn','#audio-btn','#midi-btn','#fs-btn','#pc-btn','#am-btn','#lib-btn','#rec-btn','#ndecks'];
+  const COLLAPSE=['#load-ind','#clk-btn','#live-btn','#ag-btn','#q-btn','#audio-btn','#midi-btn','#fs-btn','#pc-btn','#am-btn','#set-btn','#lib-btn','#prefs-btn','#rec-btn','#ndecks'];
   const overTop=t=>t.scrollWidth>t.clientWidth+1;
   // La barre du haut ne déborde jamais : les boutons les moins urgents passent dans « ⋯ », dans cet ordre.
   function fitTop(){
@@ -263,7 +265,7 @@ window.View=(()=>{
         if(!el._ph){el._ph=document.createComment(sel);el.before(el._ph);}pop.append(el);if(!overTop(top))break;}
       [...pop.children].sort((a,b)=>a._ph.compareDocumentPosition(b._ph)&Node.DOCUMENT_POSITION_FOLLOWING?-1:1).forEach(e=>pop.append(e));
     }
-    if(!pop.children.length)more.open=false;
+    if(!pop.children.length){more.open=false;more.hidden=true;}
     if(V.topMo)V.topMo.takeRecords();
     $$('#top details[open]').forEach(placePop);
   }
@@ -288,7 +290,7 @@ window.View=(()=>{
     if(!tr){P.append(h('p',{class:'pp-empty'},'Charge un morceau sur la platine '+d.id+' pour régler sa grille et ses cues.'));return;}
     P.append(sec('Grille',h('div',{class:'pp-bpm'},h('b',{},tr.bpm.toFixed(2)),h('span',{},'BPM')),
       h('div',{class:'r fixed pp-g'},B('Tap','Tape le tempo (4 fois ou plus)',()=>d.tap()),B('½','Diviser le BPM par deux',()=>d.setBpm(tr.bpm/2)),B('×2','Doubler le BPM',()=>d.setBpm(tr.bpm*2))),
-      h('div',{class:'r fixed pp-g'},B('◁ 10 ms','Décaler la grille plus tôt',()=>d.gridNudge(-10)),B('10 ms ▷','Décaler la grille plus tard',()=>d.gridNudge(10)),B('Poser le 1','La position actuelle devient le premier temps d’une phrase',()=>d.gridHere()))));
+      h('div',{class:'r fixed pp-g'},B([icon('nudge-l'),'10 ms'],'Décaler la grille plus tôt',()=>d.gridNudge(-10)),B(['10 ms',icon('nudge-r')],'Décaler la grille plus tard',()=>d.gridNudge(10)),B('Poser le 1','La position actuelle devient le premier temps d’une phrase',()=>d.gridHere()))));
     const hot=h('ol',{class:'pp-list'});
     tr.hot.forEach((t,i)=>hot.append(h('li',{class:t==null?'empty':'',style:'--hc:'+HOT[i]},h('i',{},String(i+1)),
       h('button',{type:'button',class:'pp-go',title:t==null?'Poser le hot cue '+(i+1)+' ici':'Aller au hot cue '+(i+1),onclick:()=>{if(t==null)d.hotDown(i);else d.seek(t);renderPrep(true);}},t==null?'Poser ici':fmtTime(t)),
@@ -386,7 +388,7 @@ window.View=(()=>{
     new ResizeObserver(refit).observe(A);
     // barre du haut : boutons ajoutés après coup (auto-mix, parcours), largeur de la fenêtre, textes qui s'allongent
     const top=$('#top'),retop=()=>{if(V.tq)return;V.tq=requestAnimationFrame(()=>{V.tq=0;fitTop();});};
-    new ResizeObserver(retop).observe(top);V.topMo=new MutationObserver(retop);V.topMo.observe(top,{childList:true});
+    new ResizeObserver(retop).observe(top);V.topMo=new MutationObserver(retop);V.topMo.observe(top,{childList:true,subtree:true,attributes:true,attributeFilter:['class','hidden']});
     setInterval(()=>{if(overTop(top))fitTop();},1000);
     addEventListener('resize',closeMenus);
     document.addEventListener('pointerdown',e=>{if(!e.target.closest('#top details'))closeMenus();},true);
@@ -394,5 +396,5 @@ window.View=(()=>{
     const mo=new MutationObserver(refit);decks.forEach(d=>mo.observe(panel(d),{childList:true}));
     document.fonts&&document.fonts.ready.then(()=>{fit();fitTop();});
   }
-  return{build,layout:layoutHook,fit,toggleFxFold,fitTop,closeMenus,tick,setZoom,setStage,setSize,toggleLib,toggleFs,cycle,state:V,get zoom(){return V.zoom;},get libFull(){return V.libFull;}};
+  return{build,layout:layoutHook,fit,toggleFxFold,fitTop,closeMenus,tick,setZoom,setStage,setSize,toggleLib,toggleFs,cycle,waveHeight:wh,resetLayout,state:V,get zoom(){return V.zoom;},get libFull(){return V.libFull;}};
 })();

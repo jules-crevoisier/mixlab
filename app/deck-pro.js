@@ -1,7 +1,7 @@
 'use strict';
 /* =====================================================================
    Mixlab · platines et mixer « pro »
-   Réglages de jeu (fenêtre Réglages, ouverte depuis le menu Affichage) :
+   Réglages (dans Préférences, onglets Platines, Mixer et Audio) :
    - mode du bouton Cue (CDJ, Denon, Numark), Cue Play, sens du pitch ;
    - sync calée sur le temps, la mesure ou la phrase de 8 mesures ;
    - courbe des faders de voie, courbe réglable et inversion du crossfader,
@@ -219,7 +219,7 @@ window.DeckPro=(()=>{
   }
   function pvSeek(f){const t=PV.tr||pvSelected();if(!t)return;const p=clamp(f,0,1)*t.duration;if(PV.on||!PV.tr)pvPlay(t,p);else{PV.tr=t;PV.pos=p;}}
   function buildPreview(){
-    const play=h('button',{class:'tb dp-pvb',type:'button','data-ctl':'preview',title:'Pré-écoute au casque du morceau sélectionné, sans toucher aux platines','aria-label':'Pré-écoute'},'▶ Pré-écoute');
+    const play=h('button',{class:'tb dp-pvb',type:'button','data-ctl':'preview',title:'Pré-écoute au casque du morceau sélectionné, sans toucher aux platines','aria-label':'Pré-écoute'},icon('phones'),'Pré-écoute');
     play.addEventListener('click',pvToggle);
     const cv=h('canvas',{class:'dp-pvc',title:'Clique ou glisse pour te déplacer dans la pré-écoute','aria-label':'Position de la pré-écoute'});
     let drag=false;const at=e=>{const r=cv.getBoundingClientRect();return(e.clientX-r.left)/r.width;};
@@ -232,7 +232,7 @@ window.DeckPro=(()=>{
   }
   function drawPreview(){
     const E=PV.el;if(!E)return;const tr=PV.tr||pvSelected();
-    E.play.textContent=PV.on?'■ Pré-écoute':'▶ Pré-écoute';E.play.classList.toggle('on',PV.on);
+    E.play.replaceChildren(icon(PV.on?'stop':'phones'),'Pré-écoute');E.play.classList.toggle('on',PV.on);
     // la barre de position n'apparaît qu'une fois la pré-écoute lancée (avant, elle ressemblait à un champ vide)
     E.root.classList.toggle('idle',!PV.tr);if(!PV.tr)return;
     E.tm.textContent=tr?fmtTime(pvPos(),false)+' / '+fmtTime(tr.duration,false):'';
@@ -347,47 +347,20 @@ window.DeckPro=(()=>{
     return true;
   };
 
-  /* ---------- fenêtre Réglages ---------- */
-  let modal=null;
-  const sel=(label,opts,val,on,tip)=>{const s=h('select',{class:'sel wide','aria-label':label,title:tip||''},opts.map(([k,n])=>h('option',{value:k},n)));s.value=val;s.addEventListener('change',()=>on(s.value));return s;};
-  const rng=(label,min,max,step,val,on,fmt)=>{const out=h('b',{class:'dp-v'},fmt(val)),r=h('input',{type:'range',class:'dp-rng',min,max,step,value:val,'aria-label':label});
-    r.addEventListener('input',()=>{on(+r.value);out.textContent=fmt(+r.value);});return{el:h('div',{class:'dp-rr'},r,out),r,out};};
-  const field=(label,ctl,tip)=>h('label',{class:'dp-f',title:tip||''},h('span',{},label),ctl);
-  function buildModal(){
-    const m=h('div',{class:'modal',id:'dp-modal',hidden:true});
-    const closeB=h('button',{class:'b',type:'button',onclick:()=>{m.hidden=true;}},'Fermer');
-    const shape=rng('Forme de la courbe du crossfader',0,1,.01,P.xfShape,v=>{P.xfShape=v;save();applyXf();},v=>v<.2?'Douce':v>.8?'Cut':Math.round(v*100)+' %');
-    const xfc=sel('Courbe du crossfader',[['mix','Mix'],['smooth','Douce'],['cut','Cut'],['custom','Réglable']],S.curve,v=>{setXfCurve(v);shape.el.hidden=v!=='custom';},'Mix : les deux à fond au centre. Douce : fondu long. Cut : coupe nette pour le scratch. Réglable : choisis la forme.');
-    shape.el.hidden=S.curve!=='custom';
-    const rev=h('input',{type:'checkbox','aria-label':'Crossfader inversé'});rev.checked=P.xfRev;rev.addEventListener('change',()=>{P.xfRev=rev.checked;save();applyXf();});
-    const q=rng('Résonance du filtre',.5,8,.1,P.filterQ,v=>{setFilterQ(v);save();},v=>v.toFixed(1));
-    const bl=rng('Balance du master',-1,1,.01,P.balance,v=>{setBalance(v);save();},v=>Math.abs(v)<.02?'Centre':(v<0?'G ':'D ')+Math.round(Math.abs(v)*100));
-    bl.r.addEventListener('dblclick',()=>{bl.r.value='0';setBalance(0);save();bl.out.textContent='Centre';});
-    regAbs('balance','Balance master',bl.el,v=>{setBalance(v*2-1);save();bl.r.value=String(P.balance);bl.out.textContent=Math.abs(P.balance)<.02?'Centre':(P.balance<0?'G ':'D ')+Math.round(Math.abs(P.balance)*100);},()=>(P.balance+1)/2);
-    const mv=rng('Volume du métronome',0,1,.01,P.metroVol,v=>{P.metroVol=v;save();},v=>Math.round(v*100)+' %');
-    const an=h('input',{type:'checkbox','aria-label':'Charger le morceau suivant'});an.checked=P.autoNext;an.addEventListener('change',()=>{P.autoNext=an.checked;save();});
-    m.append(h('div',{class:'mbox',role:'dialog','aria-label':'Réglages de jeu'},
-      h('h2',{},'Réglages de jeu ',closeB),
-      h('div',{class:'mgrid'},
-        h('div',{},h('h3',{},'Platines'),
-          field('Bouton Cue',sel('Mode du bouton Cue',CUE_MODES.map(([k,n])=>[k,n]),P.cueMode,v=>{P.cueMode=v;save();decks.forEach(decorate);},'Comme sur les lecteurs CDJ, Denon ou Numark'),CUE_TIPS[P.cueMode]),
-          field('Sens du pitch',sel('Sens du pitch',[['down','En haut : plus lent'],['up','En haut : plus rapide']],P.pitchDir,v=>{P.pitchDir=v;save();decks.forEach(decorate);}),'S’applique au pitch à l’écran et à celui de ta table'),
-          field('Sync calée sur',sel('Sync calée sur',[['beat','Le temps'],['bar','La mesure (4 temps)'],['phrase','La phrase (8 mesures)']],P.syncUnit,v=>{P.syncUnit=v;save();}),'Avec Sync, la platine qui démarre retombe sur le même temps de la mesure (ou de la phrase) que la platine suivie'),
-          h('label',{class:'dp-c',title:'Quand un morceau se termine, la platine charge le suivant : file de l’auto-mix, sinon la liste affichée'},an,'Charger le morceau suivant à la fin')),
-        h('div',{},h('h3',{},'Mixer'),
-          field('Faders de voie',sel('Courbe des faders de voie',FADER_CURVES.map(([k,n])=>[k,n]),P.faderCurve,v=>{P.faderCurve=v;save();applyFaderCurve();})),
-          field('Crossfader',xfc),shape.el,
-          h('label',{class:'dp-c',title:'Inverse le crossfader (mode « hamster ») : à gauche, tu entends la droite'},rev,'Crossfader inversé (hamster)'),
-          field('Résonance du filtre',q.el,'Plus elle est haute, plus le filtre siffle autour de sa fréquence'),
-          field('Balance du master',bl.el,'Double-clic : retour au centre. L’enregistrement reste centré.')),
-        h('div',{},h('h3',{},'Casque et enregistrement'),
-          field('Métronome',mv.el,'Volume des clics du métronome (bouton Métro de chaque platine), au casque seulement'),
-          field('Format d’enregistrement',sel('Format d’enregistrement',REC_FORMATS,P.recFormat,v=>{P.recFormat=v;save();}),'WAV : sans perte, enregistré sur ton disque à l’arrêt. WebM : fichier léger, gardé jusqu’à la fermeture.'),
-          h('p',{},'Dans l’appli, le fichier WAV s’enregistre là où tu le choisis. Dans le navigateur, il se télécharge.')))));
-    m.addEventListener('click',e=>{if(e.target===m)m.hidden=true;});
-    document.body.append(m);return m;
+  /* ---------- réglages ----------
+     Ils se changent dans Préférences (prefs.js), onglets Platines, Mixer et Audio. Un seul point d'entrée,
+     qui garde, sauvegarde et applique tout de suite. */
+  function setPref(k,v){
+    if(!(k in DEF))return;
+    if(k==='xfCurve'){setXfCurve(v);return;}
+    if(k==='filterQ'){setFilterQ(+v);save();return;}
+    if(k==='balance'){setBalance(+v);save();return;}
+    P[k]=typeof DEF[k]==='number'?+v:typeof DEF[k]==='boolean'?!!v:v;save();
+    if(k==='cueMode'||k==='pitchDir')decks.forEach(decorate);
+    else if(k==='faderCurve')applyFaderCurve();
+    else if(k==='xfShape'||k==='xfRev')applyXf();
   }
-  function openSettings(){if(!modal)modal=buildModal();modal.hidden=false;const d=$('#panels-pop');if(d&&d.closest('details'))d.closest('details').open=false;}
+  function openSettings(){window.Prefs&&Prefs.open('platines');}
 
   /* ---------- commandes posées sur les platines ---------- */
   function decorate(d){
@@ -422,11 +395,8 @@ window.DeckPro=(()=>{
     B.cue.title=CUE_TIPS[P.cueMode];
   }
   function attach(){
-    if(!modal&&document.body)modal=buildModal();
     decks.forEach(decorate);
     const bar=$('.libbar');if(bar&&(!PV.el||!bar.contains(PV.el.root)))bar.append(PV.el?PV.el.root:buildPreview());
-    const pop=$('#panels-pop');
-    if(pop&&!$('#dp-open',pop))pop.append(h('div',{class:'lbl',style:'margin-top:6px'},'Réglages'),h('button',{class:'b',id:'dp-open',type:'button',style:'height:26px',title:'Cue, pitch, sync, courbes des faders, filtre, balance, enregistrement',onclick:openSettings},'Réglages de jeu…'));
     const xs=xfSelect();
     if(xs&&!xs._dp){xs._dp=1;if(![...xs.options].some(o=>o.value==='custom'))xs.append(h('option',{value:'custom'},'Réglable'));xs.value=S.curve;xs.addEventListener('change',()=>{P.xfCurve=xs.value;save();});}
   }
@@ -479,5 +449,5 @@ window.DeckPro=(()=>{
 
   return{P,DEF,save,clone,cloneSource,setKeySync,keySyncCalc,applyKeySync,setTrackKey,keyEditor,countdown,setLock,locked,
     pvPlay,pvStop,pvToggle,pvSeek,pvPos,get preview(){return PV;},metroOut,metroAn,get clicks(){return clicks;},
-    nextFor,setXfCurve,setFilterQ,setBalance,applyFaderCurve,bal,wavHeader,pcm,openSettings,attach,FADER_CURVES,CUE_MODES,REC_FORMATS};
+    nextFor,setXfCurve,setFilterQ,setBalance,applyFaderCurve,bal,wavHeader,pcm,openSettings,setPref,decorate,attach,FADER_CURVES,CUE_MODES,REC_FORMATS};
 })();

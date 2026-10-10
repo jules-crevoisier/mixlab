@@ -82,7 +82,7 @@ Au premier lancement, Mixlab charge quatre morceaux de démo (« Néons », « Q
   - **Traktor** : disposition Studio.
   - **VirtualDJ** : disposition Mix.
 
-Échap ferme cette fenêtre (comme « Je sais déjà mixer »). Le parcours reste toujours disponible avec le bouton **Parcours**, en haut.
+Ton choix devient ton profil : disposition et niveau du coach. Il se change à tout moment dans **Préférences › Profil**, qui peut aussi te remontrer cet écran. Échap ferme cette fenêtre sans rien changer. Le parcours reste toujours disponible avec le bouton **Parcours**, en haut.
 
 Le son ne démarre qu'après un premier clic ou une première touche. Tant que le son n'est pas actif, la barre du haut affiche « Clique n'importe où pour activer le son ».
 
@@ -98,17 +98,18 @@ De gauche à droite :
 |---|---|
 | **Performance, Préparation, Studio, Mix, École** | Les cinq dispositions (presets). |
 | **2 platines / 4 platines** | Nombre de platines à l'écran. |
-| **Affichage** | Menu : panneaux, couleurs des waveforms, zoom, taille des platines, mode scène, réglages. |
+| **Affichage** | Menu : panneaux, zoom, taille des platines, waveforms, mode scène, et **Préférences…**. |
 | **Quantize** | Les cues, hot cues, boucles et effets se calent sur le temps. |
 | **Gain auto** | Égalise le volume des morceaux au chargement. |
 | **MASTER** | Le BPM de la platine maître (rien ne s'affiche tant qu'aucune platine ne donne le tempo). |
 | **Biblio** | Bibliothèque plein écran (touche F2). |
 | **REC** | Enregistre le mix. Affiche la durée pendant l'enregistrement. |
-| **Audio** | Cartes son : sortie master et sortie casque. |
-| **Contrôleur** | MIDI, mappings, clavier. Le point s'allume quand une table est branchée. |
+| **Audio** | Cartes son : ouvre **Préférences › Audio**. |
+| **Contrôleur** | MIDI, mappings, horloge. Le point s'allume quand une table est branchée. |
 | **Auto-mix** | Le panneau de l'auto-mix. |
 | **Parcours** | Le parcours « De zéro à ton premier set ». |
 | **Coach** | Le panneau du coach : conseils en direct, leçons, Académie. Le point s'allume quand les conseils en direct sont actifs. |
+| **Préférences** | Tous les réglages (Ctrl+,). Voir [Réglages](#réglages). |
 | L'heure, puis **◐** | Mode scène (touche F9). |
 | **⛶** | Plein écran. |
 | **⋯** | Apparaît quand la fenêtre est trop étroite : les boutons qui ne tiennent plus dans la barre (Gain auto, Quantize, Audio, Contrôleur…) s'y rangent, au lieu d'être coupés. |
@@ -126,15 +127,13 @@ Chaque disposition reprend l'organisation d'une famille de logiciels connus.
 ### Le menu Affichage
 
 - **Panneaux** : cases à cocher **Effets**, **Waveforms**, **Mixer**, **Bibliothèque**.
-- **Waveforms** : couleurs **3 bandes**, **RGB**, **Monochrome** ou **Daltonien**.
-- **Plage d'analyse BPM** : voir [Réglages](#réglages).
 - **Zoom de l'interface** : **−**, **100 %**, **+**. De 80 à 150 %.
 - **Platines (clic sur l'en-tête)** : **Auto**, **Complètes**, **Compactes** ou **Mini**.
 - **Waveforms : hauteur et zoom** : **−** et **+** pour la hauteur, **Zoom −** et **Zoom +** pour voir plus ou moins de temps.
 - **Mode scène** : case à cocher (ou touche F9).
 - **Bibliothèque plein écran** et **Plein écran**.
 - **Disposition par défaut** : remet les séparateurs et la taille des platines de ce preset.
-- **Réglages de jeu…** : la fenêtre des réglages.
+- **Préférences…** : la fenêtre de tous les réglages, ouverte sur l'onglet Affichage. Les couleurs des waveforms et la plage d'analyse BPM s'y trouvent.
 
 ### Séparateurs
 
@@ -313,7 +312,7 @@ Sur les waveforms parallèles, chaque ligne affiche le titre, le BPM, la tonalit
 - **Cue** : à l'arrêt, pose le point de départ. En lecture, y revient. Maintiens-le pour pré-écouter.
 - **CUP (Cue Play)** : revient au cue et lance la lecture. Appuie plusieurs fois pour bégayer.
 
-Le comportement du bouton Cue se règle dans **Réglages de jeu** :
+Le comportement du bouton Cue se règle dans **Préférences › Platines** :
 - **CDJ** (par défaut) : en lecture, retour au cue et arrêt. Maintenu sur le cue, il pré-écoute ; appuie sur Play pendant ce temps pour continuer.
 - **Denon** : à l'arrêt, pose le cue là où tu es. Pas de pré-écoute en maintenant.
 - **Numark** : revient toujours au cue et s'arrête. Le cue se pose quand tu appuies sur Play.
@@ -371,9 +370,9 @@ Le compteur à droite de cette rangée montre, en mesures.temps, le temps qui re
 
 ### Tempo, sync et master
 
-- **Pitch** : par défaut, en haut plus lent, en bas plus rapide (réglable dans **Réglages de jeu › Sens du pitch**). Double-clic : retour à 0.
+- **Pitch** : par défaut, en haut plus lent, en bas plus rapide (réglable dans **Préférences › Platines › Sens du pitch**). Double-clic : retour à 0.
 - **‹ et ›** (nudge) : maintiens pour freiner ou pousser un instant.
-- **Sync** : cale le tempo et la phase sur la platine maître. Dans **Réglages de jeu**, choisis si Sync se cale sur **le temps**, **la mesure (4 temps)** ou **la phrase (8 mesures)**.
+- **Sync** : cale le tempo et la phase sur la platine maître. Dans **Préférences › Platines**, choisis si Sync se cale sur **le temps**, **la mesure (4 temps)** ou **la phrase (8 mesures)**.
 - **Master** : les autres platines en Sync suivent celle-ci.
 
 ### Tonalité : key lock, transposition, key sync
@@ -396,7 +395,7 @@ Le compteur à droite de cette rangée montre, en mesures.temps, le temps qui re
 
 ### Chargement automatique
 
-Dans **Réglages de jeu**, coche **Charger le morceau suivant à la fin** : quand un morceau se termine, la platine charge le suivant (la file de l'auto-mix, sinon la liste affichée).
+Dans **Préférences › Platines**, coche **Charger le morceau suivant à la fin** : quand un morceau se termine, la platine charge le suivant (la file de l'auto-mix, sinon la liste affichée).
 
 ---
 
@@ -427,16 +426,17 @@ Les potards : glisse vers le haut ou le bas, molette, flèches du clavier quand 
 
 ### Crossfader
 
-En bas du mixer. Double-clic : centre. La liste à droite choisit la courbe : **Mix** (les deux à fond au centre), **Douce** (fondu long), **Cut** (coupe nette pour le scratch) ou **Réglable** (la forme se règle dans **Réglages de jeu**).
+En bas du mixer. Double-clic : centre. La liste à droite choisit la courbe : **Mix** (les deux à fond au centre), **Douce** (fondu long), **Cut** (coupe nette pour le scratch) ou **Réglable** (la forme se règle dans **Préférences › Mixer**).
 
 ### Courbes et réglages du mixer
 
-Dans **Affichage › Réglages de jeu…**, colonne Mixer :
+Dans **Préférences › Mixer** :
 - **Faders de voie** : **Douce (lente au début)**, **Progressive**, **Linéaire**, **Rapide (forte tout de suite)**.
 - **Crossfader** et sa forme quand il est **Réglable**.
 - **Crossfader inversé (hamster)**.
 - **Résonance du filtre** : plus elle est haute, plus le filtre siffle.
 - **Balance du master**. Double-clic : centre.
+- **Limiteur** du master, allumé par défaut.
 
 ### Les unités d'effets FX1 et FX2
 
@@ -474,7 +474,7 @@ Tes sons sont gardés d'une session à l'autre. Le volume général du sampler e
 
 Clique sur **REC** en haut. La durée s'affiche. Clique encore pour arrêter.
 
-Le format se choisit dans **Réglages de jeu › Format d'enregistrement** :
+Le format se choisit dans **Préférences › Audio › Format d'enregistrement** :
 - **WAV 16 bits (qualité CD)** : par défaut.
 - **WAV 24 bits (studio)**.
 - **WebM / Opus (compressé, léger)**.
@@ -523,9 +523,7 @@ Les voyants de la table suivent l'état : play, cue, sync, key lock, slip, hot c
 
 ### Partager et importer
 
-- **Copier pour partager** : copie le mapping en texte.
-- **Importer** : colle un mapping en texte dans la zone, puis clique.
-- **Tout effacer** : vide le mapping actif.
+- **Préférences › Avancé › Mapping MIDI en texte** : **Copier pour partager** copie le mapping en texte, **Importer** lit un mapping collé dans la zone, **Tout effacer** vide le mapping actif.
 - **Bibliothèque de mappings** : **Importer un fichier** (`.json`), **Exporter l'actif**, et pour chaque mapping **Charger**, **Exporter**, **×**.
 
 ### Horloge MIDI
@@ -536,7 +534,7 @@ Envoie le tempo de la platine maître (24 impulsions par temps) à une boîte à
 
 ## Le clavier
 
-Les touches suivent leur place sur le clavier, pas la lettre : elles tombent au même endroit en AZERTY et en QWERTY. Elles se changent dans **Contrôleur › Clavier** : **Changer**, **×**, **Ajouter une touche**, **Réinitialiser**.
+Les touches suivent leur place sur le clavier, pas la lettre : elles tombent au même endroit en AZERTY et en QWERTY. Elles se changent dans **Préférences › Contrôleurs et clavier** (ou **Contrôleur › Raccourcis clavier…**) : **Changer**, **×**, **Ajouter une touche**, **Réinitialiser**.
 
 ### Platines (par défaut)
 
@@ -580,12 +578,13 @@ Sur AZERTY, les touches de la rangée des chiffres marchent sans Maj.
 | Ctrl + molette sur une waveform | Zoom de la waveform |
 | F9 | Mode scène, et retour |
 | Tab | Passe d'une commande à la suivante (navigation au clavier) |
+| Ctrl+, | Ouvre ou ferme les Préférences |
 | Échap | Ferme la fenêtre ou le menu ouvert, quitte la bibliothèque plein écran, le mode lecture de l'Académie, arrête MIDI Learn |
 | F11 | Plein écran (dans le navigateur) |
 | ↑ ↓ sur un séparateur | Change sa position |
 | Entrée ou Espace sur la lettre d'une platine | Change sa taille |
 
-Sur Mac, Cmd remplace Ctrl. F2 et F9 se changent comme les autres touches, dans **Contrôleur › Clavier**.
+Sur Mac, Cmd remplace Ctrl. F2 et F9 se changent comme les autres touches, dans **Préférences › Contrôleurs et clavier**.
 
 ### Parcours
 
@@ -600,7 +599,7 @@ Sur Mac, Cmd remplace Ctrl. F2 et F9 se changent comme les autres touches, dans 
 
 Le coach écoute ton mix pendant que tu joues, sans leçon. Il affiche un conseil à la fois dans un bandeau, sur la commande à toucher : un halo à l'écran, et le voyant qui clignote sur ta table. Le **×** du bandeau masque ce conseil pour la session.
 
-Ouvre le panneau avec **Coach**. En haut, la liste **Conseils** règle le niveau :
+Ouvre le panneau avec **Coach**. En haut, la liste **Conseils** règle le niveau (aussi dans **Préférences › Coach et apprentissage**) :
 - **Débutant** : tous les conseils, y compris les petites astuces.
 - **Essentiel** : seulement les problèmes et les alertes.
 - **Coupé**.
@@ -725,24 +724,80 @@ L'auto-mix charge le morceau suivant sur la platine libre, le synchronise, le la
 
 ## Réglages
 
-### Réglages de jeu
+Tous les réglages sont dans une seule fenêtre, **Préférences**. Pour l'ouvrir :
+- le bouton **Préférences** de la barre du haut (rangé dans **⋯** si la fenêtre est étroite) ;
+- **Affichage › Préférences…** ;
+- **Ctrl+,** (Cmd+, sur Mac), qui la referme aussi.
 
-**Affichage › Réglages de jeu…**
+**Échap** ferme la fenêtre. Chaque réglage s'applique tout de suite et reste gardé d'une session à l'autre.
 
-- **Platines** : **Bouton Cue** (CDJ, Denon, Numark), **Sens du pitch**, **Sync calée sur** (le temps, la mesure, la phrase), **Charger le morceau suivant à la fin**.
-- **Mixer** : **Faders de voie**, **Crossfader**, forme de la courbe réglable, **Crossfader inversé (hamster)**, **Résonance du filtre**, **Balance du master**.
-- **Casque et enregistrement** : volume du **Métronome**, **Format d'enregistrement**.
+À gauche, les onglets et un champ **Rechercher un réglage** : tape un mot (« crossfader », « latence », « raccourcis »…), la fenêtre ne montre plus que les réglages qui correspondent, tous onglets confondus. Vide le champ pour revenir à l'onglet.
 
-### Autres réglages
+Quelques boutons restent là où on s'en sert en jouant, et mènent au bon onglet : **Audio** (barre du haut) ouvre l'onglet Audio, **Réglages › Tous les réglages du mixer…** (sous MASTER) l'onglet Mixer, **Raccourcis clavier…** (fenêtre Contrôleur) l'onglet Contrôleurs et clavier. La liste **Conseils** du panneau Coach, les listes du mixer (effet de voie, égaliseur), la courbe sous le crossfader, **Quantize** et **Gain auto** changent les mêmes réglages que la fenêtre.
 
-- **Affichage › Plage d'analyse BPM** : 60 à 120 (hip-hop, downtempo), 70 à 140, 88 à 175 (house, par défaut), 100 à 200 (drum and bass). Elle s'applique aux morceaux importés ensuite.
-- **Affichage › Waveforms** : couleurs des waveforms.
-- **Quantize** et **Gain auto** dans la barre du haut.
-- **Audio** : sortie master et sortie casque. La fenêtre affiche aussi la latence de sortie.
-- **Coach › Conseils** : niveau du coach en direct.
-- **Contrôleur › Clavier** : raccourcis.
+### Profil
 
-Tout est gardé d'une session à l'autre : disposition, tailles, zoom, mode scène, réglages, effets, mappings, raccourcis, progression du parcours et de l'Académie.
+- **Je mixe déjà sur** : aucun logiciel, Serato, rekordbox, Traktor ou VirtualDJ. Mixlab reprend la disposition la plus proche (Performance, Préparation, Studio, Mix), jamais les noms ni les logos de ces logiciels.
+- **Niveau** : **Débutant** (disposition École, coach complet), **Je sais mixer** (disposition Mix, coach essentiel) ou **Pro** (disposition Performance, coach coupé). Si tu as choisi un logiciel, c'est sa disposition qui l'emporte.
+- **Revenir aux touches d'origine** : coché, les raccourcis clavier reviennent à ceux d'origine.
+- **Appliquer ce profil** : applique la disposition, le niveau du coach et, si coché, les raccourcis.
+- **Revoir l'écran d'accueil** : le choix fait sur cet écran passe par ce même profil.
+- **Progression du parcours › Remettre à zéro**, après confirmation.
+
+L'écran d'accueil du premier lancement écrit ce même profil : ce que tu y choisis se retrouve ici et se change à tout moment.
+
+### Affichage
+
+**Disposition**, **Nombre de platines**, **Panneaux** (Effets, Waveforms, Mixer, Bibliothèque), **Taille des platines**, **Disposition par défaut**, **Zoom de l'interface** (de 80 à 150 %, textes compris), **Mode scène**, **Effets repliés**, et pour les waveforms : **Couleurs** (3 bandes, RGB, monochrome, daltonien), **Hauteur** et **Zoom**.
+
+Le menu **Affichage** garde les réglages utiles en jouant (panneaux, zoom, taille des platines, waveforms, mode scène, plein écran).
+
+### Audio
+
+- **Sortie master** et **Sortie casque** : voir [Le casque](#le-casque).
+- **Split** : casque à gauche, master à droite, sur une seule carte son.
+- **État** : la latence de sortie et la fréquence d'échantillonnage.
+- **Métronome** : volume des clics, au casque.
+- **Format d'enregistrement** : WAV 16 bits, WAV 24 bits ou WebM / Opus.
+
+### Platines
+
+- **Bouton Cue** : CDJ, Denon ou Numark.
+- **Sens du pitch** et **Plage du pitch** (±8, ±16 ou ±50 %, pour toutes les platines au démarrage).
+- **Sync calée sur** : le temps, la mesure ou la phrase.
+- **Key lock** : allumé sur toutes les platines au démarrage.
+- **Quantize** et **Gain auto** (aussi dans la barre du haut).
+- **Charger le morceau suivant à la fin**.
+- **Plage d'analyse BPM** : 60 à 120 (hip-hop, downtempo), 70 à 140, 88 à 175 (house, par défaut), 100 à 200 (drum and bass). Elle s'applique aux morceaux importés ensuite.
+- **Auto-mix** : style et durée des transitions, remplissage de la file.
+
+### Mixer
+
+**Faders de voie** (courbe), **Crossfader** (Mix, Douce, Cut, Réglable) et sa **Forme réglable**, **Crossfader inversé** (hamster), **Égaliseur** (isolateur ou classique), **Effet de voie**, **Résonance du filtre**, **Limiteur** du master (allumé par défaut ; ne le coupe que si ta table ou ta sono limite déjà) et **Balance du master** (double-clic : centre).
+
+### Contrôleurs et clavier
+
+- **Ouvrir la fenêtre Contrôleur** : brancher, MIDI Learn, mapping actif, bibliothèque de mappings, horloge MIDI.
+- **Lancer l'assistant** de mapping.
+- **Clavier** : la liste des raccourcis (**Changer**, **×**, **Ajouter une touche**, **Réinitialiser**) et **Ton clavier** (AZERTY, QWERTY, QWERTZ) quand le système ne le donne pas.
+
+### Coach et apprentissage
+
+- **Conseils pendant le mix** : Débutant, Essentiel ou Coupé (aussi dans le panneau Coach).
+- **Réafficher les conseils masqués** avec le **×** du bandeau.
+- **Parcours** et **Académie** : ta progression, **Ouvrir**, et **Remettre à zéro** après confirmation.
+
+### Bibliothèque
+
+- **Colonnes affichées** de la table (aussi le bouton **Colonnes**).
+- **Cache d'analyse** : nombre de morceaux déjà analysés, et **Vider le cache d'analyse** après confirmation. Tes morceaux, cues et playlists sont gardés ; les morceaux seront réanalysés à leur prochain import.
+
+### Avancé
+
+- **Exporter mes réglages** : un fichier `mixlab-reglages-AAAA-MM-JJ.json` avec la disposition, les réglages, les mappings et les raccourcis. Pas la bibliothèque ni la progression.
+- **Importer un fichier** : remplace tes réglages par ceux du fichier, après confirmation, puis l'appli redémarre.
+- **Réinitialiser tous les réglages** : comme au premier lancement (l'écran d'accueil revient), après confirmation. Ta bibliothèque et ta progression sont gardées.
+- **Mapping MIDI en texte** : le mapping actif en texte, avec **Copier pour partager**, **Importer** et **Tout effacer**.
 
 ---
 
@@ -752,7 +807,7 @@ Tout est gardé d'une session à l'autre : disposition, tailles, zoom, mode scè
 
 - Clique n'importe où dans la fenêtre, ou appuie sur une touche. Les navigateurs et les WebView bloquent le son tant que tu n'as pas touché la page. Le message « Clique n'importe où pour activer le son » disparaît quand c'est bon.
 - Vérifie le fader de voie, le crossfader (côté A · B de la voie) et le potard **MASTER**.
-- Vérifie la sortie choisie dans **Audio › Sortie master**.
+- Vérifie la sortie choisie dans **Préférences › Audio › Sortie master**.
 - Si **LIM** reste allumé et que le son est écrasé : baisse les **GAIN**.
 
 ### Le casque
@@ -760,7 +815,7 @@ Tout est gardé d'une session à l'autre : disposition, tailles, zoom, mode scè
 Pour pré-écouter sans que la salle entende, il faut deux sorties.
 
 - **Split** (mixer) : sur une seule carte son, casque à gauche et master à droite, avec un câble répartiteur. Marche partout.
-- **Audio › Sortie casque** : une deuxième carte son (ou la sortie casque de ta table). Dans l'appli, ça marche sous Windows. Sous macOS et Linux, la WebView ne sait pas encore choisir la carte : utilise Split en attendant le moteur audio natif. Dans le navigateur, ça marche dans Chrome et Edge.
+- **Préférences › Audio › Sortie casque** : une deuxième carte son (ou la sortie casque de ta table). Dans l'appli, ça marche sous Windows. Sous macOS et Linux, la WebView ne sait pas encore choisir la carte : utilise Split en attendant le moteur audio natif. Dans le navigateur, ça marche dans Chrome et Edge.
 
 Sans l'un des deux, la pré-écoute de la bibliothèque et le métronome se mélangent au master. Mixlab te prévient la première fois.
 

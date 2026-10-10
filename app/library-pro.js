@@ -165,7 +165,7 @@ window.LibPro=(()=>{
   const changed=t=>{saveMeta(t);renderTable();};
 
   /* ---------- colonnes ---------- */
-  const stars=t=>{const v=t.rating||0;return h('td',{class:'stars','data-id':t.id,title:'Clique une étoile pour noter'},[1,2,3,4,5].map(i=>h('span',{class:i<=v?'on':'','data-v':i},'★')));};
+  const stars=t=>{const v=t.rating||0;return h('td',{class:'stars','data-id':t.id,title:'Note de 1 à 5 : clique un repère'},[1,2,3,4,5].map(i=>h('span',{class:i<=v?'on':'','data-v':i,'aria-label':i+'/5'})));};
   const EXTRA=[
     {k:'rating',n:'Note',td:r=>stars(r.t),sv:t=>t.rating||0},
     {k:'color',n:'Couleur',td:r=>{const c=colorOf(r.t.color);return h('td',{class:'cc',title:c?c.name:''},c?h('i',{class:'cdot',style:'background:'+c.c}):'');},sv:t=>t.color||99},
@@ -223,7 +223,7 @@ window.LibPro=(()=>{
     closeEdit();
     const inp=(label,val,set,attrs={})=>{const i=h(attrs.tag||'input',{class:'in',value:attrs.tag?null:val??'',...attrs,tag:null});if(attrs.tag)i.value=val??'';i.addEventListener('input',()=>{set(i.value);changed(t);});return h('label',{class:'f'},h('span',{},label),i);};
     const starsRow=h('div',{class:'srow',role:'radiogroup','aria-label':'Note'});
-    const drawStars=()=>{starsRow.innerHTML='';[1,2,3,4,5].forEach(i=>starsRow.append(h('button',{type:'button',class:'st'+(i<=(t.rating||0)?' on':''),'aria-label':i+' étoile'+(i>1?'s':''),onclick:()=>{t.rating=t.rating===i?0:i;drawStars();changed(t);}},'★')));};
+    const drawStars=()=>{starsRow.innerHTML='';[1,2,3,4,5].forEach(i=>starsRow.append(h('button',{type:'button',class:'st'+(i<=(t.rating||0)?' on':''),'aria-label':i+' étoile'+(i>1?'s':''),onclick:()=>{t.rating=t.rating===i?0:i;drawStars();changed(t);}})));};
     drawStars();
     const sw=h('div',{class:'swr'});
     const drawSw=()=>{sw.innerHTML='';sw.append(h('button',{type:'button',class:'sw none'+(!t.color?' on':''),title:'Aucune couleur',onclick:()=>{t.color=0;drawSw();changed(t);}},'×'),...COLORS.map(c=>h('button',{type:'button',class:'sw'+(t.color===c.id?' on':''),title:c.name,'aria-label':c.name,style:'background:'+c.c,onclick:()=>{t.color=c.id;drawSw();changed(t);}})));};
@@ -327,7 +327,7 @@ window.LibPro=(()=>{
       if(r.f==='bpm')ins=[num(r,'a',{step:.5,min:40,max:250}),'et',num(r,'b',{step:.5,min:40,max:250})];
       else if(r.f==='energy')ins=[num(r,'a',{min:1,max:10}),'et',num(r,'b',{min:1,max:10})];
       else if(r.f==='key')ins=[sel(r,'op',[['is','est'],['compat','compatible avec'],['master','compatible avec la platine maître']]),r.op==='master'?null:txt(r,'a','8A, Am…')];
-      else if(r.f==='rating')ins=[sel(r,'a',[1,2,3,4,5].map(n=>[n,'★'.repeat(n)]))];
+      else if(r.f==='rating')ins=[sel(r,'a',[1,2,3,4,5].map(n=>[n,n+' / 5']))];
       else if(r.f==='color')ins=[sel(r,'a',COLORS.map(c=>[c.id,c.name]))];
       else if(r.f==='genre')ins=[txt(r,'a','house, techno…')];
       else if(r.f==='tag')ins=[txt(r,'a','peak, vocal…')];
@@ -369,7 +369,7 @@ window.LibPro=(()=>{
   function side(s,it,where){
     if(where==='crates'){
       s.append(h('div',{class:'sec lbl'},'Crates intelligentes'));
-      S.crates.forEach(c=>s.append(it('sc:'+c.id,'⚡ '+c.name,crateTracks(c).length,b=>{b.title='Clic droit pour modifier les règles';b.addEventListener('contextmenu',e=>{e.preventDefault();crateEditor(c);});})));
+      S.crates.forEach(c=>s.append(it('sc:'+c.id,[icon('crate'),c.name],crateTracks(c).length,b=>{b.title='Clic droit pour modifier les règles';b.addEventListener('contextmenu',e=>{e.preventDefault();crateEditor(c);});})));
       s.append(h('button',{class:'it',type:'button',style:'color:var(--mu)',onclick:()=>crateEditor(null)},'+ Nouvelle crate'));
     }else{
       // sets des sessions précédentes, du plus récent au plus ancien
@@ -749,9 +749,9 @@ window.LibPro=(()=>{
     const pick=native?h('button',{type:'button',class:'b pri',onclick:async()=>{let f=null;try{f=await n.pickLibraryFile();}catch(e){toast(String(e));}if(f)run(f.text,f.name,f.path);}},'Choisir un fichier…')
       :h('label',{class:'b pri filebtn'},'Choisir un fichier…',h('input',{type:'file',accept:'.xml,.m3u,.m3u8,.csv,.txt',onchange:async e=>{const f=e.target.files[0];e.target.value='';if(f)run(await f.text(),f.name,f.name);}}));
     const plSel=h('select',{class:'sel','aria-label':'Playlist à exporter'},
-      h('option',{value:'view'},'Vue affichée ('+viewName()+')'),LIB.playlists.map(p=>h('option',{value:'pl:'+p.id},p.name)),S.crates.map(c=>h('option',{value:'sc:'+c.id},'⚡ '+c.name)));
+      h('option',{value:'view'},'Vue affichée ('+viewName()+')'),LIB.playlists.map(p=>h('option',{value:'pl:'+p.id},p.name)),S.crates.map(c=>h('option',{value:'sc:'+c.id},'Crate : '+c.name)));
     const plTracks=()=>{const v=plSel.value;if(v==='view')return lib.rows.map(r=>r.t);if(v.startsWith('pl:')){const p=LIB.playlists.find(x=>'pl:'+x.id===v);return p?p.ids.map(i=>LIB.tracks.find(t=>t.id===i)).filter(Boolean):[];}return crateTracks(S.crates.find(c=>'sc:'+c.id===v));};
-    const plName=()=>plSel.value==='view'?viewName():plSel.selectedOptions[0].textContent.replace(/^⚡ /,'');
+    const plName=()=>plSel.value==='view'?viewName():plSel.selectedOptions[0].textContent.replace(/^Crate : /,'');
     modal('Import / export',
       h('div',{class:'mgrid'},
         h('div',{},h('h3',{},'Importer une collection'),
@@ -765,7 +765,7 @@ window.LibPro=(()=>{
           h('div',{class:'acts'},plSel,h('button',{type:'button',class:'b pri',onclick:()=>{const ts=plTracks();if(!ts.length){toast('Cette playlist est vide');return;}saveFile(safeName(plName())+'.m3u8',toM3U(ts,plName()),'audio/x-mpegurl');}},'M3U8'))),
         h('div',{},h('h3',{},'Playlist Spotify, Deezer…'),
           h('p',{},'Colle une liste « Artiste - Titre » ou un export CSV (Exportify pour Spotify, TuneMyMusic ou Soundiiz pour Deezer, YouTube Music, Apple Music). Mixlab retrouve les morceaux dans ta collection et te donne des liens d’achat pour les autres.'),
-          h('button',{type:'button',class:'b pri',onclick:()=>exchangeList('','')},'Retrouver une playlist…'))),
+          h('button',{type:'button',class:'b pri',onclick:()=>exchangeList('','')},'Retrouver une playlist…')),window.LibPlus?LibPlus.importBox():null),
       out);
   }
   function exchangeList(text,name){
@@ -780,7 +780,7 @@ window.LibPro=(()=>{
       const res=matchList(L.items),found=res.filter(r=>r.track),miss=res.filter(r=>!r.track);S.lastMatch=res;
       out.append(h('p',{class:'ok'},found.length+' sur '+res.length+' trouvés dans ta collection'+(L.links?' · '+L.links+' liens ignorés':'')),
         h('div',{class:'acts'},h('button',{type:'button',class:'b pri',disabled:!found.length,onclick:()=>{const p=addPlaylist(nm.value.trim()||'Playlist importée',found.map(r=>r.track.id));lib.view='pl:'+p.id;renderSide();renderTable();toast('Playlist « '+p.name+' » : '+p.ids.length+' morceaux','ok');closeModal();}},'Créer la playlist ('+found.length+')')),
-        h('div',{class:'mlist'},found.map(r=>h('div',{class:'mrow found'},h('div',{},h('b',{},'✓ '+(r.artist?r.artist+' - ':'')+r.title),h('small',{},'→ '+(r.track.artist?r.track.artist+' - ':'')+r.track.title)))),
+        h('div',{class:'mlist'},found.map(r=>h('div',{class:'mrow found'},h('div',{},h('b',{},(r.artist?r.artist+' - ':'')+r.title),h('small',{},'→ '+(r.track.artist?r.track.artist+' - ':'')+r.track.title)))),
           miss.map(r=>{const q=encodeURIComponent(((r.artist||'').split(',')[0]+' '+r.title).trim());return h('div',{class:'mrow'},h('div',{},h('b',{},(r.artist?r.artist+' - ':'')+r.title),h('small',{},'Pas dans ta collection')),
             h('div',{class:'shops'},shopLink('Bandcamp','https://bandcamp.com/search?q='+q),shopLink('Beatport','https://www.beatport.com/search?q='+q)));})));
     };
@@ -818,15 +818,15 @@ window.LibPro=(()=>{
     menu(ev,(t.artist?t.artist+' - ':'')+t.title,[
       {label:'Modifier les infos…',fn:()=>edit(t,ev)},'-',
       ...decks.filter(d=>d.active).map(d=>({label:'Charger sur la platine '+d.id+(onAir(d)?' (à l’antenne)':''),off:onAir(d),fn:()=>loadTo(d,t)})),
-      AM?{label:inQ?'✓ Déjà dans la file auto-mix':'Ajouter à la file auto-mix',off:inQ,fn:()=>{AM.add(t.id);toast('« '+t.title+' » ajouté à la file auto-mix','ok');}}:null,
+      AM?{label:inQ?'Déjà dans la file auto-mix':'Ajouter à la file auto-mix',off:inQ,fn:()=>{AM.add(t.id);toast('« '+t.title+' » ajouté à la file auto-mix','ok');}}:null,
       DP&&DP.pvPlay?{label:'Pré-écouter au casque',off:!t.buffer,fn:()=>{ui.sel=t.id;paintRows();DP.pvPlay(t);}}:null,'-',
-      ...LIB.playlists.filter(q=>q!==p).map(q=>({label:(q.ids.includes(t.id)?'✓ Déjà dans « ':'Ajouter à « ')+q.name+' »',off:q.ids.includes(t.id),fn:()=>{q.ids.push(t.id);saveMeta();renderSide();toast('Ajouté à « '+q.name+' »','ok');}})),
+      ...LIB.playlists.filter(q=>q!==p).map(q=>({label:(q.ids.includes(t.id)?'Déjà dans « ':'Ajouter à « ')+q.name+' »',off:q.ids.includes(t.id),fn:()=>{q.ids.push(t.id);saveMeta();renderSide();toast('Ajouté à « '+q.name+' »','ok');}})),
       p?'-':null,
       p?{label:'Monter dans la playlist',off:!ordered||i<=0,fn:()=>movePl(p,t.id,i-1)}:null,
       p?{label:'Descendre dans la playlist',off:!ordered||i>=p.ids.length-1,fn:()=>movePl(p,t.id,i+1)}:null,
       p?{label:'Retirer de la playlist « '+p.name+' »',cls:'bad',fn:()=>{p.ids=p.ids.filter(x=>x!==t.id);saveMeta();renderSide();renderTable();toast('Retiré de « '+p.name+' »');}}:null,
       '-',
-      {label:'Analyser à nouveau'+(DP&&DP.locked&&DP.locked(t)?' (grille verrouillée)':''),off:!t.buffer||!!(DP&&DP.locked&&DP.locked(t)),fn:()=>reanalyze(t)},
+      {label:'Analyser à nouveau'+(DP&&DP.locked&&DP.locked(t)?' (grille verrouillée)':''),off:!t.buffer||!!(DP&&DP.locked&&DP.locked(t)),fn:()=>reanalyze(t)},...(window.LibPlus?LibPlus.rowItems(t):[]),
       // « Afficher le fichier » : seulement dans l'appli, quand elle sait ouvrir le dossier
       N0&&N0.revealFile&&t.path?{label:'Afficher le fichier',fn:()=>N0.revealFile(t.path)}:null,
     ]);
@@ -872,7 +872,7 @@ window.LibPro=(()=>{
       {label:'Monter',off:i<=0,fn:()=>{LIB.playlists.splice(i,1);LIB.playlists.splice(i-1,0,p);saveMeta();renderSide();}},
       {label:'Descendre',off:i>=LIB.playlists.length-1,fn:()=>{LIB.playlists.splice(i,1);LIB.playlists.splice(i+1,0,p);saveMeta();renderSide();}},
       {label:'Exporter en M3U8',off:!p.ids.length,fn:()=>saveFile(safeName(p.name)+'.m3u8',toM3U(ts(),p.name),'audio/x-mpegurl')},
-      {label:'Vider',off:!p.ids.length,fn:()=>{p.ids=[];saveMeta();renderSide();renderTable();}},'-',
+      {label:'Vider',off:!p.ids.length,fn:()=>{p.ids=[];saveMeta();renderSide();renderTable();}},...(window.LibPlus?LibPlus.plItems(p):[]),'-',
       {label:'Supprimer…',cls:'bad',fn:()=>deletePl(p)}]);
   }
   function plItem(b,p){b.title='Clic droit : renommer, déplacer, exporter, supprimer';b.addEventListener('contextmenu',e=>{e.preventDefault();plMenu(p,e);});b.addEventListener('dblclick',()=>renamePl(p));}
@@ -918,6 +918,6 @@ window.LibPro=(()=>{
 
   return{COLORS,parseKey,parseRekordbox,parseItunes,parseM3U,parseCSV,parseList,parseAny,locToPath,pathToLoc,normTitle,matchList,
     importCollection,toRekordbox,toM3U,tracklistText,tracklistCSV,setTracks,duplicates,crateTracks,saveCrate,deleteCrate,crateEditor,search,filter,
-    hidden,bar,side,owns,keepOrder,viewTracks,empty,edit,closeEdit,row,plItem,autoLoad,liveView,menu,rowMenu,plMenu,renamePl,deletePl,missingList,saveBrowser:browserSave,get hasSaved(){return B.saved;},metaOut,metaIn,extraOut,extraIn,exchange,exchangeList,historyModal,missingModal,relocateFrom,saveFile,
+    hidden,bar,side,owns,keepOrder,viewTracks,empty,edit,closeEdit,row,plItem,autoLoad,liveView,menu,selectBy,rowMenu,plMenu,renamePl,deletePl,missingList,saveBrowser:browserSave,get hasSaved(){return B.saved;},metaOut,metaIn,extraOut,extraIn,exchange,exchangeList,historyModal,missingModal,relocateFrom,saveFile,
     get crates(){return S.crates;},get sets(){return allSets();},state:S};
 })();

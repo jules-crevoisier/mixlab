@@ -1,0 +1,776 @@
+{
+ "format": "mixlab-mapping",
+ "version": 2,
+ "name": "Hercules DJControl Inpulse 300",
+ "device": "/DJControl Inpulse 300(?! ?MK ?2)/",
+ "unverified": true,
+ "decks": 2,
+ "source": {
+  "url": "https://ts.hercules.com/download/sound/manuals/DJC_Inpulse300/DJControlInpulse300_MIDI_Commands_V_1_2.pdf",
+  "doc": "MIDI commands of Hercules DJControl Inpulse 300",
+  "version": "V 1.2 (nom du fichier)"
+ },
+ "notes": "Même organisation que l’Inpulse 200, avec EQ trois bandes, FX ON, SLIP et 8 pads. Modes de pads repris : HOTCUE, ROLL, SLICER, SAMPLER, TONEPLAY et BEATJUMP ; FX et SLICER LOOP n’ont pas d’équivalent. Sens du pitch non précisé par la documentation : utilise Inverser s’il est à l’envers. Non vérifié sur le matériel : relevé dans la documentation MIDI officielle, jamais essayé sur la vraie table. Si une commande ne répond pas, corrige-la avec MIDI Learn et signale-le.",
+ "map": {
+  "c0.0": {
+   "id": "xf",
+   "hi": true,
+   "hw": "crossfader"
+  },
+  "c0.1": {
+   "id": "lib.browse",
+   "type": "rel",
+   "mode": "2c",
+   "hw": "molette de navigation"
+  },
+  "c3.1": {
+   "id": "lib.browse",
+   "type": "rel",
+   "mode": "2c",
+   "speed": 8,
+   "hw": "SHIFT + molette de navigation"
+  },
+  "c0.3": {
+   "id": "master",
+   "hi": true,
+   "hw": "volume MASTER"
+  },
+  "c0.4": {
+   "id": "cuevol",
+   "hi": true,
+   "hw": "volume casque"
+  },
+  "n1.0": {
+   "id": "A.fxon",
+   "hw": "FX ON"
+  },
+  "n1.1": {
+   "id": "A.slip",
+   "hw": "SLIP"
+  },
+  "n1.4": {
+   "type": "shift",
+   "hw": "SHIFT",
+   "led": false
+  },
+  "n1.5": {
+   "id": "A.sync",
+   "hw": "SYNC"
+  },
+  "n1.6": {
+   "id": "A.cue",
+   "hw": "CUE"
+  },
+  "n1.7": {
+   "id": "A.play",
+   "hw": "PLAY/PAUSE"
+  },
+  "n1.8": {
+   "id": "A.jog",
+   "type": "touch",
+   "hw": "JOG (toucher)"
+  },
+  "n1.9": {
+   "id": "A.loopin",
+   "hw": "LOOP IN"
+  },
+  "n1.10": {
+   "id": "A.loopout",
+   "hw": "LOOP OUT"
+  },
+  "n1.11": {
+   "id": "A.loop",
+   "hw": "LOOP IN (appui long : boucle de 4 temps)",
+   "led": false
+  },
+  "n1.12": {
+   "id": "A.cuech",
+   "hw": "PFL (casque)"
+  },
+  "n1.13": {
+   "id": "A.load",
+   "hw": "LOAD",
+   "led": false
+  },
+  "n1.15": {
+   "id": "A.mode.hot",
+   "hw": "mode HOTCUE",
+   "led": false
+  },
+  "n1.16": {
+   "id": "A.mode.roll",
+   "hw": "mode ROLL",
+   "led": false
+  },
+  "n1.17": {
+   "id": "A.mode.slice",
+   "hw": "mode SLICER",
+   "led": false
+  },
+  "n1.18": {
+   "id": "A.mode.smp",
+   "hw": "mode SAMPLER",
+   "led": false
+  },
+  "n1.19": {
+   "id": "A.mode.pitch",
+   "hw": "mode TONEPLAY (appui long)",
+   "led": false
+  },
+  "n1.22": {
+   "id": "A.mode.jump",
+   "hw": "mode BEATJUMP (appui long)",
+   "led": false
+  },
+  "c1.0": {
+   "id": "A.fader",
+   "hi": true,
+   "hw": "fader de voie"
+  },
+  "c1.1": {
+   "id": "A.filter",
+   "hi": true,
+   "hw": "FILTER"
+  },
+  "c1.2": {
+   "id": "A.low",
+   "hi": true,
+   "hw": "EQ LOW"
+  },
+  "c1.3": {
+   "id": "A.mid",
+   "hi": true,
+   "hw": "EQ MID"
+  },
+  "c1.4": {
+   "id": "A.high",
+   "hi": true,
+   "hw": "EQ HIGH"
+  },
+  "c1.5": {
+   "id": "A.trim",
+   "hi": true,
+   "hw": "GAIN"
+  },
+  "c1.6": {
+   "id": "A.fxamt",
+   "hi": true,
+   "hw": "FX (niveau)"
+  },
+  "c1.8": {
+   "id": "A.pitch",
+   "hi": true,
+   "hw": "PITCH"
+  },
+  "c1.9": {
+   "id": "A.jog",
+   "type": "jog",
+   "mode": "2c",
+   "hw": "JOG"
+  },
+  "c1.10": {
+   "id": "A.jog",
+   "type": "jog",
+   "mode": "2c",
+   "hw": "JOG (mode vinyle, main posée)"
+  },
+  "n6.0": {
+   "id": "A.pad.hot.1",
+   "hw": "pad 1 (mode HOTCUE)"
+  },
+  "n6.1": {
+   "id": "A.pad.hot.2",
+   "hw": "pad 2 (mode HOTCUE)"
+  },
+  "n6.2": {
+   "id": "A.pad.hot.3",
+   "hw": "pad 3 (mode HOTCUE)"
+  },
+  "n6.3": {
+   "id": "A.pad.hot.4",
+   "hw": "pad 4 (mode HOTCUE)"
+  },
+  "n6.4": {
+   "id": "A.pad.hot.5",
+   "hw": "pad 5 (mode HOTCUE)"
+  },
+  "n6.5": {
+   "id": "A.pad.hot.6",
+   "hw": "pad 6 (mode HOTCUE)"
+  },
+  "n6.6": {
+   "id": "A.pad.hot.7",
+   "hw": "pad 7 (mode HOTCUE)"
+  },
+  "n6.7": {
+   "id": "A.pad.hot.8",
+   "hw": "pad 8 (mode HOTCUE)"
+  },
+  "n6.16": {
+   "id": "A.pad.roll.1",
+   "hw": "pad 1 (mode ROLL)"
+  },
+  "n6.17": {
+   "id": "A.pad.roll.2",
+   "hw": "pad 2 (mode ROLL)"
+  },
+  "n6.18": {
+   "id": "A.pad.roll.3",
+   "hw": "pad 3 (mode ROLL)"
+  },
+  "n6.19": {
+   "id": "A.pad.roll.4",
+   "hw": "pad 4 (mode ROLL)"
+  },
+  "n6.20": {
+   "id": "A.pad.roll.5",
+   "hw": "pad 5 (mode ROLL)"
+  },
+  "n6.21": {
+   "id": "A.pad.roll.6",
+   "hw": "pad 6 (mode ROLL)"
+  },
+  "n6.22": {
+   "id": "A.pad.roll.7",
+   "hw": "pad 7 (mode ROLL)"
+  },
+  "n6.23": {
+   "id": "A.pad.roll.8",
+   "hw": "pad 8 (mode ROLL)"
+  },
+  "n6.32": {
+   "id": "A.pad.slice.1",
+   "hw": "pad 1 (mode SLICER)"
+  },
+  "n6.33": {
+   "id": "A.pad.slice.2",
+   "hw": "pad 2 (mode SLICER)"
+  },
+  "n6.34": {
+   "id": "A.pad.slice.3",
+   "hw": "pad 3 (mode SLICER)"
+  },
+  "n6.35": {
+   "id": "A.pad.slice.4",
+   "hw": "pad 4 (mode SLICER)"
+  },
+  "n6.36": {
+   "id": "A.pad.slice.5",
+   "hw": "pad 5 (mode SLICER)"
+  },
+  "n6.37": {
+   "id": "A.pad.slice.6",
+   "hw": "pad 6 (mode SLICER)"
+  },
+  "n6.38": {
+   "id": "A.pad.slice.7",
+   "hw": "pad 7 (mode SLICER)"
+  },
+  "n6.39": {
+   "id": "A.pad.slice.8",
+   "hw": "pad 8 (mode SLICER)"
+  },
+  "n6.48": {
+   "id": "A.pad.smp.1",
+   "hw": "pad 1 (mode SAMPLER)"
+  },
+  "n6.49": {
+   "id": "A.pad.smp.2",
+   "hw": "pad 2 (mode SAMPLER)"
+  },
+  "n6.50": {
+   "id": "A.pad.smp.3",
+   "hw": "pad 3 (mode SAMPLER)"
+  },
+  "n6.51": {
+   "id": "A.pad.smp.4",
+   "hw": "pad 4 (mode SAMPLER)"
+  },
+  "n6.52": {
+   "id": "A.pad.smp.5",
+   "hw": "pad 5 (mode SAMPLER)"
+  },
+  "n6.53": {
+   "id": "A.pad.smp.6",
+   "hw": "pad 6 (mode SAMPLER)"
+  },
+  "n6.54": {
+   "id": "A.pad.smp.7",
+   "hw": "pad 7 (mode SAMPLER)"
+  },
+  "n6.55": {
+   "id": "A.pad.smp.8",
+   "hw": "pad 8 (mode SAMPLER)"
+  },
+  "n6.64": {
+   "id": "A.pad.pitch.1",
+   "hw": "pad 1 (mode TONEPLAY)"
+  },
+  "n6.65": {
+   "id": "A.pad.pitch.2",
+   "hw": "pad 2 (mode TONEPLAY)"
+  },
+  "n6.66": {
+   "id": "A.pad.pitch.3",
+   "hw": "pad 3 (mode TONEPLAY)"
+  },
+  "n6.67": {
+   "id": "A.pad.pitch.4",
+   "hw": "pad 4 (mode TONEPLAY)"
+  },
+  "n6.68": {
+   "id": "A.pad.pitch.5",
+   "hw": "pad 5 (mode TONEPLAY)"
+  },
+  "n6.69": {
+   "id": "A.pad.pitch.6",
+   "hw": "pad 6 (mode TONEPLAY)"
+  },
+  "n6.70": {
+   "id": "A.pad.pitch.7",
+   "hw": "pad 7 (mode TONEPLAY)"
+  },
+  "n6.71": {
+   "id": "A.pad.pitch.8",
+   "hw": "pad 8 (mode TONEPLAY)"
+  },
+  "n6.112": {
+   "id": "A.pad.jump.1",
+   "hw": "pad 1 (mode BEATJUMP)"
+  },
+  "n6.113": {
+   "id": "A.pad.jump.2",
+   "hw": "pad 2 (mode BEATJUMP)"
+  },
+  "n6.114": {
+   "id": "A.pad.jump.3",
+   "hw": "pad 3 (mode BEATJUMP)"
+  },
+  "n6.115": {
+   "id": "A.pad.jump.4",
+   "hw": "pad 4 (mode BEATJUMP)"
+  },
+  "n6.116": {
+   "id": "A.pad.jump.5",
+   "hw": "pad 5 (mode BEATJUMP)"
+  },
+  "n6.117": {
+   "id": "A.pad.jump.6",
+   "hw": "pad 6 (mode BEATJUMP)"
+  },
+  "n6.118": {
+   "id": "A.pad.jump.7",
+   "hw": "pad 7 (mode BEATJUMP)"
+  },
+  "n6.119": {
+   "id": "A.pad.jump.8",
+   "hw": "pad 8 (mode BEATJUMP)"
+  },
+  "n6.8": {
+   "id": "A.hotdel1",
+   "hw": "SHIFT + pad 1 (mode HOTCUE)",
+   "led": false
+  },
+  "n6.9": {
+   "id": "A.hotdel2",
+   "hw": "SHIFT + pad 2 (mode HOTCUE)",
+   "led": false
+  },
+  "n6.10": {
+   "id": "A.hotdel3",
+   "hw": "SHIFT + pad 3 (mode HOTCUE)",
+   "led": false
+  },
+  "n6.11": {
+   "id": "A.hotdel4",
+   "hw": "SHIFT + pad 4 (mode HOTCUE)",
+   "led": false
+  },
+  "n6.12": {
+   "id": "A.hotdel5",
+   "hw": "SHIFT + pad 5 (mode HOTCUE)",
+   "led": false
+  },
+  "n6.13": {
+   "id": "A.hotdel6",
+   "hw": "SHIFT + pad 6 (mode HOTCUE)",
+   "led": false
+  },
+  "n6.14": {
+   "id": "A.hotdel7",
+   "hw": "SHIFT + pad 7 (mode HOTCUE)",
+   "led": false
+  },
+  "n6.15": {
+   "id": "A.hotdel8",
+   "hw": "SHIFT + pad 8 (mode HOTCUE)",
+   "led": false
+  },
+  "n2.0": {
+   "id": "B.fxon",
+   "hw": "FX ON"
+  },
+  "n2.1": {
+   "id": "B.slip",
+   "hw": "SLIP"
+  },
+  "n2.4": {
+   "type": "shift",
+   "hw": "SHIFT",
+   "led": false
+  },
+  "n2.5": {
+   "id": "B.sync",
+   "hw": "SYNC"
+  },
+  "n2.6": {
+   "id": "B.cue",
+   "hw": "CUE"
+  },
+  "n2.7": {
+   "id": "B.play",
+   "hw": "PLAY/PAUSE"
+  },
+  "n2.8": {
+   "id": "B.jog",
+   "type": "touch",
+   "hw": "JOG (toucher)"
+  },
+  "n2.9": {
+   "id": "B.loopin",
+   "hw": "LOOP IN"
+  },
+  "n2.10": {
+   "id": "B.loopout",
+   "hw": "LOOP OUT"
+  },
+  "n2.11": {
+   "id": "B.loop",
+   "hw": "LOOP IN (appui long : boucle de 4 temps)",
+   "led": false
+  },
+  "n2.12": {
+   "id": "B.cuech",
+   "hw": "PFL (casque)"
+  },
+  "n2.13": {
+   "id": "B.load",
+   "hw": "LOAD",
+   "led": false
+  },
+  "n2.15": {
+   "id": "B.mode.hot",
+   "hw": "mode HOTCUE",
+   "led": false
+  },
+  "n2.16": {
+   "id": "B.mode.roll",
+   "hw": "mode ROLL",
+   "led": false
+  },
+  "n2.17": {
+   "id": "B.mode.slice",
+   "hw": "mode SLICER",
+   "led": false
+  },
+  "n2.18": {
+   "id": "B.mode.smp",
+   "hw": "mode SAMPLER",
+   "led": false
+  },
+  "n2.19": {
+   "id": "B.mode.pitch",
+   "hw": "mode TONEPLAY (appui long)",
+   "led": false
+  },
+  "n2.22": {
+   "id": "B.mode.jump",
+   "hw": "mode BEATJUMP (appui long)",
+   "led": false
+  },
+  "c2.0": {
+   "id": "B.fader",
+   "hi": true,
+   "hw": "fader de voie"
+  },
+  "c2.1": {
+   "id": "B.filter",
+   "hi": true,
+   "hw": "FILTER"
+  },
+  "c2.2": {
+   "id": "B.low",
+   "hi": true,
+   "hw": "EQ LOW"
+  },
+  "c2.3": {
+   "id": "B.mid",
+   "hi": true,
+   "hw": "EQ MID"
+  },
+  "c2.4": {
+   "id": "B.high",
+   "hi": true,
+   "hw": "EQ HIGH"
+  },
+  "c2.5": {
+   "id": "B.trim",
+   "hi": true,
+   "hw": "GAIN"
+  },
+  "c2.6": {
+   "id": "B.fxamt",
+   "hi": true,
+   "hw": "FX (niveau)"
+  },
+  "c2.8": {
+   "id": "B.pitch",
+   "hi": true,
+   "hw": "PITCH"
+  },
+  "c2.9": {
+   "id": "B.jog",
+   "type": "jog",
+   "mode": "2c",
+   "hw": "JOG"
+  },
+  "c2.10": {
+   "id": "B.jog",
+   "type": "jog",
+   "mode": "2c",
+   "hw": "JOG (mode vinyle, main posée)"
+  },
+  "n7.0": {
+   "id": "B.pad.hot.1",
+   "hw": "pad 1 (mode HOTCUE)"
+  },
+  "n7.1": {
+   "id": "B.pad.hot.2",
+   "hw": "pad 2 (mode HOTCUE)"
+  },
+  "n7.2": {
+   "id": "B.pad.hot.3",
+   "hw": "pad 3 (mode HOTCUE)"
+  },
+  "n7.3": {
+   "id": "B.pad.hot.4",
+   "hw": "pad 4 (mode HOTCUE)"
+  },
+  "n7.4": {
+   "id": "B.pad.hot.5",
+   "hw": "pad 5 (mode HOTCUE)"
+  },
+  "n7.5": {
+   "id": "B.pad.hot.6",
+   "hw": "pad 6 (mode HOTCUE)"
+  },
+  "n7.6": {
+   "id": "B.pad.hot.7",
+   "hw": "pad 7 (mode HOTCUE)"
+  },
+  "n7.7": {
+   "id": "B.pad.hot.8",
+   "hw": "pad 8 (mode HOTCUE)"
+  },
+  "n7.16": {
+   "id": "B.pad.roll.1",
+   "hw": "pad 1 (mode ROLL)"
+  },
+  "n7.17": {
+   "id": "B.pad.roll.2",
+   "hw": "pad 2 (mode ROLL)"
+  },
+  "n7.18": {
+   "id": "B.pad.roll.3",
+   "hw": "pad 3 (mode ROLL)"
+  },
+  "n7.19": {
+   "id": "B.pad.roll.4",
+   "hw": "pad 4 (mode ROLL)"
+  },
+  "n7.20": {
+   "id": "B.pad.roll.5",
+   "hw": "pad 5 (mode ROLL)"
+  },
+  "n7.21": {
+   "id": "B.pad.roll.6",
+   "hw": "pad 6 (mode ROLL)"
+  },
+  "n7.22": {
+   "id": "B.pad.roll.7",
+   "hw": "pad 7 (mode ROLL)"
+  },
+  "n7.23": {
+   "id": "B.pad.roll.8",
+   "hw": "pad 8 (mode ROLL)"
+  },
+  "n7.32": {
+   "id": "B.pad.slice.1",
+   "hw": "pad 1 (mode SLICER)"
+  },
+  "n7.33": {
+   "id": "B.pad.slice.2",
+   "hw": "pad 2 (mode SLICER)"
+  },
+  "n7.34": {
+   "id": "B.pad.slice.3",
+   "hw": "pad 3 (mode SLICER)"
+  },
+  "n7.35": {
+   "id": "B.pad.slice.4",
+   "hw": "pad 4 (mode SLICER)"
+  },
+  "n7.36": {
+   "id": "B.pad.slice.5",
+   "hw": "pad 5 (mode SLICER)"
+  },
+  "n7.37": {
+   "id": "B.pad.slice.6",
+   "hw": "pad 6 (mode SLICER)"
+  },
+  "n7.38": {
+   "id": "B.pad.slice.7",
+   "hw": "pad 7 (mode SLICER)"
+  },
+  "n7.39": {
+   "id": "B.pad.slice.8",
+   "hw": "pad 8 (mode SLICER)"
+  },
+  "n7.48": {
+   "id": "B.pad.smp.1",
+   "hw": "pad 1 (mode SAMPLER)"
+  },
+  "n7.49": {
+   "id": "B.pad.smp.2",
+   "hw": "pad 2 (mode SAMPLER)"
+  },
+  "n7.50": {
+   "id": "B.pad.smp.3",
+   "hw": "pad 3 (mode SAMPLER)"
+  },
+  "n7.51": {
+   "id": "B.pad.smp.4",
+   "hw": "pad 4 (mode SAMPLER)"
+  },
+  "n7.52": {
+   "id": "B.pad.smp.5",
+   "hw": "pad 5 (mode SAMPLER)"
+  },
+  "n7.53": {
+   "id": "B.pad.smp.6",
+   "hw": "pad 6 (mode SAMPLER)"
+  },
+  "n7.54": {
+   "id": "B.pad.smp.7",
+   "hw": "pad 7 (mode SAMPLER)"
+  },
+  "n7.55": {
+   "id": "B.pad.smp.8",
+   "hw": "pad 8 (mode SAMPLER)"
+  },
+  "n7.64": {
+   "id": "B.pad.pitch.1",
+   "hw": "pad 1 (mode TONEPLAY)"
+  },
+  "n7.65": {
+   "id": "B.pad.pitch.2",
+   "hw": "pad 2 (mode TONEPLAY)"
+  },
+  "n7.66": {
+   "id": "B.pad.pitch.3",
+   "hw": "pad 3 (mode TONEPLAY)"
+  },
+  "n7.67": {
+   "id": "B.pad.pitch.4",
+   "hw": "pad 4 (mode TONEPLAY)"
+  },
+  "n7.68": {
+   "id": "B.pad.pitch.5",
+   "hw": "pad 5 (mode TONEPLAY)"
+  },
+  "n7.69": {
+   "id": "B.pad.pitch.6",
+   "hw": "pad 6 (mode TONEPLAY)"
+  },
+  "n7.70": {
+   "id": "B.pad.pitch.7",
+   "hw": "pad 7 (mode TONEPLAY)"
+  },
+  "n7.71": {
+   "id": "B.pad.pitch.8",
+   "hw": "pad 8 (mode TONEPLAY)"
+  },
+  "n7.112": {
+   "id": "B.pad.jump.1",
+   "hw": "pad 1 (mode BEATJUMP)"
+  },
+  "n7.113": {
+   "id": "B.pad.jump.2",
+   "hw": "pad 2 (mode BEATJUMP)"
+  },
+  "n7.114": {
+   "id": "B.pad.jump.3",
+   "hw": "pad 3 (mode BEATJUMP)"
+  },
+  "n7.115": {
+   "id": "B.pad.jump.4",
+   "hw": "pad 4 (mode BEATJUMP)"
+  },
+  "n7.116": {
+   "id": "B.pad.jump.5",
+   "hw": "pad 5 (mode BEATJUMP)"
+  },
+  "n7.117": {
+   "id": "B.pad.jump.6",
+   "hw": "pad 6 (mode BEATJUMP)"
+  },
+  "n7.118": {
+   "id": "B.pad.jump.7",
+   "hw": "pad 7 (mode BEATJUMP)"
+  },
+  "n7.119": {
+   "id": "B.pad.jump.8",
+   "hw": "pad 8 (mode BEATJUMP)"
+  },
+  "n7.8": {
+   "id": "B.hotdel1",
+   "hw": "SHIFT + pad 1 (mode HOTCUE)",
+   "led": false
+  },
+  "n7.9": {
+   "id": "B.hotdel2",
+   "hw": "SHIFT + pad 2 (mode HOTCUE)",
+   "led": false
+  },
+  "n7.10": {
+   "id": "B.hotdel3",
+   "hw": "SHIFT + pad 3 (mode HOTCUE)",
+   "led": false
+  },
+  "n7.11": {
+   "id": "B.hotdel4",
+   "hw": "SHIFT + pad 4 (mode HOTCUE)",
+   "led": false
+  },
+  "n7.12": {
+   "id": "B.hotdel5",
+   "hw": "SHIFT + pad 5 (mode HOTCUE)",
+   "led": false
+  },
+  "n7.13": {
+   "id": "B.hotdel6",
+   "hw": "SHIFT + pad 6 (mode HOTCUE)",
+   "led": false
+  },
+  "n7.14": {
+   "id": "B.hotdel7",
+   "hw": "SHIFT + pad 7 (mode HOTCUE)",
+   "led": false
+  },
+  "n7.15": {
+   "id": "B.hotdel8",
+   "hw": "SHIFT + pad 8 (mode HOTCUE)",
+   "led": false
+  }
+ }
+}
