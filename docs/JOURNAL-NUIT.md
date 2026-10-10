@@ -55,3 +55,46 @@ Corrigé tout de suite :
 - **Limites** : les phrases partent du premier temps de la grille. L'analyse est refaite à chaque import, elle n'est pas encore sauvegardée.
 
 Lancé ensuite : l'interface live (zoom, tailles de platine, séparateurs, bibliothèque plein écran, mode scène, polices hors ligne, presets fidèles aux logiciels connus).
+
+## 01:30 · Assemblé : bibliothèque pro
+
+- **Grandes collections** : la table n'affiche que les lignes visibles. 5 000 morceaux se trient en une dizaine de millisecondes.
+- **Infos éditables** : note, couleur, énergie, tags, commentaire et genre. Le choix des colonnes est mémorisé.
+- **Recherche par champ** : `bpm:120-126 key:~8A rating:>=4 tag:peak`.
+- **Crates intelligentes** : règles ET / OU sur BPM, tonalité, note, couleur, genre, tag, énergie, date d'ajout, joué ou non.
+- **Clavier** : flèches, Entrée, Maj+← pour charger sur A, Maj+→ pour B, « / » pour chercher. Le double-clic ne remplace plus un morceau prêt sans demander.
+- **Échanges** : import rekordbox XML (cues, grille, playlists), iTunes / Musique, M3U. Export rekordbox XML et M3U8. Les fichiers introuvables sont gardés et relocalisables.
+- **Musique en ligne** : une playlist Spotify ou Deezer (liste ou CSV Exportify) est retrouvée dans ta collection. Les morceaux manquants ont des liens d'achat Bandcamp et Beatport.
+- **Vérifié** : 72 contrôles.
+
+## 01:45 · Assemblé : contrôleurs
+
+- **Mappings complets** : encodeurs, potards 14 bits, calque Shift, rattrapage des potards, voyants, bascule de platine A/C et B/D.
+- **Jog** : scratch quand on touche le plateau, pitch bend sinon.
+- **Assistant de mapping guidé**, bibliothèque de mappings, détection du contrôleur au branchement, horloge MIDI en sortie.
+- **Clavier** : les raccourcis marchent en AZERTY et se changent dans les réglages. Échap ferme les fenêtres.
+- **Vérifié** : 58 contrôles.
+
+## 02:00 · Assemblé : parcours « De zéro à ton premier set »
+
+- **14 chapitres**, de la première note au premier set enregistré et noté par le coach.
+- **L'interface grandit avec toi** : chaque chapitre débloque ses commandes. Un halo montre la commande à toucher.
+- **Exercices à l'oreille** : taper le temps, repérer break et drop, avec waveforms et BPM cachés.
+- **Accueil au premier lancement** : « jamais mixé », « déjà mixé » ou « je viens de Serato / rekordbox / Traktor / VirtualDJ ».
+- **Un seul bouton Coach** regroupe le parcours, les leçons et les conseils en direct.
+- **Vérifié** : 80 contrôles.
+
+## 02:30 · Assemblé : cues, pads, effets et sampler
+
+- **Hot cues** nommés et colorés, cues mémoire, boucles enregistrées. Tout est retrouvé à la relance.
+- **Modes de pads** : Hot cue, Slicer, Boucles, Pitch play, Sampler.
+- **Deux unités d'effets FX1 et FX2**, assignables à chaque platine ou au master, en simple ou en chaîne de 3. Démarrage calé sur le temps.
+- **Effets de voie** (Filtre, Bruit, Espace…), modes d'EQ classique ou isolateur, limiteur sur le master.
+- **Sampler perso** : tes propres sons sur les pads, gardés d'une session à l'autre.
+- **Réglage de la plage d'analyse BPM** (60-120, 88-175…).
+- **Corrigé à l'assemblage** : les leçons visent les nouvelles unités FX, et l'analyse de structure ne supprime plus les cues mémoire posés à la main.
+- **Vérifié** : 25 contrôles. Les 7 suites de tests passent.
+
+Lancé ensuite :
+- l'Académie, avec les cours, les quiz et les exercices ;
+- la lecture des tags (MP3, M4A, FLAC, pochettes), le cache d'analyse, l'historique gardé et les réglages d'effets gardés.
