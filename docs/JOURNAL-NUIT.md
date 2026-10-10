@@ -148,3 +148,24 @@ L'Académie s'ouvre depuis le bouton Coach, juste sous le parcours débutant.
 - **Presets plus proches des logiciels connus** : panneau Préparation (grande platine et liste) façon Export, barre latérale en Mix, compteur de temps et de phrase.
 - **Plus fluide** : les waveforms sont dessinées par tuiles réutilisées. Le temps de calcul par image passe d'environ 6 ms à 4 ms avec 4 platines.
 - **Vérifié** : les 11 suites de tests passent ensemble.
+
+## 05:00 · Deuxième critique produit, et corrections
+
+La critique complète est dans `docs/critiques/CRITIQUE-2.md`, avec 33 captures. Sur les 20 points de la première critique, 12 sont corrigés, 7 en partie, 1 pas encore (la latence audio).
+
+Corrigé dans la foulée :
+- **Menu Affichage** : il était rogné par la barre du haut et invisible. Il s'ouvre maintenant partout. Ce qui ne tient pas dans la barre passe dans un menu « ⋯ ».
+- **Preset Performance en 1366×768** : pads, boucle et pitch restent accessibles.
+- **Mode scène** : bouton toujours visible et touche F9. Waveforms plus hautes, temps restant en gros.
+- **Temps restant** jamais masqué sur les platines compactes.
+- **Bulle du coach** : elle ne couvre plus la bibliothèque, et disparaît quand le panneau du coach est ouvert.
+- **Bibliothèque** : colonnes adaptées à la largeur, bouton Charger toujours visible, ligne sélectionnée bien marquée, menu clic droit plus complet (file auto-mix, pré-écoute, retirer de la playlist, analyser à nouveau).
+- **Clavier** : Tab sert de nouveau à la navigation. La bibliothèque plein écran passe sur F2.
+- **Académie en mode lecture** : une vraie colonne de lecture au lieu du panneau étroit.
+- **Parcours débutant** : au chapitre 1, seuls Play A, le fader A et le master sont visibles. Les commandes avancées sont masquées jusqu'aux chapitres qui les enseignent.
+- **Cues et rekordbox** : les noms et couleurs des hot cues, les cues mémoire et les boucles passent maintenant dans les deux sens avec rekordbox, et survivent au rechargement dans la version navigateur.
+- **Fichiers Opus** acceptés à l'import.
+- **Clavier hors Chromium** : choix AZERTY, QWERTY ou QWERTZ quand le système ne donne pas la disposition.
+- **Tests fiabilisés** : le test de mise en page effaçait parfois lui-même les réglages qu'il vérifiait après rechargement.
+
+Lancé ensuite : la refonte du style visuel, d'après la direction donnée par la critique.
