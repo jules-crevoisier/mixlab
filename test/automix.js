@@ -39,7 +39,7 @@ const check = (ok, what, extra = '') => { console.log((ok ? 'OK   ' : 'ÉCHEC ')
   check(await W(() => Structure.at(LIB.tracks[2], 65).type === 'break' && Structure.tag(LIB.tracks[2], 65).includes('BREAK')), 'Section lue à une position donnée');
 
   // 2. Colonne Énergie
-  const col = await W(() => { const th = document.querySelector('.lt th[data-k="energy"]'); const cells = [...document.querySelectorAll('.lt td.en')].map(td => td.textContent.trim()); return { th: th && th.textContent, cells }; });
+  const col = await W(() => { const th = document.querySelector('.lt th[data-k="energy"]'); const cells = [...document.querySelectorAll('.lt td.nrg')].map(td => td.textContent.trim()); return { th: th && th.textContent, cells }; });
   check(col.th === 'Énergie' && col.cells.length >= 4 && col.cells.every(c => /^\d+$/.test(c)), 'Colonne Énergie dans la bibliothèque', JSON.stringify(col));
   await W(() => document.querySelector('.lt th[data-k="energy"]').click());
   check(await W(() => lib.sort.k === 'energy'), 'Tri par énergie');
